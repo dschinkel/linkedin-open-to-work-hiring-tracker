@@ -30,7 +30,7 @@ export interface DashboardView {
 
 /** Latest snapshot at a glance: Open-to-Work stock and flow, Hiring, and how trustworthy the scan is. */
 export function useViewDashboard(injectedRepository?: DashboardRepository): DashboardView {
-  const { api, isDemo } = useTrackerEnvironment()
+  const { api, isDemo, audience } = useTrackerEnvironment()
   const appPath = useAppPath()
   const repository = injectedRepository ?? dashboardRepositoryFor(api)
   const query = useQuery({ queryKey: ['dashboard'], queryFn: repository.latest })
@@ -38,7 +38,7 @@ export function useViewDashboard(injectedRepository?: DashboardRepository): Dash
     ...loadStatusOf(query),
     ...describeDashboard(query.data),
     hiringHref: appPath('/hiring'),
-    demoHref: '/demo',
+    demoHref: `/demo/${audience}`,
     showDemoInvite: !isDemo,
   }
 }

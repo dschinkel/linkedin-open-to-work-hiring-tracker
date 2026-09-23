@@ -8,7 +8,7 @@ export interface SettingsRepository {
 
 export function settingsRepositoryFor(api: ApiClient): SettingsRepository {
   return {
-    load: () => api.getJson('/api/settings', settingsSchema),
-    save: (settings) => api.sendJson('PUT', '/api/settings', settingsSchema, settings),
+    load: () => api.getJson('/settings', settingsSchema),
+    save: (settings) => api.sendJson('PUT', '/settings', settingsSchema, settings),
   }
 }

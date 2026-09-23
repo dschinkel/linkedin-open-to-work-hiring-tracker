@@ -1,15 +1,15 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
 import type { Network } from './domain/observation.ts'
-import { defaultSettings } from './defaultSettings.ts'
+import type { Audience } from '../contracts/api.ts'
+import { type AudienceApis, routeAudienceRequest } from './audienceRoutes.ts'
+import { defaultSettingsFor } from './defaultSettings.ts'
 import { folderInbox } from './folderInbox.ts'
-import { type ApiRequest, routeRequest } from './routes.ts'
+import type { ApiRequest, ApiResponse } from './routes.ts'
 import { generateSampleNetwork } from './seed/generateSampleNetwork.ts'
-import { createTrackerApi } from './trackerApi.ts'
+import { createTrackerApi, type TrackerApi } from './trackerApi.ts'
 
 type SampleScenario = 'empty' | 'single' | 'full'
-
-const notBuiltYet = 'Screenshot analysis is not built yet. Try the demo to see sample results.'
 
 /**
  * Dev-only stand-in for the Koa backend at /api/*. It has no scans by default, because screenshot
@@ -20,13 +20,22 @@ export function mockApiPlugin(): Plugin {
   return {
     name: 'tracker-mock-api',
     configureServer(server) {
-      const screenshotInbox = folderInbox(server.config.root, () => api.settings().inboxDirectory)
-      const api = createTrackerApi(sampleNetwork(scenarioFromEnvironment()), defaultSettings, { analyzeMessage: notBuiltYet, screenshotInbox })
+      const scenario = scenarioFromEnvironment()
+      const apis: AudienceApis = {
+        contacts: liveTrackerFor('contacts', scenario, server.config.root),
+        followers: liveTrackerFor('followers', scenario, server.config.root),
+      }
       server.middlewares.use('/api', (request, response) => {
-        void answer(request, response, (apiRequest) => routeRequest(api, apiRequest))
+        void answer(request, response, (apiRequest) => routeAudienceRequest(apis, apiRequest))
       })
     },
   }
+}
+
+function liveTrackerFor(audience: Audience, scenario: SampleScenario, projectRoot: string): TrackerApi {
+  const screenshotInbox = folderInbox(projectRoot, () => api.settings().inboxDirectory)
+  const api = createTrackerApi(sampleNetwork(scenario), defaultSettingsFor(audience), { screenshotInbox })
+  return api
 }
 
 function scenarioFromEnvironment(): SampleScenario {
@@ -48,7 +57,7 @@ function todayIsoDate(): string {
 async function answer(
   request: IncomingMessage,
   response: ServerResponse,
-  route: (apiRequest: ApiRequest) => ReturnType<typeof routeRequest>,
+  route: (apiRequest: ApiRequest) => Promise<ApiResponse>,
 ): Promise<void> {
   const url = new URL((request as IncomingMessage & { originalUrl?: string }).originalUrl ?? request.url ?? '/', 'http://localhost')
   const result = await route({

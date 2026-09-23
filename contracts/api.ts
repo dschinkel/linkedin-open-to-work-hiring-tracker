@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+/** Which list the screenshots come from. Each audience is tracked as its own, separate dashboard. */
+export const audienceSchema = z.enum(['contacts', 'followers'])
+export type Audience = z.infer<typeof audienceSchema>
+export const audiences: Audience[] = audienceSchema.options
+
 export const timeWindowSchema = z.enum(['7d', '30d', '90d', '6m', '1y', 'all'])
 export type TimeWindow = z.infer<typeof timeWindowSchema>
 
@@ -215,3 +220,22 @@ export const addScreenshotsResultSchema = z.object({
   message: z.string(),
 })
 export type AddScreenshotsResult = z.infer<typeof addScreenshotsResultSchema>
+
+export const departedPersonSchema = z.object({
+  personId: z.string(),
+  displayName: z.string(),
+  headline: z.string().nullable(),
+  companyName: z.string().nullable(),
+  firstSeen: z.string(),
+  lastSeen: z.string(),
+  scansMissed: z.number(),
+  wasOpenToWorkWhenLastSeen: z.boolean(),
+  wasHiringWhenLastSeen: z.boolean(),
+})
+export type DepartedPerson = z.infer<typeof departedPersonSchema>
+
+export const departedPeopleSchema = z.object({
+  people: z.array(departedPersonSchema),
+  scansMissedThreshold: z.number(),
+})
+export type DepartedPeople = z.infer<typeof departedPeopleSchema>

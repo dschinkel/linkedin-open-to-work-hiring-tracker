@@ -11,6 +11,7 @@ export interface NavItem {
 interface AppShellProps {
   title: string
   subtitle: string
+  toggle?: ReactNode
   logoSrc: string
   navItems: NavItem[]
   banner?: ReactNode
@@ -18,7 +19,7 @@ interface AppShellProps {
   children: ReactNode
 }
 
-export function AppShell({ title, subtitle, logoSrc, navItems, banner, headerAction, children }: AppShellProps) {
+export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, headerAction, children }: AppShellProps) {
   return (
     <div className="min-h-svh bg-background text-foreground">
       <header className="border-b">
@@ -29,6 +30,7 @@ export function AppShell({ title, subtitle, logoSrc, navItems, banner, headerAct
               <h1 className="text-lg font-semibold">{title}</h1>
               <p className="text-xs text-muted-foreground">{subtitle}</p>
             </div>
+            {toggle}
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <nav className="flex flex-wrap gap-1">

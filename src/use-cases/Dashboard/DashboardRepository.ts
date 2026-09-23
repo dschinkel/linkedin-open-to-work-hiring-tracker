@@ -7,6 +7,6 @@ export interface DashboardRepository {
 
 export function dashboardRepositoryFor(api: ApiClient): DashboardRepository {
   return {
-    latest: () => api.getJson('/api/dashboard', dashboardSchema),
+    latest: () => api.getJson('/dashboard', dashboardSchema),
   }
 }

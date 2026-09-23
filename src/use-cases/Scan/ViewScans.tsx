@@ -1,5 +1,4 @@
 import { AddScreenshots } from './AddScreenshots'
-import { AnalyzeScreenshots } from './AnalyzeScreenshots'
 import { ViewScanHistory } from './ViewScanHistory'
 
 export function ViewScans() {
@@ -10,7 +9,6 @@ export function ViewScans() {
           <h2 className="text-2xl font-semibold">Scans</h2>
           <p className="text-sm text-muted-foreground">Screenshot batches, classifier confidence, duplicates, and reprocessing.</p>
         </div>
-        <AnalyzeScreenshots />
       </div>
       <AddScreenshots />
       <ViewScanHistory />

@@ -7,6 +7,6 @@ export interface TrendRepository {
 
 export function trendRepositoryFor(api: ApiClient): TrendRepository {
   return {
-    trends: (window) => api.getJson(`/api/analytics/trends?${queryString({ window })}`, trendsSchema),
+    trends: (window) => api.getJson(`/analytics/trends?${queryString({ window })}`, trendsSchema),
   }
 }

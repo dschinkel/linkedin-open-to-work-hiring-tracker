@@ -7,7 +7,6 @@ import { HiringSnapshot } from '../Hiring/HiringSnapshot'
 import { WhoIsHiringPreview } from '../Hiring/WhoIsHiringPreview'
 import { OpenToWorkSnapshot } from '../OpenToWork/OpenToWorkSnapshot'
 import { AddScreenshots } from '../Scan/AddScreenshots'
-import { AnalyzeScreenshots } from '../Scan/AnalyzeScreenshots'
 import { ScanQualityPanel } from '../Scan/ScanQualityPanel'
 import { ViewScanHistory } from '../Scan/ViewScanHistory'
 import { ViewOpenToWorkTrend } from '../Trend/ViewOpenToWorkTrend'
@@ -23,13 +22,12 @@ export function ViewDashboard() {
           <h2 className="text-2xl font-semibold">{dashboard.latestScanLabel}</h2>
           <p className="text-sm text-muted-foreground">{dashboard.sampleLabel}</p>
         </div>
-        <AnalyzeScreenshots />
       </div>
       <AddScreenshots />
       {dashboard.showFirstRunInvite && (
         <EmptyState
           title="No scans yet"
-          description="Drop screenshots in the box above (or into LinkedinScreenShots/). Screenshot analysis is not built yet, so they will wait in the inbox."
+          description="Drop screenshots in the box above, or copy them into this dashboard’s LinkedinScreenShots/ folder. This page updates by itself. Screenshot analysis is not built yet, so for now they wait in the inbox."
           action={
             dashboard.showDemoInvite && (
               <Link to={dashboard.demoHref} className={buttonVariants({ variant: 'outline' })}>

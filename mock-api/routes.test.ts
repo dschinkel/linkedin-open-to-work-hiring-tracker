@@ -1,11 +1,11 @@
 import { routeRequest } from './routes.ts'
-import { defaultSettings } from './defaultSettings.ts'
+import { defaultSettingsFor } from './defaultSettings.ts'
 import { createTrackerApi } from './trackerApi.ts'
 
 const emptyApi = createTrackerApi(
   { people: [], scans: [], observations: [] },
-  defaultSettings,
-  { analyzeMessage: 'Nothing to analyze.' },
+  defaultSettingsFor('contacts'),
+  {},
 )
 
 describe('tracker API', () => {

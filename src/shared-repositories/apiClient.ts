@@ -35,7 +35,7 @@ export const httpTransport: Transport = async ({ method, path, body }) => {
 }
 
 /** The only place the frontend talks to the API. Every response is validated against its contract. */
-export function createApiClient(transport: Transport): ApiClient {
+export function createApiClient(transport: Transport, apiBase: string): ApiClient {
   async function request(transportRequest: TransportRequest): Promise<unknown> {
     const response = await transport(transportRequest)
     if (response.status >= 400) throw new ApiError(response.status, `${transportRequest.method} ${transportRequest.path} failed with ${response.status}`)
@@ -43,8 +43,8 @@ export function createApiClient(transport: Transport): ApiClient {
   }
 
   return {
-    getJson: async (path, schema) => schema.parse(await request({ method: 'GET', path })),
-    sendJson: async (method, path, schema, body) => schema.parse(await request({ method, path, body })),
+    getJson: async (path, schema) => schema.parse(await request({ method: 'GET', path: `${apiBase}${path}` })),
+    sendJson: async (method, path, schema, body) => schema.parse(await request({ method, path: `${apiBase}${path}`, body })),
   }
 }
 

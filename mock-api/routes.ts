@@ -29,13 +29,13 @@ const orNotFound = (body: unknown): ApiResponse => (body === null ? notFound() :
 const routes: Route[] = [
   { method: 'GET', pattern: /^\/api\/dashboard$/, respond: (api) => ok(api.dashboard()) },
   { method: 'GET', pattern: /^\/api\/scans$/, respond: (api, request) => ok(api.scanHistory(windowQuery.parse(request.query).window)) },
-  { method: 'POST', pattern: /^\/api\/scans$/, respond: (api) => ok(api.analyzeNewScreenshots()) },
   { method: 'GET', pattern: /^\/api\/scans\/([\w-]+)$/, respond: (api, _request, [scanId]) => orNotFound(api.scanDetail(scanId)) },
   { method: 'POST', pattern: /^\/api\/scans\/([\w-]+)\/reprocess$/, respond: (api, _request, [scanId]) => orNotFound(api.reprocessScan(scanId)) },
   { method: 'POST', pattern: /^\/api\/screenshots$/, respond: async (api, request) => ok(await api.addScreenshots(addScreenshotsRequestSchema.parse(request.body))) },
   { method: 'GET', pattern: /^\/api\/analytics\/trends$/, respond: (api, request) => ok(api.trends(windowQuery.parse(request.query).window)) },
   { method: 'GET', pattern: /^\/api\/hiring\/people$/, respond: (api, request) => ok(api.hiringPeople(hiringPeopleQuerySchema.parse(request.query))) },
   { method: 'GET', pattern: /^\/api\/hiring\/companies$/, respond: (api) => ok(api.hiringCompanies()) },
+  { method: 'GET', pattern: /^\/api\/departed$/, respond: (api) => ok(api.departedPeople()) },
   { method: 'GET', pattern: /^\/api\/settings$/, respond: (api) => ok(api.settings()) },
   { method: 'PUT', pattern: /^\/api\/settings$/, respond: (api, request) => ok(api.saveSettings(settingsSchema.parse(request.body))) },
 ]

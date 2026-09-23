@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom'
 import { buttonVariants } from '@/components/ui/button'
 
-export function ExitDemo() {
+export function ExitDemo({ href }: { href: string }) {
   return (
-    <Link to="/" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+    <Link to={href} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
       Exit demo
     </Link>
   )

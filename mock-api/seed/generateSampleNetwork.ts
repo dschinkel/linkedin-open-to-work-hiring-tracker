@@ -24,6 +24,7 @@ type Random = () => number
 interface TrueFrames {
   isOpen: boolean
   isHiring: boolean
+  hasLeft: boolean
 }
 
 interface SampleState {
@@ -37,6 +38,8 @@ interface SampleState {
 const cardsPerScreenshot = 14
 const sampledShare = 0.9
 const skippedDayShare = 0.12
+/** Chance per day that someone unfollows or disconnects, so the sample has people who left. */
+const leaveChancePerDay = 0.0006
 
 /** Deterministic, realistic-looking history so the dashboard is explorable before real screenshots exist. */
 export function generateSampleNetwork(options: SampleNetworkOptions): Network {
@@ -92,7 +95,7 @@ function withOccasionalOcrNoise(company: ReturnType<typeof extractCompany>, rand
 }
 
 function initialFrames(people: Person[], random: Random): Map<string, TrueFrames> {
-  return new Map(people.map((person) => [person.id, { isOpen: random() < 0.08, isHiring: random() < 0.045 }]))
+  return new Map(people.map((person) => [person.id, { isOpen: random() < 0.08, isHiring: random() < 0.045, hasLeft: false }]))
 }
 
 /** Entry into Open to Work slowly rises over the period, so the trend has a story to tell. */
@@ -101,6 +104,7 @@ function advanceOneDay(state: SampleState, progress: number): void {
   for (const frames of state.frames.values()) {
     frames.isOpen = flip(frames.isOpen, openEntry, 0.012, state.random)
     frames.isHiring = flip(frames.isHiring, 0.0008, 0.015, state.random)
+    frames.hasLeft ||= state.random() < leaveChancePerDay
   }
 }
 
@@ -114,7 +118,7 @@ function isScanDay(dayOffset: number, random: Random): boolean {
 
 function recordScan(state: SampleState, scanDate: string): void {
   const scanId = `scan-${scanDate}`
-  const seen = state.people.filter(() => state.random() < sampledShare)
+  const seen = state.people.filter((person) => !state.frames.get(person.id)?.hasLeft && state.random() < sampledShare)
   const observations = seen.map((person) => observe(scanId, person.id, state))
   state.observations.push(...observations)
   state.scans.push(sampleScan(scanId, scanDate, observations, state.random))

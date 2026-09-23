@@ -14,7 +14,7 @@ export interface HiringRepository {
 
 export function hiringRepositoryFor(api: ApiClient): HiringRepository {
   return {
-    people: async (query) => (await api.getJson(`/api/hiring/people?${queryString(query)}`, hiringPeopleSchema)).people,
-    companies: () => api.getJson('/api/hiring/companies', companyHiringSchema),
+    people: async (query) => (await api.getJson(`/hiring/people?${queryString(query)}`, hiringPeopleSchema)).people,
+    companies: () => api.getJson('/hiring/companies', companyHiringSchema),
   }
 }

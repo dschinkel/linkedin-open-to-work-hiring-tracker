@@ -3,6 +3,7 @@ import type {
   AddScreenshotsResult,
   CompanyHiring,
   Dashboard,
+  DepartedPeople,
   HiringPeopleQuery,
   HiringPerson,
   ProcessingResult,
@@ -14,6 +15,7 @@ import type {
   Trends,
   TrendPoint,
 } from '../contracts/api.ts'
+import { listDepartedPeople } from './domain/departedPeople.ts'
 import { observedDurations } from './domain/durations.ts'
 import { aggregateHiringCompanies, filterHiringPeople, listHiringPeople } from './domain/hiringPeople.ts'
 import { movingAverageAt, movingAverageTable } from './domain/movingAverages.ts'
@@ -34,15 +36,16 @@ export interface TrackerApi {
   trends: (window: TimeWindow) => Trends
   hiringPeople: (query: HiringPeopleQuery) => { people: HiringPerson[] }
   hiringCompanies: () => CompanyHiring
+  departedPeople: () => DepartedPeople
   settings: () => Settings
   saveSettings: (settings: Settings) => Settings
-  analyzeNewScreenshots: () => ProcessingResult
   reprocessScan: (scanId: string) => ProcessingResult | null
   addScreenshots: (request: AddScreenshotsRequest) => Promise<AddScreenshotsResult>
 }
 
 export interface TrackerApiOptions {
-  analyzeMessage: string
+  /** Runs right after screenshots are added and returns a status message. Until the analyzer exists, it says so. */
+  analyzeNewScreenshots?: () => Promise<string>
   /** Where dropped screenshots are stored. Without one (the demo), nothing is saved. */
   screenshotInbox?: ScreenshotInbox
 }
@@ -61,10 +64,11 @@ export function createTrackerApi(network: Network, initialSettings: Settings, op
     trends: (window) => trends(index, timeline, window),
     hiringPeople: (query) => ({ people: filterHiringPeople(hiringPeople, query) }),
     hiringCompanies: () => aggregateHiringCompanies(hiringPeople),
+    // Recomputed on every request, so each new day's scan updates the list (and anyone seen again drops off it).
+    departedPeople: () => listDepartedPeople(index),
     settings: () => settings,
     saveSettings: (next) => (settings = next),
-    analyzeNewScreenshots: () => ({ message: options.analyzeMessage }),
-    addScreenshots: (request) => (options.screenshotInbox ? addScreenshots(options.screenshotInbox, request) : Promise.resolve(nothingSaved(request))),
+    addScreenshots: (request) => addThenAnalyze(request, options),
     reprocessScan: (scanId) => (timeline.some((summary) => summary.id === scanId) ? { message: 'Scan reprocessed. Results unchanged.' } : null),
   }
 }
@@ -119,6 +123,17 @@ function toTrendPoint(summary: ScanSummary, timeline: ScanSummary[]): TrendPoint
     removedHiring: summary.hiring.removed,
     netHiring: summary.hiring.net,
   }
+}
+
+const analyzerNotBuilt = async (): Promise<string> => 'Screenshot analysis is not built yet, so they are waiting in the inbox.'
+
+/** Dropping screenshots is the trigger: they are stored, then analyzed straight away. */
+async function addThenAnalyze(request: AddScreenshotsRequest, options: TrackerApiOptions): Promise<AddScreenshotsResult> {
+  if (!options.screenshotInbox) return nothingSaved(request)
+  const added = await addScreenshots(options.screenshotInbox, request)
+  if (added.saved.length === 0) return added
+  const analysisMessage = await (options.analyzeNewScreenshots ?? analyzerNotBuilt)()
+  return { ...added, message: `${added.message} ${analysisMessage}` }
 }
 
 function nothingSaved(request: AddScreenshotsRequest): AddScreenshotsResult {

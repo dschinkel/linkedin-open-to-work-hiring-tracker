@@ -8,7 +8,7 @@
 
 <p align="center"><em>Who in your network is looking for work, how many, and who's hiring, tracked over time.</em></p>
 
-<p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
+<p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/contacts"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
 Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**.
 
@@ -28,13 +28,26 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 The app never logs into LinkedIn, crawls profiles, or automates your browser. **You** take screenshots, and the app does the rest.
 
+### Followers or contacts: pick what you track
+
+It's up to you whether you gauge your **followers** or your **contacts** (your LinkedIn connections), or both. The app keeps them as two **separate dashboards**, and the **Followers / Contacts** toggle in the header switches between them. Each has its own trends, hiring list, scans, settings, and inbox folder:
+
+| Dashboard | Screenshot this LinkedIn list | Inbox folder |
+|---|---|---|
+| Contacts | <https://www.linkedin.com/mynetwork/invite-connect/connections/> | `LinkedinScreenShots/contacts/` |
+| Followers | Your followers list (Me → View profile → Followers): <https://www.linkedin.com/mynetwork/network-manager/people-follow/followers/> | `LinkedinScreenShots/followers/` |
+
+**Keep each dashboard consistent.** Only ever drop contacts screenshots into Contacts and followers screenshots into Followers. Mixing them would make people appear and disappear between scans, which shows up as fake transitions, fake unfollowers, and a jumpy rate.
+
+> **Tip: zoom out first.** Press `Cmd+-` (Windows/Linux: `Ctrl+-`) a couple of times before taking screenshots. More people fit on the screen, so each scan takes fewer screenshots and less scrolling. Don't go so small that names become hard to read; around 67–80% works well.
+
 ### Easiest: GoFullPage (Chrome or Brave) <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle">
 
 1. Install [GoFullPage – Full Page Screen Capture](https://chromewebstore.google.com/detail/gofullpage-full-page-scre/fdpohaocaechififmbbbbbknoalclacl) in Chrome or Brave.
-2. Open your connections list: <https://www.linkedin.com/mynetwork/invite-connect/connections/>
-3. Scroll down until the connections you want to track have loaded.
+2. Open the list you track (contacts or followers, see the table above).
+3. Scroll down until everyone you want to track has loaded.
 4. Click the GoFullPage icon (or press `Alt+Shift+P`). It captures the whole scrolled page as a single image.
-5. Download the PNG and drag it onto the **drop box** on the Dashboard (or Scans page), or copy it into `LinkedinScreenShots/` yourself.
+5. Download the PNG and drag it onto the **drop box** on that dashboard (or its Scans page), or copy it into its inbox folder yourself.
 
 GoFullPage file names include the date (for example `screencapture-linkedin-com-mynetwork-2026-09-22-09_01_12.png`), and the app uses that date for the scan.
 
@@ -47,14 +60,14 @@ This is the safest option because nothing is automated: you scroll LinkedIn like
 Scroll manually and take screenshots as you go. On macOS:
 
 `Shift+Cmd+3`: capture the whole screen<br>
-`Shift+Cmd+4`: drag to capture just the connections list<br>
+`Shift+Cmd+4`: drag to capture just the list of people<br>
 `Shift+Cmd+5`: open the screenshot toolbar (screen, window, or selection, plus where to save)
 
 Overlapping screenshots are fine, because people are de-duplicated. macOS names such as `Screenshot 2026-09-22 at 9.01.12 AM.png` are dated automatically.
 
 ### Screenshot rules
 
-1. Drag screenshots onto the drop box on the Dashboard, or copy them into `LinkedinScreenShots/`. Only PNG, JPG, and WebP files are accepted, and a file already in the inbox is skipped.
+1. Drag screenshots onto the drop box on the Dashboard, or copy them into that dashboard's inbox folder. There's no button to press: screenshots are analyzed as soon as they land, and the dashboard updates by itself. Only PNG, JPG, and WebP files are accepted, and a file already in the inbox is skipped.
 2. Screenshots from the **same date** are grouped into **one scan**.
 3. Take a scan regularly (daily or weekly) so trends and transitions have history to compare.
 4. Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).
@@ -80,12 +93,14 @@ Open <http://localhost:5173>.
 
 ### Demo
 
-The screenshot-analysis backend (Koa + OpenCV/OCR + SQLite) is **not built yet**, so screenshots dropped into `LinkedinScreenShots/` are **not analyzed yet**, and the app at `/` shows "No scans yet".
+The screenshot-analysis backend (Koa + OpenCV/OCR + SQLite) is **not built yet**, so dropped screenshots are saved to the inbox but **not analyzed yet**, and the real dashboards show "No scans yet".
 
 To see what the app does, open the demo:
 
-- **Online:** <https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo>
-- **Locally:** <http://localhost:5173/demo>, or click **Demo** in the app header
+- **Online:** <https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/contacts>
+- **Locally:** <http://localhost:5173/demo/contacts>, or click **Demo** in the app header
+
+The demo has both dashboards: 500 fictional contacts and 800 fictional followers, each with its own history, so the **Followers / Contacts** toggle shows two different pictures, including a list of unfollowers and past contacts.
 
 The demo runs entirely in your browser on a fixed sample network (500 fictional people, 180 days of made-up scans ending Sep 22, 2026).
 
@@ -102,7 +117,7 @@ TRACKER_SAMPLE=single pnpm dev   # one scan: shows "trend data available after a
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Dev server (app at `/`, demo at `/demo`) |
+| `pnpm dev` | Dev server (dashboards at `/contacts` and `/followers`, demo at `/demo/contacts` and `/demo/followers`) |
 | `pnpm test` | Unit tests (Vitest) |
 | `pnpm typecheck` | TypeScript project check |
 | `pnpm lint` | oxlint |
@@ -112,11 +127,15 @@ TRACKER_SAMPLE=single pnpm dev   # one scan: shows "trend data available after a
 
 ## Pages
 
+Every page exists once for **Contacts** and once for **Followers**; the toggle in the header switches between them and keeps you on the same page.
+
 <img src="https://img.shields.io/badge/Dashboard-2ea043?style=flat-square" alt="Dashboard" align="absmiddle"> the latest scan's Open-to-Work and Hiring cards, rate trend, entry vs removal, Who's Hiring preview, scan quality, and daily history.
 
 <img src="https://img.shields.io/badge/Trends-2ea043?style=flat-square" alt="Trends" align="absmiddle"> zoomable, synced charts showing the rate with a 7-day moving average, 7/30/90-day averages, raw vs matched-cohort rate, entry vs removal, net flow, entry/removal rates, observed duration, and hiring-frame trends. Includes 7D / 30D / 90D / 6M / 1Y / All windows.
 
 <img src="https://img.shields.io/badge/Hiring-2ea043?style=flat-square" alt="Hiring" align="absmiddle"> a searchable, filterable table of everyone seen with #HIRING (current vs previous, company known vs unknown, sorting), plus counts per company. Greyed rows were not in the latest scan, so the frame is not claimed for today.
+
+<img src="https://img.shields.io/badge/Unfollowers-2ea043?style=flat-square" alt="Unfollowers" align="absmiddle"> / <img src="https://img.shields.io/badge/Past_contacts-2ea043?style=flat-square" alt="Past contacts" align="absmiddle"> people seen in earlier scans who are missing from the last 3 scans in a row: likely unfollowers (Followers) or removed connections (Contacts), with when they were last seen and whether they had the #OPEN_TO_WORK or #HIRING frame then. It updates with every new day of screenshots, and anyone seen again drops off. It's only reliable when each scan covers your whole list, since a screenshot can't prove someone left.
 
 <img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> sortable daily history (Open to Work / Hiring / All columns). Click a row for scan detail, per-screenshot results, quality, and <img src="https://img.shields.io/badge/Reprocess_scan-2ea043?style=flat-square" alt="Reprocess scan" align="absmiddle">.
 
@@ -182,5 +201,5 @@ The full specification is in [`linkedin-open-to-work-hiring-tracker-spec.md`](./
 
 1. Koa backend implementing the same `contracts/api.ts`, reusing `mock-api/domain/`
 2. SQLite + Drizzle persistence (`data/linkedin.sqlite`)
-3. `chokidar` watcher on `LinkedinScreenShots/`, with originals archived by date to `data/screenshots/`
+3. `chokidar` watcher on `LinkedinScreenShots/contacts/` and `LinkedinScreenShots/followers/`, with originals archived by date to `data/screenshots/<audience>/`
 4. Card detection, OCR, and OpenCV frame classification (with an optional vision-model fallback)
