@@ -20,6 +20,8 @@ export function describeHiringTiles(summary: HiringSummary): StatTileView[] {
 export interface HiringPersonRow {
   personId: string
   name: string
+  /** Up to two letters standing in for the profile photo. */
+  initials: string
   headline: string
   company: string
   isCompanyVisible: boolean
@@ -36,6 +38,7 @@ export function describeHiringPerson(person: HiringPerson, today: Date = new Dat
   return {
     personId: person.personId,
     name: person.displayName,
+    initials: initialsOf(person.displayName),
     headline: person.headline ?? '',
     company: person.companyName ?? 'Company not visible',
     isCompanyVisible: person.companyName !== null,
@@ -46,6 +49,15 @@ export function describeHiringPerson(person: HiringPerson, today: Date = new Dat
     recency: describeRecency(person, today),
     isStale: !person.wasObservedInLatestScan,
   }
+}
+
+function initialsOf(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join('')
 }
 
 function describeRecency(person: HiringPerson, today: Date): string {

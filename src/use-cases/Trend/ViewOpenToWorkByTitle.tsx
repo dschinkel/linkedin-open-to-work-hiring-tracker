@@ -11,7 +11,7 @@ export function ViewOpenToWorkByTitle({ timeWindow }: { timeWindow: TimeWindow }
   return (
     <SectionCard title="Open to Work by job title" description="Share of people with each title showing #OPEN_TO_WORK, and how it's changing (open / people seen).">
       <AsyncContent status={byTitle.status} errorMessage={byTitle.errorMessage}>
-        <p className="mb-3 rounded-md border border-dashed px-3 py-2 text-sm text-muted-foreground">{byTitle.coverageNote}</p>
+        <p className="mb-3 border border-dashed px-3 py-2 text-label text-muted-foreground">{byTitle.coverageNote}</p>
         {byTitle.hasTitles && <DataTable columns={byTitle.columns} rows={byTitle.rows} />}
         {byTitle.showNoTitles && <EmptyState title="No job titles could be read yet." />}
       </AsyncContent>

@@ -23,7 +23,7 @@ export function ClearAllData() {
           <Trash2 />
           Clear all data
         </Button>
-        <span className="text-sm text-muted-foreground">{clear.resultMessage}</span>
+        <span className="text-label text-muted-foreground">{clear.resultMessage}</span>
       </div>
       <AlertDialog open={clear.isConfirmOpen} onOpenChange={clear.changeConfirmOpen}>
         <AlertDialogContent>

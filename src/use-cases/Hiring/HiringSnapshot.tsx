@@ -1,11 +1,6 @@
-import { SectionCard } from '@/components/SectionCard'
-import { StatGrid } from '@/components/StatGrid'
+import { SignalSnapshot } from '@/components/SignalSnapshot'
 import type { StatTileView } from '@/components/StatTile'
 
 export function HiringSnapshot({ tiles }: { tiles: StatTileView[] }) {
-  return (
-    <SectionCard title="Hiring" description="Public #HIRING frame rate in sampled network. Counts people, not open roles.">
-      <StatGrid tiles={tiles} />
-    </SectionCard>
-  )
+  return <SignalSnapshot signal="hiring" title="Hiring" description="Public #HIRING frame rate in sampled network. Counts people, not open roles." frameText="#HIRING" tiles={tiles} />
 }

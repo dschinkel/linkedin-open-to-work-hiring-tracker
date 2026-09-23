@@ -20,6 +20,12 @@ function hiringPerson(overrides: Partial<HiringPerson>): HiringPerson {
   }
 }
 
+describe('hiring person avatar', () => {
+  it('stands in for the photo with the first letters of the first two names', () => {
+    expect(describeHiringPerson(hiringPerson({ displayName: 'ana maria de souza' }), today).initials).toBe('AM')
+  })
+})
+
 describe('hiring person recency', () => {
   it('says Hiring was observed today only when seen today', () => {
     expect(describeHiringPerson(hiringPerson({}), today).recency).toBe('Observed Hiring today')

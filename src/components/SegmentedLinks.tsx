@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export interface SegmentLink {
@@ -9,22 +10,22 @@ export interface SegmentLink {
   detail?: string
 }
 
-/** A pill-shaped toggle whose options are links, e.g. [Followers 742 | Contacts 468]. */
+/** A segmented switch whose options are links, e.g. [Followers 742 | Contacts 468]; the chosen one is filled with the theme's prompt color. */
 export function SegmentedLinks({ label, links }: { label: string; links: SegmentLink[] }) {
   return (
-    <nav aria-label={label} className="inline-flex rounded-lg border bg-muted p-0.5">
+    <nav aria-label={label} className="inline-flex border">
       {links.map((link) => (
         <Link
           key={link.label}
           to={link.to}
           aria-current={link.isActive ? 'page' : undefined}
           className={cn(
-            'rounded-md px-3 py-1 text-sm font-medium transition-colors',
-            link.isActive ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/60 hover:text-foreground',
+            buttonVariants({ variant: 'ghost' }),
+            link.isActive ? 'bg-prompt-fill font-bold text-prompt-foreground hover:bg-prompt-fill hover:text-prompt-foreground' : 'font-normal text-muted-foreground',
           )}
         >
           {link.label}
-          {link.detail && <span className="ml-1 tabular-nums opacity-70"> {link.detail}</span>}
+          {link.detail && <span className="tabular-nums opacity-75"> {link.detail}</span>}
         </Link>
       ))}
     </nav>

@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react'
 import { appearanceRepositoryFor, type AppearanceStorage } from './AppearanceRepository'
+import { swatchOf } from './appearance'
 import { useChooseAppearance } from './useChooseAppearance'
 
 const page = document.documentElement
@@ -123,7 +124,7 @@ describe('choosing the appearance', () => {
 
     act(() => result.current.chooseTheme('green'))
 
-    expect(result.current.themeSwatch).toBe('oklch(0.62 0.17 130)')
+    expect(result.current.themeSwatch).toBe(swatchOf('green'))
   })
 
   it('offers six color themes', () => {

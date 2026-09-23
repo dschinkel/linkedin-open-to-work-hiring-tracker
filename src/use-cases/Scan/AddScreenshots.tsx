@@ -12,13 +12,13 @@ export function AddScreenshots() {
       onDragLeave={drop.handleDragLeave}
       onDrop={drop.handleDrop}
       className={cn(
-        'flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-6 text-center transition-colors hover:bg-muted/50',
-        drop.isDraggingOver && 'border-open-to-work bg-open-to-work/10',
+        'flex cursor-pointer flex-col items-center gap-2 border border-dashed border-input p-6 text-center transition-colors hover:border-prompt hover:bg-card',
+        drop.isDraggingOver && 'border-solid border-open-to-work bg-open-to-work-soft',
       )}
     >
-      <ImageUp className="size-8 text-muted-foreground" />
-      <span className="font-medium">Drag LinkedIn screenshots here, or click to choose files</span>
-      <span className="text-sm text-muted-foreground">PNG, JPG, or WebP. They are analyzed as soon as they land, and this dashboard updates by itself. Files already added are skipped.</span>
+      <ImageUp className="size-8 text-prompt" />
+      <span className="font-medium text-primary">Drag LinkedIn screenshots here, or click to choose files</span>
+      <span className="max-w-measure text-label text-muted-foreground">PNG, JPG, or WebP. They are analyzed as soon as they land, and this dashboard updates by itself. Files already added are skipped.</span>
       <input id="add-screenshots" type="file" multiple accept={drop.acceptedTypes} className="sr-only" onChange={drop.handleFilesChosen} />
       {drop.isUploading && (
         <span className="upload-progress inline-flex items-center gap-2 text-sm font-semibold" role="status">

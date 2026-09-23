@@ -18,7 +18,7 @@ export function OptionPicker<Value extends string>({ label, value, options, onCh
     <ToggleGroup
       aria-label={label}
       variant="outline"
-      size="sm"
+      size="default"
       spacing={0}
       value={[value]}
       onValueChange={(selected: string[]) => reportSelection(selected, onChange)}

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { NavLink } from 'react-router-dom'
+import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 export interface NavItem {
@@ -19,31 +20,33 @@ interface AppShellProps {
   children: ReactNode
 }
 
-/** Two rows: title with the header controls, then the Followers / Contacts toggle beside the page links. */
+/** Title and subtitle beside the header controls, then the Followers / Contacts toggle leading the page tabs (current one inverted). On phones the tabs wrap below the toggle and scroll sideways. */
 export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, headerAction, children }: AppShellProps) {
   return (
-    <div className="min-h-svh bg-background text-foreground">
-      <header className="border-b">
-        <div className="mx-auto max-w-7xl space-y-3 px-4 py-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center gap-3">
-              <img src={logoSrc} alt="" className="h-10 w-auto sm:h-14" />
+    <div className="min-h-svh text-foreground">
+      <header className="border-b bg-card">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 pt-4 pb-3">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+              <img src={logoSrc} alt="" className="h-10 w-auto shrink-0 [image-rendering:pixelated] sm:h-16 lg:h-18" />
               <div className="min-w-0">
-                <h1 className="text-xl font-bold tracking-tight sm:text-3xl">{title}</h1>
-                <p className="text-sm text-muted-foreground sm:text-base">{subtitle}</p>
+                <h1 className="text-lg leading-tight font-bold tracking-figure text-primary sm:text-2xl lg:text-3xl">{title}</h1>
+                <p className="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-base">{subtitle}</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">{headerAction}</div>
+            <div className="flex flex-wrap items-center gap-3">{headerAction}</div>
           </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 pb-3">
             {toggle}
-            <nav className="flex flex-wrap gap-1">
+            <nav className="-mx-4 flex min-w-0 flex-1 basis-full gap-0.5 overflow-x-auto px-4 text-label whitespace-nowrap sm:mx-0 sm:basis-auto sm:px-0">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.isExact}
-                  className={({ isActive }) => cn('shrink-0 rounded-md px-3 py-1.5 text-sm font-medium hover:bg-muted', isActive ? 'bg-muted' : 'text-muted-foreground')}
+                  className={({ isActive }) =>
+                    cn(buttonVariants({ variant: isActive ? 'default' : 'ghost' }), 'px-2.5', isActive ? 'font-bold' : 'font-normal text-muted-foreground')
+                  }
                 >
                   {item.label}
                 </NavLink>
@@ -53,7 +56,7 @@ export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, h
         </div>
       </header>
       {banner}
-      <main className="mx-auto max-w-7xl space-y-6 px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6">{children}</main>
     </div>
   )
 }

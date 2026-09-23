@@ -20,7 +20,7 @@ const appearanceModes: readonly AppearanceMode[] = ['light', 'dark', 'system']
 export const colorThemeOptions: ColorThemeOption[] = [
   { value: 'neutral', label: 'Neutral', swatch: 'oklch(0.45 0 0)' },
   { value: 'ocean', label: 'Ocean', swatch: 'oklch(0.55 0.16 250)' },
-  { value: 'green', label: 'Green', swatch: 'oklch(0.62 0.17 130)' },
+  { value: 'green', label: 'Green', swatch: 'oklch(0.72 0.2 133)' },
 ]
 
 export function isAppearanceMode(value: unknown): value is AppearanceMode {

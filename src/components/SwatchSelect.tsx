@@ -19,7 +19,7 @@ interface SwatchSelectProps<Value extends string> {
 export function SwatchSelect<Value extends string>({ label, value, swatch, options, onChange }: SwatchSelectProps<Value>) {
   return (
     <Select items={options} value={value} onValueChange={(next) => next && onChange(next as Value)}>
-      <SelectTrigger size="sm" aria-label={label} title={label}>
+      <SelectTrigger aria-label={label} title={label}>
         <Swatch color={swatch} />
         <span className="hidden sm:inline">
           <SelectValue />
@@ -38,5 +38,5 @@ export function SwatchSelect<Value extends string>({ label, value, swatch, optio
 }
 
 function Swatch({ color }: { color: string }) {
-  return <span aria-hidden className="size-3.5 shrink-0 rounded-full ring-1 ring-foreground/15" style={{ backgroundColor: color }} />
+  return <span aria-hidden className="size-3.5 shrink-0 border border-input" style={{ backgroundColor: color }} />
 }

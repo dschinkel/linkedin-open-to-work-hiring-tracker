@@ -1,0 +1,140 @@
+/*
+ * Color themes: 3 themes x light/dark. Each block sets the same 13 role colors (--scheme-*); tokens.css maps
+ * them onto shadcn's tokens, so a theme never touches components. Every text color here (dim, text, bright, prompt
+ * and the signal colors) meets WCAG AA (4.5:1) against the page, panel, raised, fill and hover colors.
+ * accent is the prompt color as text; accent-fill is the prompt color as a filled cell (the chosen audience, the
+ * selection, chart handles), which may be livelier than text allows, with on-accent as the text on it (also 4.5:1).
+ *
+ * Applied with <html data-theme="ocean" class="dark">; the choice lives in src/use-cases/Appearance and the pre-paint
+ * script in index.html. The selectors also work on any element, so a swatch can be drawn in a theme's own colors.
+ * Ocean comes first: it is the default, so its :root block must lose to every named theme.
+ * To add a theme: copy a pair of blocks, rename, check contrast, and add it to colorThemeOptions in
+ * src/use-cases/Appearance/appearance.ts and to the list in the inline script in index.html.
+ */
+
+/* Light and dark basics shared by every theme: signal colors and block shadow. Signals never change per theme. */
+:root {
+  color-scheme: light;
+  --scheme-open-to-work: #1b7039;
+  --scheme-open-to-work-soft: #dcf1e3;
+  --scheme-hiring: #6534ab;
+  --scheme-hiring-soft: #ece4f8;
+  --scheme-removed: #b8382a;
+  --scheme-warning: #8a5d00;
+  --scheme-shadow: rgb(22 32 43 / 0.14);
+}
+
+.dark {
+  color-scheme: dark;
+  --scheme-open-to-work: #5fd38a;
+  --scheme-open-to-work-soft: #15291e;
+  --scheme-hiring: #b48cf2;
+  --scheme-hiring-soft: #241c33;
+  --scheme-removed: #f07a6a;
+  --scheme-warning: #f2c14e;
+  --scheme-shadow: rgb(0 0 0 / 0.35);
+}
+
+/* Ocean: blue-tinted slate, blue prompt (default) --------------------------------------------------------------- */
+:root,
+[data-theme='ocean'] {
+  --scheme-page: #e2f2ff;
+  --scheme-panel: #f6fcff;
+  --scheme-raised: #ffffff;
+  --scheme-fill: #d3e9ff;
+  --scheme-hover: #cfe8ff;
+  --scheme-rule: #a7cbf1;
+  --scheme-rule-strong: #88b2de;
+  --scheme-dim: #435a72;
+  --scheme-text: #0f253c;
+  --scheme-bright: #002c6a;
+  --scheme-accent: #005ecb;
+  --scheme-accent-fill: #005ecb;
+  --scheme-on-accent: #e2f2ff;
+}
+
+.dark,
+[data-theme='ocean'].dark,
+.dark [data-theme='ocean'] {
+  --scheme-page: #05111e;
+  --scheme-panel: #091725;
+  --scheme-raised: #0e1d2c;
+  --scheme-fill: #0f1f2f;
+  --scheme-hover: #16283a;
+  --scheme-rule: #213449;
+  --scheme-rule-strong: #2f445a;
+  --scheme-dim: #899eb4;
+  --scheme-text: #c9d6e4;
+  --scheme-bright: #ebf1f7;
+  --scheme-accent: #5db2f7;
+  --scheme-accent-fill: #5db2f7;
+  --scheme-on-accent: #05111e;
+}
+
+/* Neutral: grey ink, no tint ------------------------------------------------------------------------------------ */
+[data-theme='neutral'] {
+  --scheme-page: #eeeeee;
+  --scheme-panel: #fbfbfb;
+  --scheme-raised: #ffffff;
+  --scheme-fill: #e8e8e8;
+  --scheme-hover: #e4e4e4;
+  --scheme-rule: #bebebe;
+  --scheme-rule-strong: #9e9e9e;
+  --scheme-dim: #505050;
+  --scheme-text: #1b1b1b;
+  --scheme-bright: #090909;
+  --scheme-accent: #090909;
+  --scheme-accent-fill: #090909;
+  --scheme-on-accent: #eeeeee;
+}
+
+[data-theme='neutral'].dark,
+.dark [data-theme='neutral'] {
+  --scheme-page: #101010;
+  --scheme-panel: #161616;
+  --scheme-raised: #1c1c1c;
+  --scheme-fill: #1e1e1e;
+  --scheme-hover: #262626;
+  --scheme-rule: #333333;
+  --scheme-rule-strong: #424242;
+  --scheme-dim: #9b9b9b;
+  --scheme-text: #d4d4d4;
+  --scheme-bright: #f0f0f0;
+  --scheme-accent: #f0f0f0;
+  --scheme-accent-fill: #f0f0f0;
+  --scheme-on-accent: #101010;
+}
+
+/* Green: lightly green-tinted ink, bright summer yellow-green prompt (kept clear of the Open to Work green) ----- */
+[data-theme='green'] {
+  --scheme-page: #e7f5e2;
+  --scheme-panel: #f7fdf6;
+  --scheme-raised: #ffffff;
+  --scheme-fill: #daedd4;
+  --scheme-hover: #d6eccf;
+  --scheme-rule: #b3d2a9;
+  --scheme-rule-strong: #96ba8a;
+  --scheme-dim: #4b5f44;
+  --scheme-text: #172a10;
+  --scheme-bright: #003b00;
+  --scheme-accent: #337200;
+  --scheme-accent-fill: #53a300;
+  --scheme-on-accent: #172a10;
+}
+
+[data-theme='green'].dark,
+.dark [data-theme='green'] {
+  --scheme-page: #0d120b;
+  --scheme-panel: #121810;
+  --scheme-raised: #171e15;
+  --scheme-fill: #192117;
+  --scheme-hover: #21291e;
+  --scheme-rule: #2d362a;
+  --scheme-rule-strong: #3c4639;
+  --scheme-dim: #959f92;
+  --scheme-text: #d0d6ce;
+  --scheme-bright: #eef1ed;
+  --scheme-accent: #82cd29;
+  --scheme-accent-fill: #82cd29;
+  --scheme-on-accent: #0d120b;
+}

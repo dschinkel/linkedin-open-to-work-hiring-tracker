@@ -19,7 +19,7 @@ interface IconChoiceSelectProps<Value extends string> {
 export function IconChoiceSelect<Value extends string>({ label, value, icon: CurrentIcon, options, onChange }: IconChoiceSelectProps<Value>) {
   return (
     <Select items={options} value={value} onValueChange={(next) => next && onChange(next as Value)}>
-      <SelectTrigger size="sm" aria-label={label} title={label} className="size-7 justify-center px-0 [&>svg:last-child]:hidden">
+      <SelectTrigger aria-label={label} title={label} className="size-8 justify-center px-0 [&>svg:last-child]:hidden">
         <CurrentIcon />
       </SelectTrigger>
       <SelectContent alignItemWithTrigger={false} align="end">

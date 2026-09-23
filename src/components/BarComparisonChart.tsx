@@ -1,4 +1,9 @@
-import { Brush, Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { useMemo } from 'react'
+import { Bar, BarChart, Brush, CartesianGrid, XAxis, YAxis } from 'recharts'
+import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip } from '@/components/ui/chart'
+import { chartConfigFor } from './chartConfig'
+import { chartAxisTick, chartGridDash } from './chartStyles'
+import { FormattedChartTooltip } from './FormattedChartTooltip'
 import type { ChartSeries } from './LineTrendChart'
 
 interface BarComparisonChartProps {
@@ -10,24 +15,35 @@ interface BarComparisonChartProps {
   zoomGroup?: string
 }
 
+const formatCount = (value: number): string => String(value)
+
+/** Thin square bars side by side; hatched series (removals) read as struck through. */
 export function BarComparisonChart({ data, xKey, series, formatX, zoomGroup }: BarComparisonChartProps) {
+  const config = useMemo(() => chartConfigFor(series), [series])
+
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <BarChart data={data} syncId={zoomGroup} margin={{ top: 8, right: 16, bottom: 0, left: 0 }}>
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-        <XAxis dataKey={xKey} tickFormatter={formatX} tick={{ fontSize: 12 }} minTickGap={24} stroke="var(--muted-foreground)" />
-        <YAxis allowDecimals={false} tick={{ fontSize: 12 }} width={40} stroke="var(--muted-foreground)" />
-        <Tooltip
-          labelFormatter={(label) => formatX(String(label))}
-          contentStyle={{ background: 'var(--popover)', border: '1px solid var(--border)', borderRadius: 8 }}
-          cursor={{ fill: 'var(--muted)' }}
-        />
-        <Legend verticalAlign="top" height={28} />
-        <Brush dataKey={xKey} height={26} travellerWidth={10} tickFormatter={formatX} stroke="var(--muted-foreground)" fill="var(--card)" />
+    <ChartContainer config={config} className="aspect-auto h-75 w-full">
+      <BarChart data={data} syncId={zoomGroup} barCategoryGap="8%" barGap={0} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
+        <defs>
+          {series
+            .filter((bar) => bar.isHatched)
+            .map((bar) => (
+              <pattern key={bar.key} id={`hatch-${bar.key}`} width={4} height={4} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                <rect width={4} height={4} fill={`var(--color-${bar.key})`} fillOpacity={0.15} />
+                <line x1={0} y1={0} x2={0} y2={4} stroke={`var(--color-${bar.key})`} strokeWidth={2} />
+              </pattern>
+            ))}
+        </defs>
+        <CartesianGrid vertical={false} strokeDasharray={chartGridDash} />
+        <XAxis dataKey={xKey} tickFormatter={formatX} tick={chartAxisTick} minTickGap={28} axisLine={false} tickLine={false} />
+        <YAxis allowDecimals={false} tick={chartAxisTick} width={40} axisLine={false} tickLine={false} />
+        <ChartTooltip cursor={{ fill: 'var(--accent)' }} content={<FormattedChartTooltip config={config} formatValue={formatCount} formatLabel={formatX} />} />
+        <ChartLegend verticalAlign="top" align="left" content={<ChartLegendContent className="justify-start" />} />
+        <Brush dataKey={xKey} height={22} travellerWidth={8} tickFormatter={formatX} stroke="var(--border)" fill="var(--muted)" />
         {series.map((bar) => (
-          <Bar key={bar.key} dataKey={bar.key} name={bar.label} fill={bar.color} radius={[3, 3, 0, 0]} isAnimationActive={false} />
+          <Bar key={bar.key} dataKey={bar.key} fill={bar.isHatched ? `url(#hatch-${bar.key})` : `var(--color-${bar.key})`} isAnimationActive={false} />
         ))}
       </BarChart>
-    </ResponsiveContainer>
+    </ChartContainer>
   )
 }

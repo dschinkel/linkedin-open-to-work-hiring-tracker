@@ -1,0 +1,6 @@
+/*
+ * JetBrains Mono, self-hosted from @fontsource-variable/jetbrains-mono: one variable-weight file per script subset,
+ * loaded only when a page uses a character from that subset. Box-drawing and shape glyphs (■) aren't in its subsets
+ * and fall back to the system monospace font.
+ */
+@import "@fontsource-variable/jetbrains-mono";

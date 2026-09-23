@@ -13,8 +13,8 @@ export function FindHiringPeople() {
   return (
     <>
       <div>
-        <h2 className="text-2xl font-semibold">Who's hiring</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="page-title">Who's hiring</h2>
+        <p className="mt-1 max-w-3xl text-label text-muted-foreground">
           People in your screenshots showing the public #HIRING frame. Greyed rows were not in the latest scan, so the frame is not confirmed today.
         </p>
       </div>

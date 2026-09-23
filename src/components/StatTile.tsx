@@ -1,5 +1,6 @@
 import { ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
 
 export interface StatTileView {
   label: string
@@ -9,20 +10,23 @@ export interface StatTileView {
   href?: string
 }
 
+/** A figure with its name directly beneath; used where stats stand on their own. */
 export function StatTile({ label, value, hint, href }: StatTileView) {
   const body = (
-    <>
-      <div className="flex items-start justify-between gap-2">
-        <div className="text-2xl font-semibold tabular-nums">{value}</div>
-        {href && <ChevronRight className="size-4 text-muted-foreground" />}
-      </div>
-      <div className="mt-1 text-xs font-medium tracking-wide text-muted-foreground uppercase">{label}</div>
-      {hint && <div className="mt-1 text-xs text-muted-foreground">{hint}</div>}
-    </>
+    <Card size="sm" className="h-full">
+      <CardContent>
+        <div className="flex items-start justify-between gap-2">
+          <div className="figure text-figure text-primary">{value}</div>
+          {href && <ChevronRight className="size-4 text-prompt" />}
+        </div>
+        <div className="mt-2 text-label">{label}</div>
+        {hint && <div className="mt-0.5 text-xs text-muted-foreground">{hint}</div>}
+      </CardContent>
+    </Card>
   )
-  if (!href) return <div className="rounded-lg border bg-card p-4">{body}</div>
+  if (!href) return body
   return (
-    <Link to={href} className="block rounded-lg border bg-card p-4 transition-colors hover:border-primary hover:bg-muted/40">
+    <Link to={href} className="block transition-colors hover:[&_[data-slot=card]]:border-prompt hover:[&_[data-slot=card]]:bg-accent">
       {body}
     </Link>
   )

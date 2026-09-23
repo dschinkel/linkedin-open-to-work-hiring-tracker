@@ -8,12 +8,12 @@ export interface DurationBucketRow {
 
 export function DurationDistribution({ buckets }: { buckets: DurationBucketRow[] }) {
   return (
-    <ul className="space-y-2 text-sm">
+    <ul className="space-y-2 text-label">
       {buckets.map((bucket) => (
         <li key={bucket.label} className="grid grid-cols-[6rem_1fr_3rem] items-center gap-3">
           <span className="text-muted-foreground">{bucket.label}</span>
           <Progress value={bucket.share} />
-          <span className="text-right tabular-nums">{bucket.shareLabel}</span>
+          <span className="figure text-right text-primary">{bucket.shareLabel}</span>
         </li>
       ))}
     </ul>

@@ -28,8 +28,8 @@ export function ViewTrends() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold">Trends</h2>
-          <p className="text-sm text-muted-foreground">Stock, flow, and whether the movement is trustworthy. Drag the handles under any chart to zoom; all charts follow.</p>
+          <h2 className="page-title">Trends</h2>
+          <p className="mt-1 max-w-3xl text-label text-muted-foreground">Stock, flow, and whether the movement is trustworthy. Drag the handles under any chart to zoom; all charts follow.</p>
         </div>
         <OptionPicker label="Time window" value={trends.timeWindow} options={trends.windowOptions} onChange={trends.chooseTimeWindow} />
       </div>

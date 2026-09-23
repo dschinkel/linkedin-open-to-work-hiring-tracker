@@ -1,0 +1,28 @@
+/* Element defaults, in Tailwind's base layer so any utility on an element wins. */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    /* Ligatures off: code fonts turn -> and != into glyphs, and this UI shows data, so characters stay literal. */
+    @apply font-sans antialiased [font-variant-ligatures:none];
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+
+  ::selection {
+    @apply bg-prompt-fill text-prompt-foreground;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  /* Grid cells may shrink below their content (wide tables, charts) so pages never overflow a phone screen. */
+  .grid > * {
+    @apply min-w-0;
+  }
+}

@@ -11,8 +11,8 @@ export function FindOpenToWorkPeople() {
   return (
     <>
       <div>
-        <h2 className="text-2xl font-semibold">Open to Work</h2>
-        <p className="max-w-3xl text-sm text-muted-foreground">
+        <h2 className="page-title">Open to Work</h2>
+        <p className="mt-1 max-w-3xl text-label text-muted-foreground">
           People whose photo shows the public #OPENTOWORK frame. Greyed rows weren't in the latest scan, so the frame isn't confirmed for today.
         </p>
       </div>

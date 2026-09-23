@@ -10,7 +10,7 @@ export function DemoInvite({ href }: { href: string }) {
   return (
     <Link
       to={href}
-      className={cn(buttonVariants({ size: 'sm' }), 'bg-open-to-work text-white hover:bg-open-to-work/90', isHighlighted && 'demo-invite-highlight')}
+      className={cn(buttonVariants(), 'bg-open-to-work font-bold text-background hover:bg-open-to-work/90', isHighlighted && 'invite-highlight')}
     >
       <Sparkles />
       Demo

@@ -1,0 +1,35 @@
+/*
+ * Reusable ASCII devices as Tailwind utilities, built from Tailwind utilities. Use them in className like any
+ * other class (`figure text-figure`, `dot-leader`), including with variants (`sm:figure`).
+ */
+
+/* A number meant to be read at a glance: bold, tight, digits of equal width so columns line up.
+   Color is left to the call site (text-primary, or a signal color for deltas). */
+@utility figure {
+  @apply font-bold tracking-figure tabular-nums;
+}
+
+/* A panel title set into its panel's top border, like a terminal window. Uses --card-spacing, which shadcn's Card sets. */
+@utility tui-title {
+  @apply -mt-[calc(var(--card-spacing)+0.8em)] -ml-[0.5ch] w-fit bg-card px-[0.5ch];
+}
+
+/* Dotted leader between a label and its value: Screenshots ........ 54. Place it as a flex child between the two. */
+@utility dot-leader {
+  @apply min-w-4 flex-1 -translate-y-[0.25em] border-b border-dotted border-muted-foreground/50;
+}
+
+/* A page's own heading: large, bold, tight, in the brightest ink. */
+@utility page-title {
+  @apply text-2xl leading-tight font-bold tracking-figure text-primary sm:text-display;
+}
+
+/* First-visit attention pulse on the Demo button; a steady outline instead when motion is reduced. */
+@utility invite-highlight {
+  @apply animate-invite-pulse motion-reduce:animate-none motion-reduce:outline-2 motion-reduce:outline-offset-2 motion-reduce:outline-open-to-work;
+}
+
+/* Screenshot upload progress: flashes between the prompt color and normal text; steady prompt color when motion is reduced. */
+@utility upload-progress {
+  @apply animate-upload-progress motion-reduce:animate-none motion-reduce:text-prompt;
+}

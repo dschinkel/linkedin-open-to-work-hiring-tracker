@@ -37,12 +37,12 @@ interface DataTableProps {
 /** Sticky-header table with optional sortable columns and clickable rows. */
 export function DataTable({ columns, rows, sortKey, sortDirection, onSort, onRowClick }: DataTableProps) {
   return (
-    <div className="max-h-[32rem] overflow-auto rounded-md border">
+    <div className="max-h-128 overflow-auto border">
       <Table>
         <TableHeader className="sticky top-0 z-10 bg-card">
           <TableRow>
             {columns.map((column) => (
-              <TableHead key={column.key} className={cn(column.isNumeric && 'text-right')}>
+              <TableHead key={column.key} className={cn('text-muted-foreground', column.isNumeric && 'text-right')}>
                 <HeaderLabel column={column} activeKey={sortKey} direction={sortDirection} onSort={onSort} />
               </TableHead>
             ))}
@@ -84,9 +84,9 @@ function HeaderLabel({ column, activeKey, direction, onSort }: HeaderLabelProps)
   if (!column.isSortable || !onSort) return <>{column.label}</>
   const DirectionIcon = direction === 'asc' ? ArrowUp : ArrowDown
   return (
-    <button type="button" className="inline-flex items-center gap-1 hover:text-foreground" onClick={() => onSort(column.key)}>
+    <button type="button" className="inline-flex items-center gap-1 hover:text-prompt" onClick={() => onSort(column.key)}>
       {column.label}
-      {activeKey === column.key && <DirectionIcon className="size-3" />}
+      {activeKey === column.key && <DirectionIcon className="size-3 text-prompt" />}
     </button>
   )
 }

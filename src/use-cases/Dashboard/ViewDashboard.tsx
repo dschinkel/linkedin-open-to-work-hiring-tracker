@@ -19,20 +19,20 @@ export function ViewDashboard() {
     <AsyncContent status={dashboard.status} errorMessage={dashboard.errorMessage}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold">{dashboard.latestScanLabel}</h2>
-          <p className="text-lg text-muted-foreground sm:text-xl">
-            <strong className="font-bold text-foreground">{dashboard.sampledCount}</strong> {dashboard.sampleDetail}
+          <h2 className="page-title">{dashboard.latestScanLabel}</h2>
+          <p className="mt-1 text-base text-muted-foreground sm:text-lg">
+            <strong className="figure text-primary">{dashboard.sampledCount}</strong> {dashboard.sampleDetail}
           </p>
         </div>
       </div>
       {dashboard.showScanReminder && (
-        <Alert>
-          <BellRing />
+        <Alert className="border-prompt">
+          <BellRing className="text-prompt" />
           <AlertTitle>{dashboard.scanReminder}</AlertTitle>
         </Alert>
       )}
       <AddScreenshots />
-      {dashboard.showInboxNote && <p className="text-sm text-muted-foreground">{dashboard.inboxNote}</p>}
+      {dashboard.showInboxNote && <p className="text-label text-muted-foreground">{dashboard.inboxNote}</p>}
       {dashboard.showFirstRunInvite && (
         <EmptyState
           title="No scans yet"
@@ -46,7 +46,7 @@ export function ViewDashboard() {
             <HiringSnapshot tiles={dashboard.hiringTiles} />
           </div>
           <ViewOpenToWorkTrend />
-          <div className="grid gap-6 xl:grid-cols-2">
+          <div className="grid gap-6 xl:grid-cols-[3fr_2fr]">
             <WhoIsHiringPreview
               headline={dashboard.whoIsHiringHeadline}
               people={dashboard.whoIsHiringPeople}

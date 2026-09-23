@@ -11,9 +11,9 @@ export function FindDepartedPeople() {
   return (
     <>
       <div>
-        <h2 className="text-2xl font-semibold">{departed.title}</h2>
-        <p className="max-w-3xl text-sm text-muted-foreground">{departed.explanation}</p>
-        <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{departed.caveat}</p>
+        <h2 className="page-title">{departed.title}</h2>
+        <p className="mt-1 max-w-3xl text-label text-muted-foreground">{departed.explanation}</p>
+        <p className="mt-2 max-w-3xl border-l-2 border-prompt pl-3 text-label text-muted-foreground">{departed.caveat}</p>
       </div>
       <SectionCard title={departed.resultSummary}>
         <div className="mb-4 max-w-xs">

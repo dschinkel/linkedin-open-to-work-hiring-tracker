@@ -30,3 +30,6 @@ data/
 
 # Test-runner output
 .vitest/
+
+# Redesign reference material (contains real LinkedIn screenshots). Never commit it.
+redesign/

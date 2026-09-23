@@ -14,7 +14,7 @@ export function ViewOpenToWorkTrend() {
     <AsyncContent status={trend.status} errorMessage={trend.errorMessage}>
       {trend.showTrendPending && <EmptyState title="Trend data available after additional scans." />}
       {trend.hasTrend && (
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
           <SectionCard
             title="Open-to-Work rate"
             description="Public Open-to-Work rate in sampled network"

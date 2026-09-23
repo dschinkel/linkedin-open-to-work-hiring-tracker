@@ -3,13 +3,17 @@ export interface DefinitionRow {
   value: string
 }
 
+/** Label and value joined by a dotted leader, like a printed table of contents: Screenshots ........ 54 */
 export function DefinitionList({ rows }: { rows: DefinitionRow[] }) {
   return (
-    <dl className="divide-y text-sm">
+    <dl className="text-label">
       {rows.map((row) => (
-        <div key={row.label} className="flex justify-between gap-4 py-1.5">
-          <dt className="text-muted-foreground">{row.label}</dt>
-          <dd className="font-medium tabular-nums">{row.value}</dd>
+        <div key={row.label} className="flex items-baseline gap-2 py-1">
+          <dt className="flex min-w-0 flex-1 items-baseline gap-2 text-muted-foreground">
+            {row.label}
+            <span aria-hidden className="dot-leader" />
+          </dt>
+          <dd className="figure text-primary">{row.value}</dd>
         </div>
       ))}
     </dl>

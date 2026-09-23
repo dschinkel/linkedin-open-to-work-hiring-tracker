@@ -15,8 +15,8 @@ export function EditSettings() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold">Settings</h2>
-          <p className="text-sm text-muted-foreground">Everything stays local, in data/linkedin.sqlite.</p>
+          <h2 className="page-title">Settings</h2>
+          <p className="mt-1 text-label text-muted-foreground">Everything stays local, in data/linkedin.sqlite.</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">{form.saveMessage}</span>

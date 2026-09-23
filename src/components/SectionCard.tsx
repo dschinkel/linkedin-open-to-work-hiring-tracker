@@ -11,10 +11,10 @@ interface SectionCardProps {
 export function SectionCard({ title, description, action, children }: SectionCardProps) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
+      <CardHeader className="max-sm:grid-cols-1">
+        <CardTitle className="text-title font-bold text-primary">{title}</CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
-        {action && <CardAction>{action}</CardAction>}
+        {action && <CardAction className="max-sm:col-start-1 max-sm:row-span-1 max-sm:row-start-auto max-sm:justify-self-start">{action}</CardAction>}
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>

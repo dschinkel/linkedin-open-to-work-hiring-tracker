@@ -1,0 +1,179 @@
+/*
+ * Design tokens. Three tiers, each built only from the one above it:
+ *   1. Schemes   – themes.css: 3 color themes (Neutral, Ocean, Green) x light/dark, each setting the same role colors (--scheme-*).
+ *   2. Semantic  – shadcn's standard token contract (so any `shadcn add` component works) plus this app's signal colors,
+ *                  all pointing at scheme roles. Switching theme or mode swaps every color at once.
+ *   3. Theme     – Tailwind bindings: colors, type scale, tracking, shadows and animations as utilities.
+ */
+
+/* 2. Semantic ---------------------------------------------------------------------------------------------------- */
+:root {
+  --background: var(--scheme-page);
+  --foreground: var(--scheme-text);
+  --card: var(--scheme-panel);
+  --card-foreground: var(--scheme-text);
+  --popover: var(--scheme-raised);
+  --popover-foreground: var(--scheme-bright);
+  --primary: var(--scheme-bright);
+  --primary-foreground: var(--scheme-page);
+  --secondary: var(--scheme-fill);
+  --secondary-foreground: var(--scheme-text);
+  --muted: var(--scheme-fill);
+  --muted-foreground: var(--scheme-dim);
+  --accent: var(--scheme-hover);
+  --accent-foreground: var(--scheme-bright);
+  --destructive: var(--scheme-removed);
+  --border: var(--scheme-rule);
+  --input: var(--scheme-rule-strong);
+  --ring: var(--scheme-accent-fill);
+  --radius: 0rem;
+
+  --chart-1: var(--scheme-open-to-work);
+  --chart-2: var(--scheme-hiring);
+  --chart-3: var(--scheme-removed);
+  --chart-4: var(--scheme-dim);
+  --chart-5: var(--scheme-text);
+
+  --sidebar: var(--card);
+  --sidebar-foreground: var(--card-foreground);
+  --sidebar-primary: var(--primary);
+  --sidebar-primary-foreground: var(--primary-foreground);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--accent-foreground);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+
+  /* App signals: Open to Work (green frame) and Hiring (purple frame) stay distinct in every theme. */
+  --prompt: var(--scheme-accent);
+  --prompt-fill: var(--scheme-accent-fill);
+  --prompt-foreground: var(--scheme-on-accent);
+  --open-to-work: var(--scheme-open-to-work);
+  --open-to-work-soft: var(--scheme-open-to-work-soft);
+  --hiring: var(--scheme-hiring);
+  --hiring-soft: var(--scheme-hiring-soft);
+  --removed: var(--scheme-removed);
+  --warning: var(--scheme-warning);
+  --muted-series: var(--scheme-dim);
+}
+
+/* 3. Theme ------------------------------------------------------------------------------------------------------- */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-prompt: var(--prompt);
+  --color-prompt-fill: var(--prompt-fill);
+  --color-prompt-foreground: var(--prompt-foreground);
+  --color-open-to-work: var(--open-to-work);
+  --color-open-to-work-soft: var(--open-to-work-soft);
+  --color-hiring: var(--hiring);
+  --color-hiring-soft: var(--hiring-soft);
+  --color-removed: var(--removed);
+  --color-warning: var(--warning);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@theme {
+  /* One monospace family for everything: body, headings, figures. */
+  --font-sans: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: var(--font-sans);
+  --font-heading: var(--font-sans);
+
+  /*
+   * Type scale. Tailwind's steps are redefined one to two sizes up so every page reads comfortably: hints never go
+   * below 14px, body and table text is 16px, labels 17px. Components keep using the plain names (text-xs, text-sm).
+   */
+  --text-2xs: 0.875rem; /* 14px: ring captions, small hints */
+  --text-2xs--line-height: calc(1.25 / 0.875);
+  --text-xs: 0.875rem; /* 14px: hints, secondary copy */
+  --text-xs--line-height: calc(1.25 / 0.875);
+  --text-sm: 1rem; /* 16px: body, descriptions, table cells, buttons */
+  --text-sm--line-height: 1.5;
+  --text-label: 1.0625rem; /* 17px: stat labels, nav */
+  --text-label--line-height: 1.45;
+  --text-base: 1.0625rem; /* 17px */
+  --text-base--line-height: 1.5;
+  --text-lg: 1.25rem; /* 20px */
+  --text-lg--line-height: 1.4;
+  --text-xl: 1.375rem; /* 22px */
+  --text-xl--line-height: 1.35;
+  --text-2xl: 1.75rem; /* 28px: movement figures, phone page heading */
+  --text-2xl--line-height: 1.2;
+  --text-3xl: 2rem; /* 32px: app title */
+  --text-3xl--line-height: 1.15;
+  --text-title: 1.375rem; /* 22px: panel titles */
+  --text-title--line-height: 1.3;
+  --text-figure: 2.375rem; /* 38px: key counts */
+  --text-figure--line-height: 1;
+  --text-display: 2.5rem; /* 40px: page heading */
+  --text-display--line-height: 1.1;
+  --text-figure-lg: 3rem; /* 48px: the ring's rate */
+  --text-figure-lg--line-height: 1;
+
+  --tracking-figure: -0.03em;
+
+  /* Comfortable reading width for help text. */
+  --container-measure: 60ch;
+
+  /* Hard offset shadows, like a window drawn one cell down and right. */
+  --shadow-block: 4px 4px 0 0 var(--scheme-shadow);
+
+  --animate-cell-on: cell-on 90ms linear backwards;
+  --animate-invite-pulse: invite-pulse 1.8s ease-out 0.4s 5;
+  --animate-upload-progress: upload-progress 2.4s ease-in-out infinite;
+
+  @keyframes cell-on {
+    from { opacity: 0; }
+  }
+
+  @keyframes invite-pulse {
+    0% {
+      box-shadow: 0 0 0 0 color-mix(in oklch, var(--open-to-work) 70%, transparent);
+      transform: scale(1);
+    }
+    15% { transform: scale(1.08); }
+    30% { transform: scale(1); }
+    80%, 100% { box-shadow: 0 0 0 14px transparent; }
+  }
+
+  @keyframes upload-progress {
+    0%, 100% { color: var(--foreground); opacity: 1; }
+    50% { color: var(--prompt); opacity: 0.55; }
+  }
+}
