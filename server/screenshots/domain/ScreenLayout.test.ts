@@ -44,6 +44,12 @@ describe('reading names beside the photo column', () => {
     expect(readNameStrip([...heading, ...nameStrip], pitch).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing', 'Grace Hopper'])
   })
 
+  it('keeps a hard-to-read word when the rest of its line reads clearly', () => {
+    const accentedName = [word('Jurgen', 100, 360, 23), word('De', 160, 360), word('Smet', 185, 360), word('Coach', 100, 382)]
+
+    expect(readNameStrip([...nameStrip, ...accentedName], pitch).map((person) => [person.displayName, person.headline])).toContainEqual(['Jurgen De Smet', 'Coach'])
+  })
+
   it('keeps initials in names', () => {
     expect(readNameStrip([word('Azad', 100, 60), word('A.', 145, 60)], pitch).map((person) => person.displayName)).toEqual(['Azad A.'])
   })

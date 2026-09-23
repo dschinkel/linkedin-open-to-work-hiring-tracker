@@ -10,6 +10,8 @@ export interface TextBox {
 
 interface TextLine extends TextBox {
   height: number
+  /** How sure OCR was of the clearest word on the line. */
+  bestConfidence: number
 }
 
 const notAHeadline = /^(followed by|\d+ mutual|and \d+ others|follow|following|message|connect|pending)\b/i
@@ -32,7 +34,7 @@ export interface NameBlock {
  * Lines that sit close together belong to one person; a bigger gap starts the next person.
  */
 export function readNameStrip(words: TextBox[], rowPitch: number): NameBlock[] {
-  const lines = groupIntoLines(words.filter(isRealWord)).filter(isReadableLine)
+  const lines = groupIntoLines(words.filter(couldBeAWord)).filter(isReadableLine)
   const listLines = linesOfTheList(lines, rowPitch).sort((a, b) => a.y0 - b.y0)
   return splitIntoBlocksBy(listLines, rowPitch * 0.3).map(toNameBlock)
 }
@@ -57,7 +59,7 @@ function hasTitleUnder(name: TextLine, aligned: TextLine[], rowPitch: number): b
 }
 
 function isReadableLine(line: TextLine): boolean {
-  return /[A-Za-z]{2}/.test(line.text) && !actionButton.test(line.text) && !listHeading.test(line.text)
+  return line.bestConfidence >= trustworthyConfidence && /[A-Za-z]{2}/.test(line.text) && !actionButton.test(line.text) && !listHeading.test(line.text)
 }
 
 function toNameBlock(block: TextLine[]): NameBlock {
@@ -81,9 +83,13 @@ function splitIntoBlocksBy(lines: TextLine[], gapBetweenPeople: number): TextLin
   return blocks
 }
 
-/** A trustworthy word, or an initial like the "A." in "Azad A.". */
-function isRealWord(word: TextBox): boolean {
-  return word.confidence >= trustworthyConfidence && (/[A-Za-z]{2}/.test(word.text) || /^[A-Z]\.$/.test(word.text))
+/**
+ * A trustworthy word, an initial like the "A." in "Azad A.", or letters OCR was unsure of (accents such as the
+ * "ü" in "Jürgen" lower its confidence). Unsure words only count on a line that also has a trustworthy word.
+ */
+function couldBeAWord(word: TextBox): boolean {
+  const trusted = word.confidence >= trustworthyConfidence && (/[A-Za-z]{2}/.test(word.text) || /^[A-Z]\.$/.test(word.text))
+  return trusted || /^\p{L}{2,}$/u.test(word.text)
 }
 
 /** Words that sit on the same baseline and close together become one line of text. */
@@ -93,7 +99,7 @@ export function groupIntoLines(words: TextBox[]): TextLine[] {
   for (const word of sorted) {
     const line = lines.find((candidate) => continuesLine(candidate, word))
     if (line) Object.assign(line, joinWord(line, word))
-    else lines.push({ ...word, text: word.text.trim(), height: word.y1 - word.y0 })
+    else lines.push({ ...word, text: word.text.trim(), height: word.y1 - word.y0, bestConfidence: word.confidence })
   }
   return lines
 }
@@ -113,13 +119,9 @@ function joinWord(line: TextLine, word: TextBox): TextLine {
     y1: Math.max(line.y1, word.y1),
     height: Math.max(line.height, word.y1 - word.y0),
     confidence: Math.min(line.confidence, word.confidence),
+    bestConfidence: Math.max(line.bestConfidence, word.confidence),
   }
 }
-
-
-
-
-
 
 /** Drops LinkedIn's connection-degree and pronoun suffixes: "Jane Smith · 2nd", "Jane Smith (She/Her)". */
 export function cleanName(text: string): string {

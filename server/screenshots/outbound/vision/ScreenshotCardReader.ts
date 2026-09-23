@@ -45,9 +45,7 @@ export const screenshotCardReader = (cacheFolder = path.resolve('data/ocr')): Ca
     if (photos.length === 0) return []
     const pitch = rowSpacing(photos)
     const strip = nameStripBeside(photos, pitch, pixels)
-    const words = await readStrip(await ocr(), image, strip)
-    if (process.env.DEBUG_OCR) console.log(JSON.stringify({ strip, pitch, words: words.map((w) => [w.text, Math.round(w.x0), Math.round(w.y0), Math.round(w.y1), Math.round(w.confidence)]) }))
-    const names = readNameStrip(words, pitch)
+    const names = readNameStrip(await readStrip(await ocr(), image, strip), pitch)
     return names
       .map((name) => ({ name, photo: photoFor(name, photos) }))
       .filter(({ photo }) => photos.includes(photo) || sitsOnThePage(pixels, photo))
@@ -68,10 +66,16 @@ async function decode(image: Buffer): Promise<Pixels> {
  */
 function nameStripBeside(photos: AvatarCircle[], pitch: number, { width, height }: Pixels): NameStrip {
   const diameter = photos[0].radius * 2
-  const left = Math.round(Math.max(...photos.map((photo) => photo.centreX + photo.radius)) + diameter * 0.12)
+  const left = Math.round(typicalRightEdge(photos) + diameter * 0.12)
   const top = Math.max(0, Math.round(photos[0].centreY - pitch * 2))
   const scale = Math.min(6, Math.max(1, Math.round(readableTextHeight / (diameter * nameToPhotoRatio))))
   return { left, top, width: Math.min(width - left, Math.round(diameter * 18)), height: height - top, scale, cutWordEdge: diameter * 0.07 }
+}
+
+/** Most photos' right edge; one photo read a little off-centre must not push the strip into the names. */
+function typicalRightEdge(photos: AvatarCircle[]): number {
+  const edges = photos.map((photo) => photo.centreX + photo.radius).sort((a, b) => a - b)
+  return edges[Math.floor(edges.length / 2)]
 }
 
 async function readStrip(worker: Worker, image: Buffer, strip: NameStrip): Promise<TextBox[]> {
