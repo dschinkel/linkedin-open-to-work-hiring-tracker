@@ -18,7 +18,7 @@ export function AddScreenshots() {
     >
       <ImageUp className="size-8 text-prompt" />
       <span className="font-medium text-primary">Drag LinkedIn screenshots here, or click to choose files</span>
-      <span className="max-w-measure text-label text-muted-foreground">PNG, JPG, WebP, or PDF (each PDF page counts as one screenshot). They are analyzed as soon as they land, and this dashboard updates by itself. Files already added are skipped.</span>
+      <span className="max-w-measure text-label text-muted-foreground">PNG, JPG, WebP, or PDF (each PDF page counts as one screenshot). Files already added are skipped.</span>
       <input id="add-screenshots" type="file" multiple accept={drop.acceptedTypes} className="sr-only" onChange={drop.handleFilesChosen} />
       {drop.isUploading && (
         <span className="upload-progress inline-flex items-center gap-2 text-sm font-semibold" role="status">
