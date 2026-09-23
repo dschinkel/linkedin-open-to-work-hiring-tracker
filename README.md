@@ -1,7 +1,7 @@
 <p align="center">
   <img src="public/logo-animated.svg" alt="Open-to-Work & Hiring Tracker icon" width="160" />
 </p>
-
+#### Disclaimer (bitch to yourselves)
 <h4 align="center">This app is semi-vibe-coded, meaning it's using some of my rules but not all.  So kinda half backed. It is what it is, some good, some bad; don't expect super clean or superb test coverage 😆.  It's just to find out some quick stats.</h4>
 
 <h1 align="center">LinkedIn Open-to-Work & Hiring Tracker</h1>
