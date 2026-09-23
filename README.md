@@ -10,6 +10,8 @@
 
 <p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
+> **Want to use it yourself? Fork this repo, then use your fork.** Click **Fork** at the top of this page, clone your fork, and run `pnpm install && pnpm dev` (see [Running it](#running-it)). Your screenshots are saved on your own machine in `LinkedinScreenShots/` and kept permanently; that folder is git-ignored, so they are never committed or pushed, even from a public fork.
+
 Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**.
 
 The goal is a clearer picture of how your close network of contacts is doing, not a single snapshot.
