@@ -26,7 +26,7 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 The app never logs into LinkedIn, crawls profiles, or automates your browser. **You** take screenshots, and the app does the rest.
 
-### Easiest: GoFullPage (Chrome or Brave)
+### Easiest: GoFullPage (Chrome or Brave) $\color{red}{\textsf{use at your own risk}}$
 
 1. Install [GoFullPage – Full Page Screen Capture](https://chromewebstore.google.com/detail/gofullpage-full-page-scre/fdpohaocaechififmbbbbbknoalclacl) in Chrome or Brave.
 2. Open your connections list: <https://www.linkedin.com/mynetwork/invite-connect/connections/>
