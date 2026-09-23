@@ -1,10 +1,8 @@
 import { BellRing } from 'lucide-react'
-import { Link } from 'react-router-dom'
 import { AsyncContent } from '@/components/AsyncContent'
 import { EmptyState } from '@/components/EmptyState'
 import { SectionCard } from '@/components/SectionCard'
 import { Alert, AlertTitle } from '@/components/ui/alert'
-import { buttonVariants } from '@/components/ui/button'
 import { HiringSnapshot } from '../Hiring/HiringSnapshot'
 import { WhoIsHiringPreview } from '../Hiring/WhoIsHiringPreview'
 import { OpenToWorkSnapshot } from '../OpenToWork/OpenToWorkSnapshot'
@@ -36,14 +34,7 @@ export function ViewDashboard() {
       {dashboard.showFirstRunInvite && (
         <EmptyState
           title="No scans yet"
-          description="Drop screenshots in the box above, or copy them into this dashboard’s LinkedinScreenShots/ folder. This page updates by itself. Screenshot analysis is not built yet, so for now they wait in the inbox."
-          action={
-            dashboard.showDemoInvite && (
-              <Link to={dashboard.demoHref} className={buttonVariants({ variant: 'outline' })}>
-                Try the demo with sample data
-              </Link>
-            )
-          }
+          description="Drop screenshots in the box above, or copy them into this dashboard’s LinkedinScreenShots/ folder. They’re read straight away and this page updates by itself."
         />
       )}
       {dashboard.hasScans && (

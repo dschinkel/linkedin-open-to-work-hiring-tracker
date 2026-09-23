@@ -13,6 +13,7 @@ function settingsRepositoryHolding(stored: Settings) {
       savedSettings.push(changed)
       return changed
     },
+    clearAllData: async () => ({ message: 'not used here' }),
   }
   return { repository, savedSettings }
 }
@@ -23,6 +24,7 @@ function settingsRepositoryRefusingSaves(stored: Settings, reason: string): Sett
     save: async () => {
       throw new Error(reason)
     },
+    clearAllData: async () => ({ message: 'not used here' }),
   }
 }
 

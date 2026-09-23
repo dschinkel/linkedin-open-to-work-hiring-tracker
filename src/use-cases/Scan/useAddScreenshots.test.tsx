@@ -21,7 +21,7 @@ function dropped(files: File[]): DragEvent<HTMLElement> {
 }
 
 function savedAs(fileName: string): AddScreenshotsResult {
-  return { saved: [fileName], rejected: [], analysisMessage: 'Analyzed into the Sep 22 scan.', message: `Saved ${fileName}.` }
+  return { saved: [fileName], rejected: [], analysisMessage: '', importedCount: 1, failedCount: 0, peopleInScan: 20 * (Number(/\d+/.exec(fileName)?.[0] ?? 1)), message: `Saved ${fileName}.` }
 }
 
 function inboxAnswering(answer: (upload: Upload) => Promise<AddScreenshotsResult>) {
@@ -44,7 +44,7 @@ function inboxSavingEverything() {
 
 function inboxRejecting(rejectedName: string, reason: string) {
   return inboxAnswering(async ([file]) =>
-    file.fileName === rejectedName ? { saved: [], rejected: [{ fileName: rejectedName, reason }], analysisMessage: '', message: '' } : savedAs(file.fileName),
+    file.fileName === rejectedName ? { saved: [], rejected: [{ fileName: rejectedName, reason }], analysisMessage: '', importedCount: 0, failedCount: 0, peopleInScan: 0, message: '' } : savedAs(file.fileName),
   )
 }
 
@@ -116,13 +116,13 @@ describe('adding screenshots', () => {
     await waitFor(() => expect(result.current.resultMessage).toContain('3 screenshots added'))
   })
 
-  it('passes on what analysis did with the new screenshots', async () => {
+  it('totals what was read across the whole batch, not just the last file', async () => {
     const { repository } = inboxSavingEverything()
     const { result } = renderScreenshotDrop(repository)
 
-    act(() => result.current.handleFilesChosen(chosen([screenshot('page-1.png')])))
+    act(() => result.current.handleFilesChosen(chosen([screenshot('page-1.png'), screenshot('page-2.png'), screenshot('page-3.png')])))
 
-    await waitFor(() => expect(result.current.resultMessage).toContain('Analyzed into the Sep 22 scan.'))
+    await waitFor(() => expect(result.current.resultMessage).toBe('3 screenshots added. 3 read. 60 people in this scan.'))
   })
 
   it('lists screenshots the inbox skipped with the reason', async () => {

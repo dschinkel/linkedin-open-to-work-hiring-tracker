@@ -142,3 +142,31 @@ describe('watching the inbox folders', () => {
     await stopWatching()
   }, 30_000)
 })
+
+describe('clearing all data', () => {
+  it('empties both dashboards and the inbox folders', async () => {
+    const project = freshProject()
+    const { http } = serverIn(project)
+    await upload(http, 'followers', firstShot)
+    mkdirSync(path.join(project, 'LinkedinScreenShots/contacts'), { recursive: true })
+    copyFileSync(path.join(fixtures, secondShot), path.join(project, 'LinkedinScreenShots/contacts', secondShot))
+
+    await http.delete('/api/followers/all-data')
+
+    expect([
+      (await http.get('/api/followers/dashboard')).body.scanCount,
+      (await http.get('/api/followers/network-size')).body.peopleCount,
+      readdirSync(path.join(project, 'LinkedinScreenShots/contacts')),
+    ]).toEqual([0, 0, []])
+  }, 60_000)
+
+  it('keeps working after clearing, so new screenshots import again', async () => {
+    const { http } = serverIn(freshProject())
+    await upload(http, 'followers', firstShot)
+    await http.delete('/api/followers/all-data')
+
+    await upload(http, 'followers', firstShot)
+
+    expect((await http.get('/api/followers/dashboard')).body.scanCount).toBe(1)
+  }, 60_000)
+})

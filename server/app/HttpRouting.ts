@@ -13,7 +13,7 @@ export interface ApiResponse {
 }
 
 export interface Route {
-  method: 'GET' | 'POST' | 'PUT'
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
   pattern: RegExp
   respond: (request: ApiRequest, params: string[]) => ApiResponse | Promise<ApiResponse>
 }

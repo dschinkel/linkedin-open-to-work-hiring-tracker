@@ -225,6 +225,10 @@ export const addScreenshotsResultSchema = z.object({
   rejected: z.array(z.object({ fileName: z.string(), reason: z.string() })),
   /** What happened when the new screenshots were analyzed. */
   analysisMessage: z.string(),
+  /** Screenshots read successfully / that couldn't be read, and how many people are now in their day's scan. */
+  importedCount: z.number(),
+  failedCount: z.number(),
+  peopleInScan: z.number(),
   message: z.string(),
 })
 export type AddScreenshotsResult = z.infer<typeof addScreenshotsResultSchema>

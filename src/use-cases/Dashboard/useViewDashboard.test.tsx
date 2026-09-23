@@ -119,16 +119,4 @@ describe('dashboard at a glance', () => {
 
     expect(view.hiringHref).toBe('/demo/contacts/hiring')
   })
-
-  it('invites live users into the demo of the same audience', async () => {
-    const view = await readyDashboard(repositoryReturning(dashboard()), insideTracker({ mode: 'live', audience: 'contacts' }))
-
-    expect(view).toMatchObject({ showDemoInvite: true, demoHref: '/demo/contacts' })
-  })
-
-  it('does not invite into the demo from inside the demo', async () => {
-    const view = await readyDashboard(repositoryReturning(dashboard()), insideTracker({ mode: 'demo' }))
-
-    expect(view.showDemoInvite).toBe(false)
-  })
 })

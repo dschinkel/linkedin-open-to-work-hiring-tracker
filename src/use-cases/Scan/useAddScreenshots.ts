@@ -20,7 +20,9 @@ export interface AddScreenshotsView {
 interface UploadTotals {
   saved: string[]
   rejected: AddScreenshotsResult['rejected']
-  analysisMessage: string
+  importedCount: number
+  failedCount: number
+  peopleInScan: number
 }
 
 const acceptedTypes = 'image/png,image/jpeg,image/webp'
@@ -72,7 +74,7 @@ export function useAddScreenshots(injectedRepository?: ScanRepository): AddScree
 }
 
 async function uploadOneByOne(files: File[], repository: ScanRepository, reportProgress: (message: string) => void): Promise<UploadTotals> {
-  const totals: UploadTotals = { saved: [], rejected: [], analysisMessage: '' }
+  const totals: UploadTotals = { saved: [], rejected: [], importedCount: 0, failedCount: 0, peopleInScan: 0 }
   for (const [position, file] of files.entries()) {
     reportProgress(`Adding ${position + 1} of ${files.length}: ${file.name}`)
     await uploadOne(file, repository, totals)
@@ -85,16 +87,24 @@ async function uploadOne(file: File, repository: ScanRepository, totals: UploadT
     const result = await repository.addScreenshots([await toUpload(file)])
     totals.saved.push(...result.saved)
     totals.rejected.push(...result.rejected)
-    totals.analysisMessage = result.analysisMessage || totals.analysisMessage
+    totals.importedCount += result.importedCount
+    totals.failedCount += result.failedCount
+    totals.peopleInScan = Math.max(totals.peopleInScan, result.peopleInScan)
   } catch (error) {
     totals.rejected.push({ fileName: file.name, reason: `Upload failed (${error instanceof Error ? error.message : 'unknown error'})` })
   }
 }
 
+/** One line for the whole batch, e.g. "23 screenshots added. 21 read, 2 couldn't be read. 480 people in this scan." */
 function summarize(totals: UploadTotals): string {
-  const added = `${totals.saved.length} screenshot${totals.saved.length === 1 ? '' : 's'} added`
-  const skipped = totals.rejected.length > 0 ? `, ${totals.rejected.length} skipped` : ''
-  return `${added}${skipped}. ${totals.analysisMessage}`.trim()
+  const added = `${plural(totals.saved.length, 'screenshot')} added${totals.rejected.length > 0 ? `, ${totals.rejected.length} skipped` : ''}.`
+  const read = totals.importedCount + totals.failedCount > 0 ? ` ${totals.importedCount} read${totals.failedCount > 0 ? `, ${totals.failedCount} couldn't be read` : ''}.` : ''
+  const people = totals.importedCount > 0 ? ` ${plural(totals.peopleInScan, 'person', 'people')} in this scan.` : ''
+  return `${added}${read}${people}`
+}
+
+function plural(count: number, one: string, many = `${one}s`): string {
+  return `${count} ${count === 1 ? one : many}`
 }
 
 async function toUpload(file: File): Promise<AddScreenshotsRequest['files'][number]> {

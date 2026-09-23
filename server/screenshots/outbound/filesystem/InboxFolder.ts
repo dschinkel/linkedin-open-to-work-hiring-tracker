@@ -1,5 +1,6 @@
 import { access, mkdir, readdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
+import { acceptedScreenshotName } from '../../domain/ScreenshotFileName.ts'
 
 /** Port: the folder screenshots are dropped into, and the archive they can be moved to after import. */
 export interface InboxFolder {
@@ -11,6 +12,8 @@ export interface InboxFolder {
   archive: (fileName: string, scanDate: string) => Promise<void>
   archivedFiles: (scanDate: string) => Promise<string[]>
   readArchived: (fileName: string, scanDate: string) => Promise<Buffer>
+  /** Deletes every screenshot still in the inbox (other files are left alone). */
+  emptyInbox: () => Promise<void>
 }
 
 interface InboxLocations {
@@ -42,6 +45,11 @@ export const inboxFolder = ({ projectRoot, inboxDirectory, archiveDirectory }: I
     },
     archivedFiles: async (scanDate) => ((await exists(archiveFor(scanDate))) ? (await readdir(archiveFor(scanDate))).sort() : []),
     readArchived: (fileName, scanDate) => readFile(path.join(archiveFor(scanDate), fileName)),
+    emptyInbox: async () => {
+      if (!(await exists(inbox()))) return
+      const screenshots = (await readdir(inbox())).filter((fileName) => acceptedScreenshotName(fileName) !== null)
+      await Promise.all(screenshots.map((fileName) => rm(path.join(inbox(), fileName), { force: true })))
+    },
   }
 }
 

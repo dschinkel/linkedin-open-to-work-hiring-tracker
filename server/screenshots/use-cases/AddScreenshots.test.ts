@@ -21,6 +21,7 @@ function inboxHolding(existing: string[]): InboxFolder & { stored: string[] } {
     archive: unused,
     archivedFiles: async () => [],
     readArchived: unused,
+    emptyInbox: async () => undefined,
   }
 }
 

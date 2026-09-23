@@ -22,20 +22,24 @@ function demoNetworkFor(audience: Audience): Network {
 
 /** Sample data held in memory: nothing is saved, and dropped screenshots are politely refused. */
 export const sampleTrackerRoutes = (audience: Audience, network: Network) =>
-  audienceTrackerRoutes(
-    memoryTrackerStore(network, defaultSettingsFor(audience)),
-    {
+  audienceTrackerRoutes({
+    trackerStore: memoryTrackerStore(network, defaultSettingsFor(audience)),
+    screenshots: {
       addScreenshots: async (request) => nothingSaved(request),
       reprocessScan: async () => ({ message: 'Sample data has no screenshots to re-read.' }),
     },
-    () => network.scans.map((scan) => scan.scanDate).sort().at(-1) ?? demoLatestScanDate,
-  )
+    clearAllData: async () => ({ message: 'This is sample data, so there is nothing of yours to clear.' }),
+    today: () => network.scans.map((scan) => scan.scanDate).sort().at(-1) ?? demoLatestScanDate,
+  })
 
 function nothingSaved(request: AddScreenshotsRequest): AddScreenshotsResult {
   return {
     saved: [],
     rejected: request.files.map((file) => ({ fileName: file.fileName, reason: 'Sample data only' })),
     analysisMessage: '',
+    importedCount: 0,
+    failedCount: 0,
+    peopleInScan: 0,
     message: 'This is sample data, so screenshots are not saved. Run the app locally to add your own.',
   }
 }

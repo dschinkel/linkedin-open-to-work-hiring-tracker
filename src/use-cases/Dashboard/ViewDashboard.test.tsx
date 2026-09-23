@@ -25,11 +25,4 @@ describe('dashboard', () => {
     expect(await screen.findByText('No scans yet')).toBeInTheDocument()
   })
 
-  it('points a first-time user to the demo', async () => {
-    vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(noScansYet))))
-
-    renderDashboard()
-
-    expect(await screen.findByRole('link', { name: 'Try the demo with sample data' })).toHaveAttribute('href', '/demo/followers')
-  })
 })

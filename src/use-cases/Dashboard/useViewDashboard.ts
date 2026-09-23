@@ -28,13 +28,11 @@ export interface DashboardView {
   scanReminder: string
   showScanReminder: boolean
   hiringHref: string
-  demoHref: string
-  showDemoInvite: boolean
 }
 
 /** Latest snapshot at a glance: Open-to-Work stock and flow, Hiring, and how trustworthy the scan is. */
 export function useViewDashboard(injectedRepository?: DashboardRepository): DashboardView {
-  const { api, isDemo, audience } = useTrackerEnvironment()
+  const { api } = useTrackerEnvironment()
   const appPath = useAppPath()
   const repository = injectedRepository ?? dashboardRepositoryFor(api)
   const query = useQuery({ queryKey: ['dashboard'], queryFn: repository.latest })
@@ -42,12 +40,10 @@ export function useViewDashboard(injectedRepository?: DashboardRepository): Dash
     ...loadStatusOf(query),
     ...describeDashboard(query.data),
     hiringHref: appPath('/hiring'),
-    demoHref: `/demo/${audience}`,
-    showDemoInvite: !isDemo,
   }
 }
 
-type DashboardFields = Omit<DashboardView, 'status' | 'errorMessage' | 'hiringHref' | 'demoHref' | 'showDemoInvite'>
+type DashboardFields = Omit<DashboardView, 'status' | 'errorMessage' | 'hiringHref'>
 
 const noDashboard: DashboardFields = {
   hasScans: false,

@@ -40,6 +40,7 @@ function inboxWith(): InboxFolder & { removed: string[]; archived: string[] } {
     archive: async (fileName) => void archived.push(fileName),
     archivedFiles: async () => [],
     readArchived: async () => Buffer.from('image'),
+    emptyInbox: async () => undefined,
   }
 }
 

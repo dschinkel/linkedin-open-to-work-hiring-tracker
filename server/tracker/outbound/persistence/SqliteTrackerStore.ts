@@ -113,6 +113,11 @@ export const sqliteTrackerStore = (database: DatabaseSync, audience: Audience, d
   }
 }
 
+/** Deletes every row from every table, for both audiences, in one step. The tables themselves stay. */
+export function eraseTrackerDatabase(database: DatabaseSync): void {
+  database.exec('BEGIN; DELETE FROM observations; DELETE FROM screenshots; DELETE FROM scans; DELETE FROM people; DELETE FROM settings; COMMIT;')
+}
+
 function readDay(database: DatabaseSync, audience: Audience, scanDate: string): AnalyzedDay | null {
   const network = readNetwork(database, audience)
   const scan = network.scans.find((existing) => existing.scanDate === scanDate)

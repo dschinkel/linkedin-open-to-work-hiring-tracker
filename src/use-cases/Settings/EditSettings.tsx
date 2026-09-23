@@ -5,6 +5,7 @@ import { LabeledInput } from '@/components/LabeledInput'
 import { SectionCard } from '@/components/SectionCard'
 import { SwitchField } from '@/components/SwitchField'
 import { Button } from '@/components/ui/button'
+import { ClearAllData } from './ClearAllData'
 import { useEditSettings } from './useEditSettings'
 
 export function EditSettings() {
@@ -56,6 +57,7 @@ export function EditSettings() {
             <ChoiceSelect id="frequency" label="Scan frequency" value={form.settings.scanFrequency} options={form.frequencyOptions} onChange={form.changeScanFrequency} />
           </SectionCard>
         </div>
+        <ClearAllData />
       </AsyncContent>
     </>
   )

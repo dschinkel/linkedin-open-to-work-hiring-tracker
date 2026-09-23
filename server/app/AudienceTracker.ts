@@ -1,3 +1,4 @@
+import type { ProcessingResult } from '../../contracts/api.ts'
 import type { Route } from './HttpRouting.ts'
 import type { ScreenshotUseCases } from '../screenshots/http/ScreenshotsHttp.ts'
 import { screenshotsHttp } from '../screenshots/http/ScreenshotsHttp.ts'
@@ -17,7 +18,14 @@ import { viewScan } from '../tracker/use-cases/ViewScan.ts'
 import { viewTrends } from '../tracker/use-cases/ViewTrends.ts'
 
 /** Composition for one audience (followers or contacts): its use cases wired to its routes. */
-export const audienceTrackerRoutes = (trackerStore: TrackerStore, screenshotUseCases: ScreenshotUseCases, today: () => string = localToday): Route[] => {
+export interface AudienceTrackerParts {
+  trackerStore: TrackerStore
+  screenshots: ScreenshotUseCases
+  clearAllData: () => Promise<ProcessingResult>
+  today?: () => string
+}
+
+export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData, today = localToday }: AudienceTrackerParts): Route[] => {
   const ports = { analytics: trackerAnalytics(trackerStore), trackerStore, today }
   const useCases: TrackerUseCases = {
     ...viewDashboard(ports),
@@ -29,8 +37,9 @@ export const audienceTrackerRoutes = (trackerStore: TrackerStore, screenshotUseC
     ...findDepartedPeople(ports),
     ...measureNetworkSize(ports),
     ...editSettings(ports),
+    clearAllData,
   }
-  return [...trackerRoutes(trackerHttp(useCases)), ...screenshotRoutes(screenshotsHttp(screenshotUseCases))]
+  return [...trackerRoutes(trackerHttp(useCases)), ...screenshotRoutes(screenshotsHttp(screenshots))]
 }
 
 function localToday(): string {

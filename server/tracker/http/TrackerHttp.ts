@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { CompanyHiring, Dashboard, DepartedPeople, HiringPeopleQuery, HiringPerson, NetworkSize, ScanDetail, ScanHistory, Settings, TimeWindow, Trends } from '../../../contracts/api.ts'
+import type { CompanyHiring, Dashboard, DepartedPeople, HiringPeopleQuery, HiringPerson, NetworkSize, ProcessingResult, ScanDetail, ScanHistory, Settings, TimeWindow, Trends } from '../../../contracts/api.ts'
 import { hiringPeopleQuerySchema, settingsSchema, timeWindowSchema } from '../../../contracts/api.ts'
 import { type ApiRequest, type ApiResponse, ok, orNotFound } from '../../app/HttpRouting.ts'
 
@@ -14,6 +14,7 @@ export interface TrackerUseCases {
   measureNetworkSize: () => NetworkSize
   viewSettings: () => Settings
   saveSettings: (settings: Settings) => Settings
+  clearAllData: () => Promise<ProcessingResult>
 }
 
 const windowQuery = z.object({ window: timeWindowSchema.default('90d') })
@@ -30,6 +31,7 @@ export const trackerHttp = (useCases: TrackerUseCases) => ({
   networkSize: (): ApiResponse => ok(useCases.measureNetworkSize()),
   settings: (): ApiResponse => ok(useCases.viewSettings()),
   saveSettings: (request: ApiRequest): ApiResponse => ok(useCases.saveSettings(settingsSchema.parse(request.body))),
+  clearAllData: async (): Promise<ApiResponse> => ok(await useCases.clearAllData()),
 })
 
 export type TrackerHttp = ReturnType<typeof trackerHttp>

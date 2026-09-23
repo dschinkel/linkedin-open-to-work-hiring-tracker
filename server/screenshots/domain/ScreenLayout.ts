@@ -8,15 +8,6 @@ export interface TextBox {
   confidence: number
 }
 
-/** One person's row on a LinkedIn list: their visible text and the band of the image it sits in. */
-export interface PersonRow {
-  displayName: string
-  headline: string | null
-  textLeft: number
-  top: number
-  bottom: number
-}
-
 interface TextLine extends TextBox {
   height: number
 }
@@ -24,19 +15,44 @@ interface TextLine extends TextBox {
 const notAHeadline = /^(followed by|\d+ mutual|and \d+ others|follow|following|message|connect|pending)\b/i
 const trustworthyConfidence = 60
 
+const actionButton = /^(follow|following|message|connect|pending|remove)$/i
+
+/** One person's text as read beside the photo column: name first, then title. */
+export interface NameBlock {
+  displayName: string
+  headline: string | null
+  top: number
+  bottom: number
+}
+
 /**
- * Finds people on a followers/connections list from OCR words. Names and headlines line up in one text
- * column; each tight block of lines in that column is one person (name first, headline next). Text outside
- * the column (page titles, buttons, the curved #OPENTOWORK label on a frame) is ignored.
+ * Every name in the strip of text beside the photo column is one person, whether or not their photo is empty.
+ * Lines that sit close together belong to one person; a bigger gap starts the next person.
  */
-export function findPersonRows(words: TextBox[]): PersonRow[] {
-  const lines = groupIntoLines(words.filter(isRealWord))
-  const column = textColumn(lines)
-  if (column === null) return []
-  const inColumn = lines.filter((line) => Math.abs(line.x0 - column) <= medianHeight(lines)).sort((a, b) => a.y0 - b.y0)
-  const blocks = splitIntoBlocks(inColumn)
-  const pitch = rowPitch(blocks)
-  return blocks.map((block) => toRow(block, pitch))
+export function readNameStrip(words: TextBox[], rowPitch: number): NameBlock[] {
+  const lines = groupIntoLines(words.filter(isRealWord)).filter((line) => !actionButton.test(line.text)).sort((a, b) => a.y0 - b.y0)
+  return splitIntoBlocksBy(lines, rowPitch * 0.3).map(toNameBlock)
+}
+
+function toNameBlock(block: TextLine[]): NameBlock {
+  const [name, ...rest] = block
+  return {
+    displayName: cleanName(name.text),
+    headline: rest.find((line) => !notAHeadline.test(line.text))?.text ?? null,
+    top: block[0].y0,
+    bottom: (block.at(-1) as TextLine).y1,
+  }
+}
+
+function splitIntoBlocksBy(lines: TextLine[], gapBetweenPeople: number): TextLine[][] {
+  const blocks: TextLine[][] = []
+  for (const line of lines) {
+    const current = blocks.at(-1)
+    const previous = current?.at(-1)
+    if (current && previous && line.y0 - previous.y1 <= gapBetweenPeople) current.push(line)
+    else blocks.push([line])
+  }
+  return blocks
 }
 
 function isRealWord(word: TextBox): boolean {
@@ -73,57 +89,10 @@ function joinWord(line: TextLine, word: TextBox): TextLine {
   }
 }
 
-/** The left edge most lines share: that's where names and headlines start. */
-function textColumn(lines: TextLine[]): number | null {
-  const tolerance = medianHeight(lines)
-  let best: { left: number; count: number } | null = null
-  for (const line of lines) {
-    const count = lines.filter((other) => Math.abs(other.x0 - line.x0) <= tolerance).length
-    if (!best || count > best.count) best = { left: line.x0, count }
-  }
-  return best && best.count >= 2 ? best.left : null
-}
 
-function splitIntoBlocks(lines: TextLine[]): TextLine[][] {
-  const gapBetweenPeople = medianHeight(lines) * 0.9
-  const blocks: TextLine[][] = []
-  for (const line of lines) {
-    const current = blocks.at(-1)
-    const previous = current?.at(-1)
-    if (current && previous && line.y0 - previous.y1 <= gapBetweenPeople) current.push(line)
-    else blocks.push([line])
-  }
-  return blocks
-}
 
-function rowPitch(blocks: TextLine[][]): number {
-  const centres = blocks.map(blockCentre)
-  const gaps = centres.slice(1).map((centre, index) => centre - centres[index]).sort((a, b) => a - b)
-  if (gaps.length === 0) return (blocks[0]?.[0]?.height ?? 20) * 6
-  return gaps[Math.floor(gaps.length / 2)]
-}
 
-function toRow(block: TextLine[], pitch: number): PersonRow {
-  const [name, ...rest] = block
-  const headline = rest.find((line) => !notAHeadline.test(line.text)) ?? null
-  const centre = blockCentre(block)
-  return {
-    displayName: cleanName(name.text),
-    headline: headline?.text ?? null,
-    textLeft: Math.min(...block.map((line) => line.x0)),
-    top: centre - pitch * 0.48,
-    bottom: centre + pitch * 0.48,
-  }
-}
 
-function blockCentre(block: TextLine[]): number {
-  return (block[0].y0 + (block.at(-1) as TextLine).y1) / 2
-}
-
-function medianHeight(lines: TextLine[]): number {
-  const heights = lines.map((line) => line.height).sort((a, b) => a - b)
-  return heights[Math.floor(heights.length / 2)] ?? 20
-}
 
 /** Drops LinkedIn's connection-degree and pronoun suffixes: "Jane Smith · 2nd", "Jane Smith (She/Her)". */
 export function cleanName(text: string): string {

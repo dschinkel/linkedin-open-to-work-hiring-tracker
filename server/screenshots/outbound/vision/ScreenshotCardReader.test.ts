@@ -18,3 +18,4 @@ describe('reading a LinkedIn followers screenshot', () => {
     ])
   }, 60_000)
 })
+

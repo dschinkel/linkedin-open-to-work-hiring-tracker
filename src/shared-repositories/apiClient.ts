@@ -1,7 +1,7 @@
 import type { ZodType } from 'zod'
 
 export interface TransportRequest {
-  method: 'GET' | 'POST' | 'PUT'
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE'
   path: string
   body?: unknown
 }
@@ -16,7 +16,7 @@ export type Transport = (request: TransportRequest) => Promise<TransportResponse
 
 export interface ApiClient {
   getJson: <Body>(path: string, schema: ZodType<Body>) => Promise<Body>
-  sendJson: <Body>(method: 'POST' | 'PUT', path: string, schema: ZodType<Body>, body?: unknown) => Promise<Body>
+  sendJson: <Body>(method: 'POST' | 'PUT' | 'DELETE', path: string, schema: ZodType<Body>, body?: unknown) => Promise<Body>
 }
 
 export class ApiError extends Error {

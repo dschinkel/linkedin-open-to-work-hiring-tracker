@@ -24,10 +24,18 @@ export const addScreenshots = ({ inboxFolder, trackerStore, analyzeWaitingScreen
   }
 
   const addScreenshots = async (request: AddScreenshotsRequest): Promise<AddScreenshotsResult> => {
-    const result: AddScreenshotsResult = { saved: [], rejected: [], analysisMessage: '', message: '' }
+    const result: AddScreenshotsResult = { saved: [], rejected: [], analysisMessage: '', importedCount: 0, failedCount: 0, peopleInScan: 0, message: '' }
     for (const file of request.files) await addOne(file, result)
-    const analysisMessage = result.saved.length > 0 ? describeAnalysis(await analyzeWaitingScreenshots()) : ''
-    return { ...result, analysisMessage, message: `${describeAdded(result)} ${analysisMessage}`.trim() }
+    const report = result.saved.length > 0 ? await analyzeWaitingScreenshots() : null
+    const analysisMessage = report ? describeAnalysis(report) : ''
+    return {
+      ...result,
+      analysisMessage,
+      importedCount: report?.importedFiles.length ?? 0,
+      failedCount: report?.failedFiles.length ?? 0,
+      peopleInScan: report?.peopleFound ?? 0,
+      message: `${describeAdded(result)} ${analysisMessage}`.trim(),
+    }
   }
 
   return { addScreenshots }

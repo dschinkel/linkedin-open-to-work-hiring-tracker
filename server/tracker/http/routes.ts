@@ -13,4 +13,5 @@ export const trackerRoutes = (http: TrackerHttp): Route[] => [
   { method: 'GET', pattern: /^\/api\/network-size$/, respond: http.networkSize },
   { method: 'GET', pattern: /^\/api\/settings$/, respond: http.settings },
   { method: 'PUT', pattern: /^\/api\/settings$/, respond: http.saveSettings },
+  { method: 'DELETE', pattern: /^\/api\/all-data$/, respond: http.clearAllData },
 ]
