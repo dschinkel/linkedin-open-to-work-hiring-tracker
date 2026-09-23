@@ -101,6 +101,8 @@ export type HiringPerson = z.infer<typeof hiringPersonSchema>
 
 export const dashboardSchema = z.object({
   scanCount: z.number(),
+  /** Screenshots saved to the inbox that have not been analyzed yet. */
+  inboxWaitingCount: z.number(),
   latestScan: scanSummarySchema.nullable(),
   latestQuality: scanQualitySchema.nullable(),
   whoIsHiring: z.object({

@@ -1,12 +1,9 @@
 import { routeRequest } from './routes.ts'
 import { defaultSettingsFor } from './defaultSettings.ts'
 import { createTrackerApi } from './trackerApi.ts'
+import { memoryStore } from './trackerStore.ts'
 
-const emptyApi = createTrackerApi(
-  { people: [], scans: [], observations: [] },
-  defaultSettingsFor('contacts'),
-  {},
-)
+const emptyApi = createTrackerApi(memoryStore({ people: [], scans: [], observations: [] }, defaultSettingsFor('contacts')), {})
 
 describe('tracker API', () => {
   it('rejects an unknown time window', async () => {

@@ -23,6 +23,8 @@ export interface DashboardView {
   whoIsHiringPeople: HiringPersonRow[]
   showNoHiringPeople: boolean
   qualitySections: QualitySection[]
+  inboxNote: string
+  showInboxNote: boolean
   hiringHref: string
   demoHref: string
   showDemoInvite: boolean
@@ -56,11 +58,14 @@ const noDashboard: DashboardFields = {
   whoIsHiringPeople: [],
   showNoHiringPeople: true,
   qualitySections: [],
+  inboxNote: '',
+  showInboxNote: false,
 }
 
 function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
   const latest = dashboard?.latestScan
-  if (!dashboard || !latest) return noDashboard
+  if (!dashboard) return noDashboard
+  if (!latest) return { ...noDashboard, ...describeInbox(dashboard.inboxWaitingCount) }
   return {
     hasScans: true,
     showFirstRunInvite: false,
@@ -72,7 +77,14 @@ function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
     whoIsHiringPeople: dashboard.whoIsHiring.preview.map((person) => describeHiringPerson(person)),
     showNoHiringPeople: dashboard.whoIsHiring.peopleCount === 0,
     qualitySections: dashboard.latestQuality ? describeScanQuality(dashboard.latestQuality) : [],
+    ...describeInbox(dashboard.inboxWaitingCount),
   }
+}
+
+/** Screenshots saved in the database's inbox list that analysis has not picked up yet. */
+function describeInbox(waitingCount: number): Pick<DashboardView, 'inboxNote' | 'showInboxNote'> {
+  const screenshots = waitingCount === 1 ? '1 screenshot is' : `${formatCount(waitingCount)} screenshots are`
+  return { inboxNote: `${screenshots} saved and waiting in the inbox for analysis.`, showInboxNote: waitingCount > 0 }
 }
 
 function describeWhoIsHiring(whoIsHiring: Dashboard['whoIsHiring']): string {

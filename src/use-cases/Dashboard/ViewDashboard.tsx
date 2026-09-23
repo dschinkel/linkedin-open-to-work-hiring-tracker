@@ -24,6 +24,7 @@ export function ViewDashboard() {
         </div>
       </div>
       <AddScreenshots />
+      {dashboard.showInboxNote && <p className="text-sm text-muted-foreground">{dashboard.inboxNote}</p>}
       {dashboard.showFirstRunInvite && (
         <EmptyState
           title="No scans yet"

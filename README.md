@@ -91,15 +91,24 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
 
 ### Where your data lives
 
-> **Not built yet:** the screenshot analyzer and the SQLite database are the next part of this project. Today, dropped screenshots are only saved to the inbox folder. Nothing is extracted from them yet, so **keep your screenshots**; they are currently your only copy.
+Everything is stored locally in **`data/linkedin.sqlite`**, one SQLite file on your own computer. The app reads from and writes to it on every request, so what you see is always what's saved. You don't set it up: `pnpm dev` creates it on first run and keeps its tables up to date after that.
 
-Once built, everything the app extracts (people, Open-to-Work and Hiring frames, scans, history) is stored in **`data/linkedin.sqlite`**, a single file on your own computer:
+| Table | What it holds |
+|---|---|
+| `people` | Everyone seen in your screenshots: a pseudonymous identity hash, visible name, headline, and company (with how confidently the company was read) |
+| `scans` | One row per day of screenshots: the date, cards detected, and duplicates removed |
+| `observations` | Each person in each scan: their #OPEN_TO_WORK and #HIRING frame status, with confidence and how it was detected |
+| `screenshots` | Every screenshot you add: file name, when it was added, whether it's still waiting or which scan it went into |
+| `settings` | Your Settings page choices |
 
-- It's **persistent**: it survives restarts, reboots, and pulling app updates.
-- It's **not backed up by git**, because `data/` is git-ignored. You lose it if you delete the project folder, clone into a new folder, move to a new laptop, or your disk fails.
-- To keep it safe, **back it up** like any other file: Time Machine (or your usual backup), or copy `data/linkedin.sqlite` somewhere safe now and then. Restoring is copying it back.
+Followers and Contacts share the file but are kept apart: every row belongs to one of them.
 
-After analysis, screenshots are archived under `data/screenshots/` by date so scans can be re-analyzed when detection improves. An option to delete screenshots automatically after analysis is planned.
+- **It's persistent.** It survives restarts, reboots, and pulling app updates.
+- **It's not backed up by git.** `data/` is git-ignored (so your data is never pushed), which also means you lose it if you delete the project folder, clone into a new folder, move to a new laptop, or your disk fails.
+- **Back it up like any other file:** Time Machine (or your usual backup), or copy `data/linkedin.sqlite` somewhere safe now and then. Restoring is copying it back while `pnpm dev` is stopped.
+- **You can open it yourself** with any SQLite tool, for example `sqlite3 data/linkedin.sqlite` or [DB Browser for SQLite](https://sqlitebrowser.org/).
+
+> **Keep your screenshots for now.** The analyzer that reads names and frames out of screenshots is the next part of this project. Until it exists, the database records each screenshot you add as waiting (the dashboard shows how many), but can't extract people from it yet, so the screenshots are still your only copy of that information. Once analyzed, originals are archived under `data/screenshots/` by date so scans can be re-analyzed when detection improves; an option to delete them automatically after analysis is planned.
 
 
 ---
@@ -120,9 +129,13 @@ pnpm dev
 
 Open <http://localhost:5173>.
 
-### Demo
+That's the whole setup. The first time `pnpm dev` runs, it creates the local database (`data/linkedin.sqlite`) and all its tables by itself, and upgrades it automatically when a newer version of the app needs changes. There's no database to install and **no Docker**: SQLite is built into Node.js and stores everything in that one file. The terminal shows which database it's using:
 
-The screenshot-analysis backend (Koa + OpenCV/OCR + SQLite) is **not built yet**, so dropped screenshots are saved to the inbox but **not analyzed yet**, and the real dashboards show "No scans yet".
+```text
+  Tracker: created SQLite database data/linkedin.sqlite
+```
+
+### Demo
 
 To see what the app does, open the demo:
 
@@ -135,7 +148,7 @@ The demo runs entirely in your browser on a fixed sample network (500 fictional 
 
 It never talks to a server or LinkedIn. Every chart can be zoomed like a stock chart: drag the handles under a chart, and the other charts on the page follow.
 
-To fill the local app at `/` with sample data instead of the empty state:
+To fill your local dashboards with sample data instead (held in memory only; your database is not read or changed):
 
 ```bash
 TRACKER_SAMPLE=full pnpm dev     # ~6 months of sample history ending today
@@ -164,7 +177,9 @@ Every page exists once for **Contacts** and once for **Followers**; the toggle i
 
 <img src="https://img.shields.io/badge/Hiring-2ea043?style=flat-square" alt="Hiring" align="absmiddle"> a searchable, filterable table of everyone seen with #HIRING (current vs previous, company known vs unknown, sorting), plus counts per company. Greyed rows were not in the latest scan, so the frame is not claimed for today.
 
-<img src="https://img.shields.io/badge/Unfollowers-2ea043?style=flat-square" alt="Unfollowers" align="absmiddle"> / <img src="https://img.shields.io/badge/Past_contacts-2ea043?style=flat-square" alt="Past contacts" align="absmiddle"> people seen in earlier scans who are missing from the last 3 scans in a row: likely unfollowers (Followers) or removed connections (Contacts), with when they were last seen and whether they had the #OPEN_TO_WORK or #HIRING frame then. It updates with every new day of screenshots, and anyone seen again drops off. It's only reliable when each scan covers your whole list, since a screenshot can't prove someone left.
+<img src="https://img.shields.io/badge/Unfollowers-2ea043?style=flat-square" alt="Unfollowers" align="absmiddle"> / <img src="https://img.shields.io/badge/Past_contacts-2ea043?style=flat-square" alt="Past contacts" align="absmiddle"> people seen in earlier scans who are missing from the last 3 scans in a row: likely unfollowers (Followers) or removed connections (Contacts), with when they were last seen and whether they had the #OPEN_TO_WORK or #HIRING frame then.
+
+It updates with every new day of screenshots, and anyone seen again drops off. It's only reliable when each scan covers your whole list, since a screenshot can't prove someone left.
 
 <img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> sortable daily history (Open to Work / Hiring / All columns). Click a row for scan detail, per-screenshot results, quality, and <img src="https://img.shields.io/badge/Reprocess_scan-2ea043?style=flat-square" alt="Reprocess scan" align="absmiddle">.
 
@@ -211,6 +226,8 @@ mock-api/
                               scan dates, hiring list, scan quality (+ tests)
   seed/                       deterministic sample network
   routes.ts, trackerApi.ts    /api/* routes with Zod-validated input
+  sqliteStore.ts              the local database: creates and upgrades tables, reads and writes data
+  trackerStore.ts             the storage port (SQLite for your data, memory for the demo and tests)
   demoTrackerApi.ts           the static demo network (runs in the browser)
   mockApiPlugin.ts            serves /api/* inside `pnpm dev` until the Koa backend exists
 src/
@@ -229,7 +246,6 @@ src/
 The full specification is in [`linkedin-open-to-work-hiring-tracker-spec.md`](./linkedin-open-to-work-hiring-tracker-spec.md). Next steps:
 
 1. Koa backend implementing the same `contracts/api.ts`, reusing `mock-api/domain/`
-2. SQLite + Drizzle persistence (`data/linkedin.sqlite`)
-3. `chokidar` watcher on `LinkedinScreenShots/contacts/` and `LinkedinScreenShots/followers/`, with originals archived by date to `data/screenshots/<audience>/`
-4. Card detection, OCR, and OpenCV frame classification (with an optional vision-model fallback)
-5. Settings option to delete screenshots automatically after analysis (default: keep, so scans can be re-analyzed)
+2. `chokidar` watcher on `LinkedinScreenShots/contacts/` and `LinkedinScreenShots/followers/`, with originals archived by date to `data/screenshots/<audience>/`
+3. Card detection, OCR, and OpenCV frame classification (with an optional vision-model fallback)
+4. Settings option to delete screenshots automatically after analysis (default: keep, so scans can be re-analyzed)

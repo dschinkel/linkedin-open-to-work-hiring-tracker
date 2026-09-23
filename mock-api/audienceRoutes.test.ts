@@ -2,11 +2,12 @@ import { type AudienceApis, routeAudienceRequest } from './audienceRoutes.ts'
 import { defaultSettingsFor } from './defaultSettings.ts'
 import { generateSampleNetwork } from './seed/generateSampleNetwork.ts'
 import { createTrackerApi } from './trackerApi.ts'
+import { memoryStore } from './trackerStore.ts'
 
 const options = {}
 const apis: AudienceApis = {
-  contacts: createTrackerApi({ people: [], scans: [], observations: [] }, defaultSettingsFor('contacts'), options),
-  followers: createTrackerApi(generateSampleNetwork({ latestScanDate: '2026-09-22', days: 3, peopleCount: 20, seed: 1 }), defaultSettingsFor('followers'), options),
+  contacts: createTrackerApi(memoryStore({ people: [], scans: [], observations: [] }, defaultSettingsFor('contacts')), options),
+  followers: createTrackerApi(memoryStore(generateSampleNetwork({ latestScanDate: '2026-09-22', days: 3, peopleCount: 20, seed: 1 }), defaultSettingsFor('followers')), options),
 }
 
 describe('contacts and followers', () => {

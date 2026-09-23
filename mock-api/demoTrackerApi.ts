@@ -4,6 +4,7 @@ import { defaultSettingsFor } from './defaultSettings.ts'
 import { demoNetworks } from './demoNetworks.ts'
 import { generateSampleNetwork } from './seed/generateSampleNetwork.ts'
 import { createTrackerApi, type TrackerApi } from './trackerApi.ts'
+import { memoryStore } from './trackerStore.ts'
 
 /** Fixed end date so every visitor sees the same static demo, whatever day it is. */
 export const demoLatestScanDate = '2026-09-22'
@@ -16,5 +17,5 @@ export function createDemoTrackerApis(): AudienceApis {
 
 function demoTrackerFor(audience: Audience): TrackerApi {
   const network = generateSampleNetwork({ latestScanDate: demoLatestScanDate, days: 180, ...demoNetworks[audience] })
-  return createTrackerApi(network, defaultSettingsFor(audience), {})
+  return createTrackerApi(memoryStore(network, defaultSettingsFor(audience)), {})
 }
