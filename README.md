@@ -24,6 +24,8 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 **Who left:** who **unfollowed you** or who you **lost as contacts**, and whether they were Open to Work or Hiring when last seen.
 
+**Open to Work by job title:** which kinds of roles (engineers, recruiters, product, and so on) are Open to Work, and how that's changing. It only covers people whose title could be read, and says how many that is.
+
 **Followers and contacts count:** shown in the header, counting each person once across your recent screenshots.
 
 **Trust signals:** matched-cohort rates, scan quality, and classifier confidence, so you can tell a real change from a different set of screenshots.
@@ -141,7 +143,7 @@ Each page exists for **Followers** and **Contacts**; the header toggle switches 
 
 <img src="https://img.shields.io/badge/Dashboard-2ea043?style=flat-square" alt="Dashboard" align="absmiddle"> latest numbers, rate trend, entry vs removal, who's hiring, scan quality, daily history, and the screenshot drop box.
 
-<img src="https://img.shields.io/badge/Trends-2ea043?style=flat-square" alt="Trends" align="absmiddle"> zoomable, synced charts: rate and moving averages, raw vs matched cohort, entries vs removals, net flow, how long people stay open, and hiring trends.
+<img src="https://img.shields.io/badge/Trends-2ea043?style=flat-square" alt="Trends" align="absmiddle"> zoomable, synced charts: rate and moving averages, raw vs matched cohort, entries vs removals, net flow, how long people stay open, hiring trends, and a grid of Open to Work by job title.
 
 <img src="https://img.shields.io/badge/Hiring-2ea043?style=flat-square" alt="Hiring" align="absmiddle"> everyone seen with #HIRING, searchable and filterable, plus counts per company.
 
@@ -151,7 +153,7 @@ Only reliable when each scan covers your whole list, since a screenshot can't pr
 
 <img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> daily history; click a day for its screenshots and quality.
 
-<img src="https://img.shields.io/badge/Settings-2ea043?style=flat-square" alt="Settings" align="absmiddle"> inbox and archive folders, what happens after import, thresholds, and reminders.
+<img src="https://img.shields.io/badge/Settings-2ea043?style=flat-square" alt="Settings" align="absmiddle"> inbox and archive folders, what happens after import, thresholds, reminders, and **Clear all data** (asks you to confirm first).
 
 ## How the metrics are defined
 
@@ -170,6 +172,10 @@ Only reliable when each scan covers your whole list, since a screenshot can't pr
 
 ## How screenshots are read
 
-Text is read with OCR (tesseract.js). Frames are found from pixels: a real #OPENTOWORK or #HIRING frame is an unbroken green or purple band around the avatar with a label printed on it. So a green shirt or purple background isn't mistaken for a frame, and anything unclear is marked Uncertain rather than guessed. No face recognition, and nothing leaves your machine.
+1. **Find the people.** The app finds the column of round profile photos. Every name beside it is a person, including people with an empty photo.
+2. **Read names and titles.** The strip of text beside the photos is enlarged and read with OCR (tesseract.js), so zoomed-out screenshots still work. Titles that can't be read are left blank rather than guessed.
+3. **Read the frame.** Each photo is checked for an unbroken green (#OPENTOWORK) or purple (#HIRING) band with a label printed on it. A green shirt or purple background doesn't count, and anything unclear is marked Uncertain.
+
+No face recognition, and nothing leaves your machine.
 
 It's tested on LinkedIn-style screenshots with fictional people (`server/screenshots/fixtures/`, regenerated with `node scripts/render-screenshot-fixtures.mjs`). If your real screenshots read poorly, open an issue with the zoom level you used.

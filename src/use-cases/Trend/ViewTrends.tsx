@@ -19,6 +19,7 @@ import {
   transitionRateSeries,
 } from './trendCharts'
 import { useViewTrends } from './useViewTrends'
+import { ViewOpenToWorkByTitle } from './ViewOpenToWorkByTitle'
 
 export function ViewTrends() {
   const trends = useViewTrends()
@@ -67,6 +68,9 @@ export function ViewTrends() {
               showDurationPending={trends.showDurationPending}
             />
             <HiringTrendCharts points={trends.points} />
+            <div className="lg:col-span-2">
+              <ViewOpenToWorkByTitle timeWindow={trends.timeWindow} />
+            </div>
           </div>
         )}
       </AsyncContent>

@@ -15,6 +15,7 @@ import { listScans } from '../tracker/use-cases/ListScans.ts'
 import { measureNetworkSize } from '../tracker/use-cases/MeasureNetworkSize.ts'
 import { viewDashboard } from '../tracker/use-cases/ViewDashboard.ts'
 import { viewScan } from '../tracker/use-cases/ViewScan.ts'
+import { viewTitleTrends } from '../tracker/use-cases/ViewTitleTrends.ts'
 import { viewTrends } from '../tracker/use-cases/ViewTrends.ts'
 
 /** Composition for one audience (followers or contacts): its use cases wired to its routes. */
@@ -32,6 +33,7 @@ export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData,
     ...listScans(ports),
     ...viewScan(ports),
     ...viewTrends(ports),
+    ...viewTitleTrends(ports),
     ...findHiringPeople(ports),
     ...listHiringCompanies(ports),
     ...findDepartedPeople(ports),

@@ -258,3 +258,17 @@ export const networkSizeSchema = z.object({
   latestScanDate: z.string().nullable(),
 })
 export type NetworkSize = z.infer<typeof networkSizeSchema>
+
+export const titleTrendsSchema = z.object({
+  periods: z.array(z.string()),
+  rows: z.array(
+    z.object({
+      title: z.string(),
+      cells: z.array(z.object({ rate: rate, open: z.number(), classified: z.number() })),
+      changePp: rate,
+    }),
+  ),
+  peopleWithTitle: z.number(),
+  peopleTotal: z.number(),
+})
+export type TitleTrends = z.infer<typeof titleTrendsSchema>

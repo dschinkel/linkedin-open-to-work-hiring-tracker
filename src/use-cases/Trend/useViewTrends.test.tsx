@@ -12,6 +12,7 @@ function trendRepositoryReturning(answer: Trends) {
       windowsAskedFor.push(window)
       return answer
     },
+    titleTrends: async () => Promise.reject(new Error('not used here')),
   }
   return { repository, windowsAskedFor }
 }

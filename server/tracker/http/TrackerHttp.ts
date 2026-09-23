@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import type { CompanyHiring, Dashboard, DepartedPeople, HiringPeopleQuery, HiringPerson, NetworkSize, ProcessingResult, ScanDetail, ScanHistory, Settings, TimeWindow, Trends } from '../../../contracts/api.ts'
+import type { CompanyHiring, Dashboard, DepartedPeople, HiringPeopleQuery, HiringPerson, NetworkSize, ProcessingResult, ScanDetail, ScanHistory, Settings, TimeWindow, TitleTrends, Trends } from '../../../contracts/api.ts'
 import { hiringPeopleQuerySchema, settingsSchema, timeWindowSchema } from '../../../contracts/api.ts'
 import { type ApiRequest, type ApiResponse, ok, orNotFound } from '../../app/HttpRouting.ts'
 
@@ -8,6 +8,7 @@ export interface TrackerUseCases {
   listScans: (window: TimeWindow) => ScanHistory
   viewScan: (scanId: string) => ScanDetail | null
   viewTrends: (window: TimeWindow) => Trends
+  viewTitleTrends: (window: TimeWindow) => TitleTrends
   findHiringPeople: (query: HiringPeopleQuery) => { people: HiringPerson[] }
   listHiringCompanies: () => CompanyHiring
   findDepartedPeople: () => DepartedPeople
@@ -25,6 +26,7 @@ export const trackerHttp = (useCases: TrackerUseCases) => ({
   scans: (request: ApiRequest): ApiResponse => ok(useCases.listScans(windowQuery.parse(request.query).window)),
   scan: (_request: ApiRequest, [scanId]: string[]): ApiResponse => orNotFound(useCases.viewScan(scanId)),
   trends: (request: ApiRequest): ApiResponse => ok(useCases.viewTrends(windowQuery.parse(request.query).window)),
+  titleTrends: (request: ApiRequest): ApiResponse => ok(useCases.viewTitleTrends(windowQuery.parse(request.query).window)),
   hiringPeople: (request: ApiRequest): ApiResponse => ok(useCases.findHiringPeople(hiringPeopleQuerySchema.parse(request.query))),
   hiringCompanies: (): ApiResponse => ok(useCases.listHiringCompanies()),
   departed: (): ApiResponse => ok(useCases.findDepartedPeople()),

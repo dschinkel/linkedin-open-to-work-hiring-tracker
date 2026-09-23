@@ -7,6 +7,7 @@ export const trackerRoutes = (http: TrackerHttp): Route[] => [
   { method: 'GET', pattern: /^\/api\/scans$/, respond: http.scans },
   { method: 'GET', pattern: /^\/api\/scans\/([\w-]+)$/, respond: http.scan },
   { method: 'GET', pattern: /^\/api\/analytics\/trends$/, respond: http.trends },
+  { method: 'GET', pattern: /^\/api\/analytics\/titles$/, respond: http.titleTrends },
   { method: 'GET', pattern: /^\/api\/hiring\/people$/, respond: http.hiringPeople },
   { method: 'GET', pattern: /^\/api\/hiring\/companies$/, respond: http.hiringCompanies },
   { method: 'GET', pattern: /^\/api\/departed$/, respond: http.departed },
