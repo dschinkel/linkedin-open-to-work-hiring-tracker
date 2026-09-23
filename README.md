@@ -34,7 +34,9 @@ The app never logs into LinkedIn, crawls profiles, or automates your browser. **
 
 GoFullPage file names include the date (for example `screencapture-linkedin-com-mynetwork-2026-09-22-09_01_12.png`), and the app uses that date for the scan.
 
-### Alternative: regular screenshots
+> **Heads-up: GoFullPage carries some risk.** It captures the page by scrolling it automatically, and LinkedIn may treat automated scrolling or capturing as scraping by an application. That could get your account flagged or restricted. If you want to be sure you won't get dinged, scroll and take the screenshots yourself (see below).
+
+### Safest: scroll and take screenshots yourself
 
 Scroll manually and take screenshots as you go (macOS: `Cmd+Shift+4`). Overlapping screenshots are fine, because people are de-duplicated. macOS names such as `Screenshot 2026-09-22 at 9.01.12 AM.png` are dated automatically.
 
