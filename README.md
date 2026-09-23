@@ -1,8 +1,8 @@
-#### This app is vibe-coded, it is what it is, don't expect super clean
-
 <p align="center">
   <img src="public/favicon.svg" alt="Open-to-Work & Hiring Tracker icon" width="112" />
 </p>
+
+#### This app is vibe-coded, it is what it is, don't expect super clean
 
 <h1 align="center">LinkedIn Open-to-Work & Hiring Tracker</h1>
 
