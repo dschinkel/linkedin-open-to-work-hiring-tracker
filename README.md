@@ -188,18 +188,18 @@ It updates with every new day of screenshots, and anyone seen again drops off. I
 
 ## How the metrics are defined
 
-| Metric | Formula |
+| Metric | What it means |
 |---|---|
-| Public Open-to-Work rate | OPEN ÷ (OPEN + NOT_OPEN) × 100. Uncertain is excluded |
-| Change | Percentage points (`pp`), never `%` |
-| Newly open / removed | Matched people only. A missing person is not an exit, and a first-time person is not an entry |
-| Entry rate | NOT_OPEN → OPEN ÷ previously NOT_OPEN people seen again |
-| Removal rate | OPEN → NOT_OPEN ÷ previously OPEN people seen again |
-| Entry / exit ratio | Added ÷ Removed. Shown as `—` when nothing was removed |
-| Matched-cohort rate | Only people classified in both this scan and the previous one |
-| Moving averages | Mean of scans actually taken in the window. Missing days are skipped, not filled |
-| Observed duration | From the first observed NOT_OPEN → OPEN to the first observed OPEN → NOT_OPEN |
-| Hiring-frame rate | HIRING ÷ (HIRING + NOT_HIRING) × 100. Counts people, not open roles |
+| Open-to-Work rate | % of people showing the #OPEN_TO_WORK frame (unclear avatars skipped) |
+| Hiring rate | % of people showing the #HIRING frame (people, not job openings) |
+| Change | Measured in percentage points (`pp`) |
+| Newly open / removed | Only counts people seen in both scans |
+| Entry rate | % of not-open people who became open |
+| Removal rate | % of open people who stopped showing it |
+| Entry / exit ratio | New opens per removal (`—` when there were no removals) |
+| Matched-cohort rate | The rate among only people seen in both scans |
+| Moving averages | Average of the scans you actually took; missing days are skipped |
+| Observed duration | Days between the frame appearing and disappearing |
 
 ---
 
