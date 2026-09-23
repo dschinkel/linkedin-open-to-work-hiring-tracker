@@ -130,7 +130,7 @@ describe('choosing the appearance', () => {
   it('offers six color themes', () => {
     const { result } = chooseAppearanceWith(inMemoryStorage())
 
-    expect(result.current.themeOptions.map((option) => option.label)).toEqual(['Neutral', 'Ocean', 'Green'])
+    expect(result.current.themeOptions.map((option) => option.label)).toEqual(['Neutral', 'Ocean', 'Aqua', 'Green', 'Yellow', 'Orange', 'Red'])
   })
 
   it('restores the chosen mode and theme on the next visit', () => {

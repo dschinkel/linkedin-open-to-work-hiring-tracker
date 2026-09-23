@@ -137,7 +137,7 @@ pnpm dev
 
 Open <http://localhost:5173>. That one command runs everything: the web app with live reload, the API (Koa), the SQLite database (created on first run), and watchers on both inbox folders. No Docker, nothing else to install. The first screenshot you add downloads English OCR data once (about 10 MB, into `data/ocr/`); after that it works offline.
 
-The app opens in **dark mode** with an **ocean** blue accent. Switch light/dark/system and pick from 3 color themes (Neutral, Ocean, Green) in the header.
+The app opens in **dark mode** with an **ocean** blue accent. Switch light/dark/system and pick from 7 color themes (Neutral, Ocean, Aqua, Green, Yellow, Orange, Red) in the header.
 
 ### Demo
 

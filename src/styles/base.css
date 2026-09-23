@@ -9,8 +9,10 @@
     @apply font-sans antialiased [font-variant-ligatures:none];
   }
 
+  /* The page fades from the theme's glow at the top to its page color, like a terminal backdrop. */
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background bg-fixed text-foreground;
+    background-image: linear-gradient(to bottom, var(--page-glow), var(--background) 75%);
   }
 
   ::selection {

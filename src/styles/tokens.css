@@ -9,6 +9,7 @@
 /* 2. Semantic ---------------------------------------------------------------------------------------------------- */
 :root {
   --background: var(--scheme-page);
+  --page-glow: var(--scheme-page-glow);
   --foreground: var(--scheme-text);
   --card: var(--scheme-panel);
   --card-foreground: var(--scheme-text);
