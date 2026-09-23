@@ -2,7 +2,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { App } from './App'
 
-const noScansYet = { scanCount: 0, inboxWaitingCount: 0, latestScan: null, latestQuality: null, whoIsHiring: { peopleCount: 0, companyCount: 0, preview: [] } }
+const noScansYet = { scanCount: 0, inboxWaitingCount: 0, scanReminder: null, latestScan: null, latestQuality: null, whoIsHiring: { peopleCount: 0, companyCount: 0, preview: [] } }
 
 describe('switching to the demo', () => {
   it('shows the sample data, not the empty real app', async () => {

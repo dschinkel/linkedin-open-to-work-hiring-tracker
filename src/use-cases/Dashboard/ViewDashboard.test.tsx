@@ -4,7 +4,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { ViewDashboard } from './ViewDashboard'
 
-const noScansYet = { scanCount: 0, inboxWaitingCount: 0, latestScan: null, latestQuality: null, whoIsHiring: { peopleCount: 0, companyCount: 0, preview: [] } }
+const noScansYet = { scanCount: 0, inboxWaitingCount: 0, scanReminder: null, latestScan: null, latestQuality: null, whoIsHiring: { peopleCount: 0, companyCount: 0, preview: [] } }
 
 function renderDashboard() {
   render(

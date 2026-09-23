@@ -16,13 +16,14 @@ export interface SettingsView {
   thresholds: Record<Threshold, string>
   frequencyOptions: PickerOption<Settings['scanFrequency']>[]
   retentionOptions: PickerOption<Settings['retention']>[]
+  afterAnalysisOptions: PickerOption<Settings['afterAnalysis']>[]
   changeInboxDirectory: (value: string) => void
   changeArchiveDirectory: (value: string) => void
   changeAutomaticProcessing: (value: boolean) => void
-  changeVisionFallback: (value: boolean) => void
   changeThreshold: (threshold: Threshold) => (value: string) => void
   changeScanFrequency: (value: Settings['scanFrequency']) => void
   changeRetention: (value: Settings['retention']) => void
+  changeAfterAnalysis: (value: Settings['afterAnalysis']) => void
   save: () => void
   isSaving: boolean
   isSaveDisabled: boolean
@@ -34,6 +35,11 @@ const frequencyOptions: PickerOption<Settings['scanFrequency']>[] = [
   { value: 'weekly', label: 'Weekly' },
   { value: 'biweekly', label: 'Every 2 weeks' },
   { value: 'monthly', label: 'Monthly' },
+]
+
+const afterAnalysisOptions: PickerOption<Settings['afterAnalysis']>[] = [
+  { value: 'delete', label: 'Delete screenshots once imported' },
+  { value: 'keep', label: 'Keep an archived copy' },
 ]
 
 const retentionOptions: PickerOption<Settings['retention']>[] = [
@@ -51,6 +57,7 @@ const placeholderSettings: Settings = {
   visionFallback: false,
   scanFrequency: 'daily',
   retention: 'forever',
+  afterAnalysis: 'delete',
 }
 
 /** Edits a local draft of settings and saves it only when it passes the settings contract. */
@@ -91,13 +98,14 @@ export function useEditSettings(injectedRepository?: SettingsRepository): Settin
     thresholds: thresholdTexts(settings),
     frequencyOptions,
     retentionOptions,
+    afterAnalysisOptions,
     changeInboxDirectory: (inboxDirectory) => change({ inboxDirectory }),
     changeArchiveDirectory: (archiveDirectory) => change({ archiveDirectory }),
     changeAutomaticProcessing: (automaticProcessing) => change({ automaticProcessing }),
-    changeVisionFallback: (visionFallback) => change({ visionFallback }),
     changeThreshold,
     changeScanFrequency: (scanFrequency) => change({ scanFrequency }),
     changeRetention: (retention) => change({ retention }),
+    changeAfterAnalysis: (afterAnalysis) => change({ afterAnalysis }),
     save,
     isSaving: saving.isPending,
     isSaveDisabled: draft === null || saving.isPending,

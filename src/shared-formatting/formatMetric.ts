@@ -46,3 +46,8 @@ export function daysSince(isoDate: string, today: Date = new Date()): number {
   const todayIso = [today.getFullYear(), today.getMonth() + 1, today.getDate()].map((part) => String(part).padStart(2, '0')).join('-')
   return Math.round((Date.parse(`${todayIso}T00:00:00Z`) - Date.parse(`${isoDate}T00:00:00Z`)) / millisecondsPerDay)
 }
+
+/** "1 person", "42 people". */
+export function formatPeople(count: number): string {
+  return count === 1 ? '1 person' : `${formatCount(count)} people`
+}

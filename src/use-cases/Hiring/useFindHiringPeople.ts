@@ -5,7 +5,7 @@ import type { LoadStatus } from '@/components/AsyncContent'
 import type { DataColumn, DataRow } from '@/components/DataTable'
 import type { DefinitionRow } from '@/components/DefinitionList'
 import type { PickerOption } from '@/components/OptionPicker'
-import { formatCount } from '@/shared-formatting/formatMetric'
+import { formatPeople } from '@/shared-formatting/formatMetric'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { describeHiringPerson, type HiringPersonRow } from './describeHiring'
@@ -86,7 +86,7 @@ export function useFindHiringPeople(injectedRepository?: HiringRepository): Hiri
     statusOptions,
     companyKnownOptions,
     sortOptions,
-    resultSummary: `${formatCount(rows.length)} people`,
+    resultSummary: formatPeople(rows.length),
     hasPeople: rows.length > 0,
     showNoMatches: rows.length === 0,
     columns,
@@ -114,12 +114,8 @@ function toTableRow(person: HiringPersonRow): DataRow {
 function describeCompanies(companies: CompanyHiring | undefined): DefinitionRow[] {
   if (!companies) return []
   return [
-    ...companies.companies.map((company) => ({ label: company.companyName, value: peopleLabel(company.peopleCount) })),
-    { label: 'Company needs review', value: peopleLabel(companies.needsReviewCount) },
-    { label: 'Company not visible', value: peopleLabel(companies.notVisibleCount) },
+    ...companies.companies.map((company) => ({ label: company.companyName, value: formatPeople(company.peopleCount) })),
+    { label: 'Company needs review', value: formatPeople(companies.needsReviewCount) },
+    { label: 'Company not visible', value: formatPeople(companies.notVisibleCount) },
   ]
-}
-
-function peopleLabel(count: number): string {
-  return count === 1 ? '1 person' : `${formatCount(count)} people`
 }

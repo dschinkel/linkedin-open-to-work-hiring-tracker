@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type { DepartedPerson } from '@contracts/api'
 import type { LoadStatus } from '@/components/AsyncContent'
 import type { DataColumn, DataRow } from '@/components/DataTable'
-import { formatCount, formatShortDate } from '@/shared-formatting/formatMetric'
+import { formatPeople, formatShortDate } from '@/shared-formatting/formatMetric'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { type DepartureRepository, departureRepositoryFor } from './DepartureRepository'
@@ -46,7 +46,7 @@ export function useFindDepartedPeople(injectedRepository?: DepartureRepository):
     ...loadStatusOf(query),
     title: departureTitles[audience],
     explanation: `Seen in earlier scans but missing from the last ${threshold} scans in a row. This is only reliable when every scan covers your whole list; someone may just have been scrolled past. Anyone who shows up again drops off this list, and it updates with every new day of screenshots.`,
-    resultSummary: `${formatCount(people.length)} people`,
+    resultSummary: formatPeople(people.length),
     search,
     searchByName,
     hasPeople: people.length > 0,

@@ -1,2 +1,5 @@
+allowBuilds:
+  # Its install script only prints a donation message; the library works without it.
+  tesseract.js: false
 minimumReleaseAgeExclude:
   - cn@0.4.0

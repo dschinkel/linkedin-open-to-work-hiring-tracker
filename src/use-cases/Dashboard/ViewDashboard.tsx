@@ -1,7 +1,9 @@
+import { BellRing } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { AsyncContent } from '@/components/AsyncContent'
 import { EmptyState } from '@/components/EmptyState'
 import { SectionCard } from '@/components/SectionCard'
+import { Alert, AlertTitle } from '@/components/ui/alert'
 import { buttonVariants } from '@/components/ui/button'
 import { HiringSnapshot } from '../Hiring/HiringSnapshot'
 import { WhoIsHiringPreview } from '../Hiring/WhoIsHiringPreview'
@@ -23,6 +25,12 @@ export function ViewDashboard() {
           <p className="text-sm text-muted-foreground">{dashboard.sampleLabel}</p>
         </div>
       </div>
+      {dashboard.showScanReminder && (
+        <Alert>
+          <BellRing />
+          <AlertTitle>{dashboard.scanReminder}</AlertTitle>
+        </Alert>
+      )}
       <AddScreenshots />
       {dashboard.showInboxNote && <p className="text-sm text-muted-foreground">{dashboard.inboxNote}</p>}
       {dashboard.showFirstRunInvite && (

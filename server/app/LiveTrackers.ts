@@ -1,0 +1,69 @@
+import { existsSync } from 'node:fs'
+import path from 'node:path'
+import type { Audience } from '../../contracts/api.ts'
+import { watchInbox } from '../screenshots/jobs/InboxWatcher.ts'
+import { inboxFolder as inboxFolderAt } from '../screenshots/outbound/filesystem/InboxFolder.ts'
+import type { CardReader } from '../screenshots/outbound/vision/CardReader.ts'
+import { addScreenshots } from '../screenshots/use-cases/AddScreenshots.ts'
+import { analyzeInbox } from '../screenshots/use-cases/AnalyzeInbox.ts'
+import { reprocessScan } from '../screenshots/use-cases/ReprocessScan.ts'
+import { defaultSettingsFor } from '../tracker/domain/DefaultSettings.ts'
+import { defaultDatabasePath, openTrackerDatabase, sqliteTrackerStore } from '../tracker/outbound/persistence/SqliteTrackerStore.ts'
+import type { TrackerStore } from '../tracker/outbound/persistence/TrackerStore.ts'
+import type { RoutesByAudience } from './AudienceRouting.ts'
+import { audienceTrackerRoutes } from './AudienceTracker.ts'
+
+export interface LiveTrackerSetup {
+  projectRoot: string
+  cardReader: CardReader
+  log: (message: string) => void
+}
+
+export interface LiveTrackers {
+  routesByAudience: RoutesByAudience
+  /** Starts watching both inbox folders; returns a function that stops watching. */
+  watchInboxes: () => () => Promise<void>
+}
+
+/**
+ * Your real data: data/linkedin.sqlite (created with its tables on first run), each audience's inbox
+ * folder, and the analyzer that turns screenshots into saved people.
+ */
+export const liveTrackers = ({ projectRoot, cardReader, log }: LiveTrackerSetup): LiveTrackers => {
+  const databasePath = path.join(projectRoot, defaultDatabasePath)
+  const isNew = !existsSync(databasePath)
+  const database = openTrackerDatabase(databasePath)
+  log(`Tracker: ${isNew ? 'created' : 'using'} SQLite database ${defaultDatabasePath}`)
+  const followers = liveAudience('followers', sqliteTrackerStore(database, 'followers', defaultSettingsFor('followers')), projectRoot, cardReader)
+  const contacts = liveAudience('contacts', sqliteTrackerStore(database, 'contacts', defaultSettingsFor('contacts')), projectRoot, cardReader)
+  return {
+    routesByAudience: { followers: followers.routes, contacts: contacts.routes },
+    watchInboxes: () => {
+      const stops = [followers, contacts].map((audience) => audience.watch(log))
+      return async () => void (await Promise.all(stops.map((stop) => stop())))
+    },
+  }
+}
+
+function liveAudience(audience: Audience, trackerStore: TrackerStore, projectRoot: string, cardReader: CardReader) {
+  const inboxFolder = inboxFolderAt({
+    projectRoot,
+    inboxDirectory: () => trackerStore.readSettings().inboxDirectory,
+    archiveDirectory: () => trackerStore.readSettings().archiveDirectory,
+  })
+  const { analyzeWaitingScreenshots } = analyzeInbox({ audience, trackerStore, inboxFolder, cardReader })
+  const routes = audienceTrackerRoutes(trackerStore, {
+    ...addScreenshots({ inboxFolder, trackerStore, analyzeWaitingScreenshots }),
+    ...reprocessScan({ audience, trackerStore, inboxFolder, cardReader }),
+  })
+  const watch = (log: (message: string) => void) =>
+    watchInbox({
+      folderPath: inboxFolder.folderPath(),
+      onScreenshotFound: (fileName) => {
+        if (trackerStore.knowsScreenshot(fileName) || !trackerStore.readSettings().automaticProcessing) return
+        trackerStore.recordWaitingScreenshot(fileName)
+        void analyzeWaitingScreenshots().then((report) => log(`Tracker (${audience}): imported ${report.importedFiles.length}, failed ${report.failedFiles.length}`))
+      },
+    })
+  return { routes, watch }
+}

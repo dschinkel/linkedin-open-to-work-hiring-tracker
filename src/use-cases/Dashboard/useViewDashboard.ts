@@ -25,6 +25,8 @@ export interface DashboardView {
   qualitySections: QualitySection[]
   inboxNote: string
   showInboxNote: boolean
+  scanReminder: string
+  showScanReminder: boolean
   hiringHref: string
   demoHref: string
   showDemoInvite: boolean
@@ -60,6 +62,8 @@ const noDashboard: DashboardFields = {
   qualitySections: [],
   inboxNote: '',
   showInboxNote: false,
+  scanReminder: '',
+  showScanReminder: false,
 }
 
 function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
@@ -78,6 +82,8 @@ function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
     showNoHiringPeople: dashboard.whoIsHiring.peopleCount === 0,
     qualitySections: dashboard.latestQuality ? describeScanQuality(dashboard.latestQuality) : [],
     ...describeInbox(dashboard.inboxWaitingCount),
+    scanReminder: dashboard.scanReminder ?? '',
+    showScanReminder: dashboard.scanReminder !== null,
   }
 }
 

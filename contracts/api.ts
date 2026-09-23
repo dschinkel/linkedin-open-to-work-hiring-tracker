@@ -103,6 +103,8 @@ export const dashboardSchema = z.object({
   scanCount: z.number(),
   /** Screenshots saved to the inbox that have not been analyzed yet. */
   inboxWaitingCount: z.number(),
+  /** Set when a new scan is due by the chosen scan frequency, e.g. "Your weekly scan is due: the last one was 9 days ago." */
+  scanReminder: z.string().nullable(),
   latestScan: scanSummarySchema.nullable(),
   latestQuality: scanQualitySchema.nullable(),
   whoIsHiring: z.object({
@@ -202,6 +204,8 @@ export const settingsSchema = z.object({
   visionFallback: z.boolean(),
   scanFrequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly']),
   retention: z.enum(['forever', '1y', '90d']),
+  /** What happens to a screenshot once its data is saved to the database: deleted (default) or kept in the archive. */
+  afterAnalysis: z.enum(['delete', 'keep']).default('delete'),
 })
 export type Settings = z.infer<typeof settingsSchema>
 

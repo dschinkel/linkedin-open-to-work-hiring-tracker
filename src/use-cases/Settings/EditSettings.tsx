@@ -15,7 +15,7 @@ export function EditSettings() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-semibold">Settings</h2>
-          <p className="text-sm text-muted-foreground">Everything stays local. Screenshots are archived, never deleted, so scans can be reprocessed.</p>
+          <p className="text-sm text-muted-foreground">Everything stays local, in data/linkedin.sqlite.</p>
         </div>
         <div className="flex items-center gap-3">
           <span className="text-xs text-muted-foreground">{form.saveMessage}</span>
@@ -33,15 +33,16 @@ export function EditSettings() {
               <LabeledInput id="archive" label="Archive directory" value={form.settings.archiveDirectory} onChange={form.changeArchiveDirectory} />
               <SwitchField
                 id="automatic-processing"
-                label="Automatic processing"
-                description="Analyze screenshots as soon as they land in the inbox"
+                label="Watch the inbox folders"
+                description="Also import screenshots copied straight into the folders. Dropped screenshots are always imported."
                 checked={form.settings.automaticProcessing}
                 onChange={form.changeAutomaticProcessing}
               />
-              <ChoiceSelect id="retention" label="Screenshot retention" value={form.settings.retention} options={form.retentionOptions} onChange={form.changeRetention} />
+              <ChoiceSelect id="after-analysis" label="After a screenshot is imported" value={form.settings.afterAnalysis} options={form.afterAnalysisOptions} onChange={form.changeAfterAnalysis} />
+              <ChoiceSelect id="retention" label="Archive retention" value={form.settings.retention} options={form.retentionOptions} onChange={form.changeRetention} />
             </div>
           </SectionCard>
-          <SectionCard title="Classifier" description="Above the upper threshold is a match, below the lower is not, anything between is ambiguous">
+          <SectionCard title="Frame detection" description="How sure a reading must be to count. Anything less sure is marked Uncertain.">
             <div className="space-y-4">
               <div className="grid gap-3 sm:grid-cols-2">
                 <LabeledInput id="open-threshold" label="Open to Work: match above" type="number" step="0.01" value={form.thresholds.open} onChange={form.changeThreshold('open')} />
@@ -49,16 +50,9 @@ export function EditSettings() {
                 <LabeledInput id="hiring-threshold" label="Hiring: match above" type="number" step="0.01" value={form.thresholds.hiring} onChange={form.changeThreshold('hiring')} />
                 <LabeledInput id="not-hiring-threshold" label="Hiring: no match below" type="number" step="0.01" value={form.thresholds.notHiring} onChange={form.changeThreshold('notHiring')} />
               </div>
-              <SwitchField
-                id="vision-fallback"
-                label="Vision-model fallback"
-                description="Send only ambiguous avatars to a vision model; otherwise they stay Uncertain"
-                checked={form.settings.visionFallback}
-                onChange={form.changeVisionFallback}
-              />
             </div>
           </SectionCard>
-          <SectionCard title="Scan reminders" description="Capturing stays manual; the app reminds you when a scan is due">
+          <SectionCard title="Scan reminders" description="The dashboard reminds you when a new scan is due">
             <ChoiceSelect id="frequency" label="Scan frequency" value={form.settings.scanFrequency} options={form.frequencyOptions} onChange={form.changeScanFrequency} />
           </SectionCard>
         </div>

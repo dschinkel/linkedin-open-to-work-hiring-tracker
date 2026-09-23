@@ -75,97 +75,61 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
 
 ### Screenshot rules
 
-1. Drag screenshots onto the drop box on the Dashboard, or copy them into that dashboard's inbox folder. There's no button to press: screenshots are analyzed as soon as they land, and the dashboard updates by itself. Only PNG, JPG, and WebP files are accepted, and a file already in the inbox is skipped.
-2. Screenshots from the **same date** are grouped into **one scan**, even across several uploads.
+1. Drop screenshots on the Dashboard, or copy them into that dashboard's inbox folder. They're read straight away; there's no button.
+2. Screenshots from the same date make one scan, even across several uploads.
+3. Overlap is fine: each person is counted once, matched by name, headline, and company (never by face).
+4. Keep avatars, names, and headlines visible.
+5. Scan regularly (daily or weekly) so there's history to compare.
 
-   **Overlapping screenshots are fine; duplicates are filtered out.** When you scroll and screenshot, the same person often shows up at the bottom of one screenshot and the top of the next. The app is smart enough to catch that: every card from the day is matched by the person's visible name, headline, and company (ignoring case and spacing, never face recognition), so each person counts once. If two screenshots of the same person read their frame differently, the clearer reading wins, and if both are confident but disagree, that person is marked Uncertain instead of guessed. The number of duplicates removed is shown on each scan.
-3. Take a scan regularly (daily or weekly) so trends and transitions have history to compare.
-4. Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).
-5. Screenshots contain real people's names, so `LinkedinScreenShots/` and `data/` are **git-ignored**: they stay on your machine and are never committed or pushed.
+### What happens to your screenshots
 
-   **Recommendation: never push your screenshots**, not even to a private fork. They show other people's names, photos, and headlines. Your git history doesn't need them: once screenshots are analyzed, what the app learns from them is kept in a local SQLite database (see [Where your data lives](#where-your-data-lives)).
+Each screenshot is read the moment it arrives: people, headlines, and both frames are saved to your local database, and **the screenshot is then deleted**. One that can't be read (blurry, not a LinkedIn list) is left in the inbox so you can see what went wrong. To keep an archived copy of each one instead, choose *Keep an archived copy* in Settings.
 
-   If you still want them in your fork's history, remove these lines from `.gitignore`, and only ever in a **private** fork:
-
-   ```gitignore
-   LinkedinScreenShots/*
-   !LinkedinScreenShots/.gitkeep
-   data/
-   ```
+Screenshots and the database are **git-ignored**, so they're never committed or pushed. **Recommendation: never push your screenshots**, not even to a private fork; they show other people's names and photos, and the database already holds what you need. (To keep them in a private fork anyway, remove `LinkedinScreenShots/*`, `!LinkedinScreenShots/.gitkeep`, and `data/` from `.gitignore`.)
 
 ### Where your data lives
 
-Everything is stored locally in **`data/linkedin.sqlite`**, one SQLite file on your own computer. The app reads from and writes to it on every request, so what you see is always what's saved. You don't set it up: `pnpm dev` creates it on first run and keeps its tables up to date after that.
+Everything is in **`data/linkedin.sqlite`**, one file on your computer, created automatically the first time you run the app.
 
 | Table | What it holds |
 |---|---|
-| `people` | Everyone seen in your screenshots: a pseudonymous identity hash, visible name, headline, and company (with how confidently the company was read) |
-| `scans` | One row per day of screenshots: the date, cards detected, and duplicates removed |
-| `observations` | Each person in each scan: their #OPEN_TO_WORK and #HIRING frame status, with confidence and how it was detected |
-| `screenshots` | Every screenshot you add: file name, when it was added, whether it's still waiting or which scan it went into |
-| `settings` | Your Settings page choices |
+| `people` | Everyone seen: an identity hash, name, headline, company |
+| `scans` | One row per day: cards found, duplicates removed |
+| `observations` | Each person on each day: #OPEN_TO_WORK and #HIRING, with confidence |
+| `screenshots` | Every screenshot added: waiting, imported, or failed (and why) |
+| `settings` | Your Settings choices |
 
-Followers and Contacts share the file but are kept apart: every row belongs to one of them.
-
-- **It's persistent.** It survives restarts, reboots, and pulling app updates.
-- **It's not backed up by git.** `data/` is git-ignored (so your data is never pushed), which also means you lose it if you delete the project folder, clone into a new folder, move to a new laptop, or your disk fails.
-- **Back it up like any other file:** Time Machine (or your usual backup), or copy `data/linkedin.sqlite` somewhere safe now and then. Restoring is copying it back while `pnpm dev` is stopped.
-- **You can open it yourself** with any SQLite tool, for example `sqlite3 data/linkedin.sqlite` or [DB Browser for SQLite](https://sqlitebrowser.org/).
-
-> **Keep your screenshots for now.** The analyzer that reads names and frames out of screenshots is the next part of this project. Until it exists, the database records each screenshot you add as waiting (the dashboard shows how many), but can't extract people from it yet, so the screenshots are still your only copy of that information. Once analyzed, originals are archived under `data/screenshots/` by date so scans can be re-analyzed when detection improves; an option to delete them automatically after analysis is planned.
-
+Followers and Contacts share the file but never mix. It survives restarts and updates, but **git doesn't back it up**: copy `data/linkedin.sqlite` somewhere safe now and then (or let Time Machine do it). Open it with any SQLite tool, e.g. `sqlite3 data/linkedin.sqlite`.
 
 ---
 
 ## Running it
 
-### Prerequisites
-
-Node.js 26.10+ (the version is pinned in `.nvmrc`, so `nvm install && nvm use` picks it up)<br>
-pnpm 12+ (`npm install -g pnpm`)
-
-### Start
+**Needs:** Node.js 26.10+ (`nvm install && nvm use` reads `.nvmrc`) and pnpm 12+.
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-Open <http://localhost:5173>.
+Open <http://localhost:5173>. That one command runs everything: the web app with live reload, the API (Koa), the SQLite database (created on first run), and watchers on both inbox folders. No Docker, nothing else to install. The first screenshot you add downloads English OCR data once (about 10 MB, into `data/ocr/`); after that it works offline.
 
-That's the whole setup. The first time `pnpm dev` runs, it creates the local database (`data/linkedin.sqlite`) and all its tables by itself, and upgrades it automatically when a newer version of the app needs changes. There's no database to install and **no Docker**: SQLite is built into Node.js and stores everything in that one file. The terminal shows which database it's using:
-
-```text
-  Tracker: created SQLite database data/linkedin.sqlite
-```
+The app opens in **dark mode** with a **yellow** accent. Switch light/dark/system and pick from 6 color themes in the header.
 
 ### Demo
 
-To see what the app does, open the demo:
+<https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers> (or **Demo** in the app header). It runs in your browser with fictional data: 800 followers and 500 contacts over 180 days. Every chart zooms like a stock chart: drag the handles under it.
 
-- **Online:** <https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers>
-- **Locally:** <http://localhost:5173/demo/followers>, or click **Demo** in the app header
-
-The demo has both dashboards: 500 fictional contacts and 800 fictional followers, each with its own history, so the **Followers / Contacts** toggle shows two different pictures, including a list of unfollowers and past contacts.
-
-The demo runs entirely in your browser on a fixed sample network (500 fictional people, 180 days of made-up scans ending Sep 22, 2026).
-
-It never talks to a server or LinkedIn. Every chart can be zoomed like a stock chart: drag the handles under a chart, and the other charts on the page follow.
-
-To fill your local dashboards with sample data instead (held in memory only; your database is not read or changed):
-
-```bash
-TRACKER_SAMPLE=full pnpm dev     # ~6 months of sample history ending today
-TRACKER_SAMPLE=single pnpm dev   # one scan: shows "trend data available after additional scans"
-```
+For sample data in your local dashboards (kept in memory; your database isn't touched): `TRACKER_SAMPLE=full pnpm dev`.
 
 ### Scripts
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Dev server (dashboards at `/followers` (default) and `/contacts`, demo at `/demo/followers` and `/demo/contacts`) |
-| `pnpm test` | Unit tests (Vitest) |
-| `pnpm typecheck` | TypeScript project check |
+| `pnpm dev` | App, API, database, and inbox watchers, with live reload |
+| `pnpm server` | Just the API on port 3001 (headless, for scripts) |
+| `pnpm test` | All tests: React hooks and views, analytics, the screenshot reader, SQLite, and headless HTTP tests of the Koa server |
+| `pnpm typecheck` | TypeScript check |
 | `pnpm lint` | oxlint |
 | `pnpm build` | Production build |
 
@@ -173,22 +137,21 @@ TRACKER_SAMPLE=single pnpm dev   # one scan: shows "trend data available after a
 
 ## Pages
 
-Every page exists once for **Contacts** and once for **Followers**; the toggle in the header switches between them and keeps you on the same page.
+Each page exists for **Followers** and **Contacts**; the header toggle switches between them and keeps you on the same page.
 
-<img src="https://img.shields.io/badge/Dashboard-2ea043?style=flat-square" alt="Dashboard" align="absmiddle"> the latest scan's Open-to-Work and Hiring cards, rate trend, entry vs removal, Who's Hiring preview, scan quality, and daily history.
+<img src="https://img.shields.io/badge/Dashboard-2ea043?style=flat-square" alt="Dashboard" align="absmiddle"> latest numbers, rate trend, entry vs removal, who's hiring, scan quality, daily history, and the screenshot drop box.
 
-<img src="https://img.shields.io/badge/Trends-2ea043?style=flat-square" alt="Trends" align="absmiddle"> zoomable, synced charts showing the rate with a 7-day moving average, 7/30/90-day averages, raw vs matched-cohort rate, entry vs removal, net flow, entry/removal rates, observed duration, and hiring-frame trends. Includes 7D / 30D / 90D / 6M / 1Y / All windows.
+<img src="https://img.shields.io/badge/Trends-2ea043?style=flat-square" alt="Trends" align="absmiddle"> zoomable, synced charts: rate and moving averages, raw vs matched cohort, entries vs removals, net flow, how long people stay open, and hiring trends.
 
-<img src="https://img.shields.io/badge/Hiring-2ea043?style=flat-square" alt="Hiring" align="absmiddle"> a searchable, filterable table of everyone seen with #HIRING (current vs previous, company known vs unknown, sorting), plus counts per company. Greyed rows were not in the latest scan, so the frame is not claimed for today.
+<img src="https://img.shields.io/badge/Hiring-2ea043?style=flat-square" alt="Hiring" align="absmiddle"> everyone seen with #HIRING, searchable and filterable, plus counts per company.
 
-<img src="https://img.shields.io/badge/Unfollowers-2ea043?style=flat-square" alt="Unfollowers" align="absmiddle"> / <img src="https://img.shields.io/badge/Past_contacts-2ea043?style=flat-square" alt="Past contacts" align="absmiddle"> people seen in earlier scans who are missing from the last 3 scans in a row: likely unfollowers (Followers) or removed connections (Contacts), with when they were last seen and whether they had the #OPEN_TO_WORK or #HIRING frame then.
+<img src="https://img.shields.io/badge/Unfollowers-2ea043?style=flat-square" alt="Unfollowers" align="absmiddle"> / <img src="https://img.shields.io/badge/Past_contacts-2ea043?style=flat-square" alt="Past contacts" align="absmiddle"> people missing from your last 3 scans, and whether they were Open to Work or Hiring when last seen.
 
-It updates with every new day of screenshots, and anyone seen again drops off. It's only reliable when each scan covers your whole list, since a screenshot can't prove someone left.
+Only reliable when each scan covers your whole list, since a screenshot can't prove someone left.
 
-<img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> sortable daily history (Open to Work / Hiring / All columns). Click a row for scan detail, per-screenshot results, quality, and <img src="https://img.shields.io/badge/Reprocess_scan-2ea043?style=flat-square" alt="Reprocess scan" align="absmiddle">.
+<img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> daily history; click a day for its screenshots and quality.
 
-<img src="https://img.shields.io/badge/Settings-2ea043?style=flat-square" alt="Settings" align="absmiddle"> inbox/archive folders, automatic processing, classifier thresholds, vision fallback, retention, and scan reminders.
-
+<img src="https://img.shields.io/badge/Settings-2ea043?style=flat-square" alt="Settings" align="absmiddle"> inbox and archive folders, what happens after import, thresholds, and reminders.
 
 ## How the metrics are defined
 
@@ -205,11 +168,8 @@ It updates with every new day of screenshots, and anyone seen again drops off. I
 | Moving averages | Average of the scans you actually took; missing days are skipped |
 | Observed duration | Days between the frame appearing and disappearing |
 
-## Roadmap
+## How screenshots are read
 
-Next steps:
+Text is read with OCR (tesseract.js). Frames are found from pixels: a real #OPENTOWORK or #HIRING frame is an unbroken green or purple band around the avatar with a label printed on it. So a green shirt or purple background isn't mistaken for a frame, and anything unclear is marked Uncertain rather than guessed. No face recognition, and nothing leaves your machine.
 
-1. Koa backend implementing the same `contracts/api.ts`, reusing `mock-api/domain/`
-2. `chokidar` watcher on `LinkedinScreenShots/contacts/` and `LinkedinScreenShots/followers/`, with originals archived by date to `data/screenshots/<audience>/`
-3. Card detection, OCR, and OpenCV frame classification (with an optional vision-model fallback)
-4. Settings option to delete screenshots automatically after analysis (default: keep, so scans can be re-analyzed)
+It's tested on LinkedIn-style screenshots with fictional people (`server/screenshots/fixtures/`, regenerated with `node scripts/render-screenshot-fixtures.mjs`). If your real screenshots read poorly, open an issue with the zoom level you used.

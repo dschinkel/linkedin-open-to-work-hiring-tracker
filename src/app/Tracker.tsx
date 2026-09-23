@@ -12,6 +12,7 @@ import { ViewScan } from '@/use-cases/Scan/ViewScan'
 import { ViewScans } from '@/use-cases/Scan/ViewScans'
 import { EditSettings } from '@/use-cases/Settings/EditSettings'
 import { ViewTrends } from '@/use-cases/Trend/ViewTrends'
+import { ChooseAppearance } from '@/use-cases/Appearance/ChooseAppearance'
 import type { Audience } from '@contracts/api'
 import { SegmentedLinks } from '@/components/SegmentedLinks'
 import type { TrackerMode } from '@/shared-repositories/trackerEnvironment'
@@ -34,6 +35,7 @@ export function Tracker({ mode, audience }: { mode: TrackerMode; audience: Audie
             <>
               {tracker.showDemoInvite && <DemoInvite href={tracker.demoHref} />}
               {tracker.showExitDemo && <ExitDemo href={tracker.exitDemoHref} />}
+              <ChooseAppearance />
             </>
           }
         >

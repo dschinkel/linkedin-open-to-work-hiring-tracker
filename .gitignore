@@ -27,3 +27,6 @@ dist-ssr
 LinkedinScreenShots/*
 !LinkedinScreenShots/.gitkeep
 data/
+
+# Test-runner output
+.vitest/
