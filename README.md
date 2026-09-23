@@ -38,7 +38,7 @@ GoFullPage file names include the date (for example `screencapture-linkedin-com-
 
 > **Heads-up: GoFullPage carries some risk.** It captures the page by scrolling it automatically, and LinkedIn may treat automated scrolling or capturing as scraping by an application. That could get your account flagged or restricted. If you want to be sure you won't get dinged, scroll and take the screenshots yourself (see below).
 
-### Safest: scroll and take screenshots yourself
+### $\color{green}{\textsf{Safest:}}$ scroll and take screenshots yourself
 
 This is the safest option because nothing is automated: you scroll LinkedIn like any normal visitor and use your operating system's own screenshot tool. No browser extension or app touches the LinkedIn page, so there is nothing for LinkedIn to flag as scraping.
 
