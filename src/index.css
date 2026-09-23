@@ -178,3 +178,8 @@
     outline-offset: 2px;
   }
 }
+
+/* Grid cells may shrink below their content (wide tables, charts) so pages never overflow a phone screen. */
+.grid > * {
+  min-width: 0;
+}

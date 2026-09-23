@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.svg" alt="Open-to-Work & Hiring Tracker icon" width="160" />
+  <img src="public/logo-animated.svg" alt="Open-to-Work & Hiring Tracker icon" width="160" />
 </p>
 
 <h4 align="center">This app is vibe-coded, it is what it is, don't expect super clean</h4>
@@ -77,7 +77,17 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
    **Overlapping screenshots are fine; duplicates are filtered out.** When you scroll and screenshot, the same person often shows up at the bottom of one screenshot and the top of the next. The app is smart enough to catch that: every card from the day is matched by the person's visible name, headline, and company (ignoring case and spacing, never face recognition), so each person counts once. If two screenshots of the same person read their frame differently, the clearer reading wins, and if both are confident but disagree, that person is marked Uncertain instead of guessed. The number of duplicates removed is shown on each scan.
 3. Take a scan regularly (daily or weekly) so trends and transitions have history to compare.
 4. Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).
-5. Screenshots contain real people's names. `LinkedinScreenShots/` and `data/` are **git-ignored**, so never force-add them.
+5. Screenshots contain real people's names, so `LinkedinScreenShots/` and `data/` are **git-ignored**: they stay on your machine and are never committed or pushed.
+
+   **Want your screenshots saved in your fork?** If you'd like your fork's git history to keep them (for example as a backup), remove these lines from `.gitignore` in your fork:
+
+   ```gitignore
+   LinkedinScreenShots/*
+   !LinkedinScreenShots/.gitkeep
+   data/
+   ```
+
+   Only do this if your fork is **private**. In a public fork, everyone could see the names and headlines of your followers and contacts.
 
 ---
 

@@ -217,6 +217,8 @@ export type AddScreenshotsRequest = z.infer<typeof addScreenshotsRequestSchema>
 export const addScreenshotsResultSchema = z.object({
   saved: z.array(z.string()),
   rejected: z.array(z.object({ fileName: z.string(), reason: z.string() })),
+  /** What happened when the new screenshots were analyzed. */
+  analysisMessage: z.string(),
   message: z.string(),
 })
 export type AddScreenshotsResult = z.infer<typeof addScreenshotsResultSchema>

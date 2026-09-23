@@ -8,7 +8,7 @@ export interface ScreenshotInbox {
 
 /** Stores each acceptable file once; a file already in the inbox is skipped, never duplicated. */
 export async function addScreenshots(inbox: ScreenshotInbox, request: AddScreenshotsRequest): Promise<AddScreenshotsResult> {
-  const result: AddScreenshotsResult = { saved: [], rejected: [], message: '' }
+  const result: AddScreenshotsResult = { saved: [], rejected: [], analysisMessage: '', message: '' }
   for (const file of request.files) await addOne(inbox, file, result)
   return { ...result, message: summarize(result) }
 }

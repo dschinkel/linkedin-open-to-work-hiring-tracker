@@ -137,11 +137,12 @@ async function addThenAnalyze(request: AddScreenshotsRequest, options: TrackerAp
   const added = await addScreenshots(options.screenshotInbox, request)
   if (added.saved.length === 0) return added
   const analysisMessage = await (options.analyzeNewScreenshots ?? analyzerNotBuilt)()
-  return { ...added, message: `${added.message} ${analysisMessage}` }
+  return { ...added, analysisMessage, message: `${added.message} ${analysisMessage}` }
 }
 
 function nothingSaved(request: AddScreenshotsRequest): AddScreenshotsResult {
   return {
+    analysisMessage: '',
     saved: [],
     rejected: request.files.map((file) => ({ fileName: file.fileName, reason: 'Demo only' })),
     message: 'This is the demo, so screenshots are not saved. Run the app locally to add your own.',

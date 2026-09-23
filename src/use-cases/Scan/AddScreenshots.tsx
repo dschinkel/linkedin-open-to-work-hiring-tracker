@@ -20,7 +20,7 @@ export function AddScreenshots() {
       <span className="font-medium">Drag LinkedIn screenshots here, or click to choose files</span>
       <span className="text-sm text-muted-foreground">PNG, JPG, or WebP. They are analyzed as soon as they land, and this dashboard updates by itself. Files already added are skipped.</span>
       <input id="add-screenshots" type="file" multiple accept={drop.acceptedTypes} className="sr-only" onChange={drop.handleFilesChosen} />
-      {drop.isUploading && <span className="text-sm">Adding screenshots…</span>}
+      {drop.isUploading && <span className="text-sm">{drop.progressMessage}</span>}
       {drop.resultMessage && <span className="text-sm font-medium">{drop.resultMessage}</span>}
       <ul className="text-xs text-muted-foreground">
         {drop.skippedFiles.map((skipped) => (

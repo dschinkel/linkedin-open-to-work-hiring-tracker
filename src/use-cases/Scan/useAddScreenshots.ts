@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { type ChangeEvent, type DragEvent, useState } from 'react'
-import type { AddScreenshotsRequest } from '@contracts/api'
+import type { AddScreenshotsRequest, AddScreenshotsResult } from '@contracts/api'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { type ScanRepository, scanRepositoryFor } from './ScanRepository'
 
 export interface AddScreenshotsView {
   isDraggingOver: boolean
   isUploading: boolean
+  progressMessage: string
   resultMessage: string
   skippedFiles: string[]
   acceptedTypes: string
@@ -16,17 +17,30 @@ export interface AddScreenshotsView {
   handleFilesChosen: (event: ChangeEvent<HTMLInputElement>) => void
 }
 
+interface UploadTotals {
+  saved: string[]
+  rejected: AddScreenshotsResult['rejected']
+  analysisMessage: string
+}
+
 const acceptedTypes = 'image/png,image/jpeg,image/webp'
 
-/** Drag-and-drop (or pick) screenshots straight into the inbox instead of copying them into the folder by hand. */
+/**
+ * Drag-and-drop (or pick) screenshots straight into the inbox. Files go up one at a time, so a
+ * big batch of full-page captures never becomes one huge request, and one bad file can't sink the rest.
+ */
 export function useAddScreenshots(injectedRepository?: ScanRepository): AddScreenshotsView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? scanRepositoryFor(api)
   const queryClient = useQueryClient()
   const [isDraggingOver, setIsDraggingOver] = useState(false)
+  const [progressMessage, setProgressMessage] = useState('')
   const upload = useMutation({
-    mutationFn: async (files: File[]) => repository.addScreenshots(await Promise.all(files.map(toUpload))),
-    onSuccess: () => queryClient.invalidateQueries(),
+    mutationFn: (files: File[]) => uploadOneByOne(files, repository, setProgressMessage),
+    onSettled: () => {
+      setProgressMessage('')
+      void queryClient.invalidateQueries()
+    },
   })
 
   function addFiles(files: FileList | null): void {
@@ -36,7 +50,8 @@ export function useAddScreenshots(injectedRepository?: ScanRepository): AddScree
   return {
     isDraggingOver,
     isUploading: upload.isPending,
-    resultMessage: upload.data?.message ?? upload.error?.message ?? '',
+    progressMessage,
+    resultMessage: upload.data ? summarize(upload.data) : (upload.error?.message ?? ''),
     skippedFiles: (upload.data?.rejected ?? []).map((file) => `${file.fileName}: ${file.reason}`),
     acceptedTypes,
     handleDragOver: (event) => {
@@ -54,6 +69,32 @@ export function useAddScreenshots(injectedRepository?: ScanRepository): AddScree
       event.target.value = ''
     },
   }
+}
+
+async function uploadOneByOne(files: File[], repository: ScanRepository, reportProgress: (message: string) => void): Promise<UploadTotals> {
+  const totals: UploadTotals = { saved: [], rejected: [], analysisMessage: '' }
+  for (const [position, file] of files.entries()) {
+    reportProgress(`Adding ${position + 1} of ${files.length}: ${file.name}`)
+    await uploadOne(file, repository, totals)
+  }
+  return totals
+}
+
+async function uploadOne(file: File, repository: ScanRepository, totals: UploadTotals): Promise<void> {
+  try {
+    const result = await repository.addScreenshots([await toUpload(file)])
+    totals.saved.push(...result.saved)
+    totals.rejected.push(...result.rejected)
+    totals.analysisMessage = result.analysisMessage || totals.analysisMessage
+  } catch (error) {
+    totals.rejected.push({ fileName: file.name, reason: `Upload failed (${error instanceof Error ? error.message : 'unknown error'})` })
+  }
+}
+
+function summarize(totals: UploadTotals): string {
+  const added = `${totals.saved.length} screenshot${totals.saved.length === 1 ? '' : 's'} added`
+  const skipped = totals.rejected.length > 0 ? `, ${totals.rejected.length} skipped` : ''
+  return `${added}${skipped}. ${totals.analysisMessage}`.trim()
 }
 
 async function toUpload(file: File): Promise<AddScreenshotsRequest['files'][number]> {
