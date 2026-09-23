@@ -56,19 +56,19 @@
 .dark,
 [data-theme='ocean'].dark,
 .dark [data-theme='ocean'] {
-  --scheme-page: #05111e;
-  --scheme-panel: #091725;
-  --scheme-raised: #0e1d2c;
-  --scheme-fill: #0f1f2f;
-  --scheme-hover: #16283a;
-  --scheme-rule: #213449;
-  --scheme-rule-strong: #2f445a;
-  --scheme-dim: #899eb4;
-  --scheme-text: #c9d6e4;
-  --scheme-bright: #ebf1f7;
-  --scheme-accent: #5db2f7;
-  --scheme-accent-fill: #5db2f7;
-  --scheme-on-accent: #05111e;
+  --scheme-page: #132336;
+  --scheme-panel: #182b41;
+  --scheme-raised: #1e3349;
+  --scheme-fill: #233a52;
+  --scheme-hover: #2b455f;
+  --scheme-rule: #3a5978;
+  --scheme-rule-strong: #4d6f92;
+  --scheme-dim: #a6bdd5;
+  --scheme-text: #dae7f3;
+  --scheme-bright: #f2f7fc;
+  --scheme-accent: #7cc4ff;
+  --scheme-accent-fill: #7cc4ff;
+  --scheme-on-accent: #0c1a29;
 }
 
 /* Neutral: grey ink, no tint ------------------------------------------------------------------------------------ */
@@ -90,19 +90,19 @@
 
 [data-theme='neutral'].dark,
 .dark [data-theme='neutral'] {
-  --scheme-page: #101010;
-  --scheme-panel: #161616;
-  --scheme-raised: #1c1c1c;
-  --scheme-fill: #1e1e1e;
-  --scheme-hover: #262626;
-  --scheme-rule: #333333;
-  --scheme-rule-strong: #424242;
-  --scheme-dim: #9b9b9b;
-  --scheme-text: #d4d4d4;
-  --scheme-bright: #f0f0f0;
-  --scheme-accent: #f0f0f0;
-  --scheme-accent-fill: #f0f0f0;
-  --scheme-on-accent: #101010;
+  --scheme-page: #1f1f1f;
+  --scheme-panel: #262626;
+  --scheme-raised: #2d2d2d;
+  --scheme-fill: #333333;
+  --scheme-hover: #3b3b3b;
+  --scheme-rule: #4a4a4a;
+  --scheme-rule-strong: #5e5e5e;
+  --scheme-dim: #b2b2b2;
+  --scheme-text: #e0e0e0;
+  --scheme-bright: #f7f7f7;
+  --scheme-accent: #f7f7f7;
+  --scheme-accent-fill: #f7f7f7;
+  --scheme-on-accent: #1a1a1a;
 }
 
 /* Green: lightly green-tinted ink, bright summer yellow-green prompt (kept clear of the Open to Work green) ----- */
