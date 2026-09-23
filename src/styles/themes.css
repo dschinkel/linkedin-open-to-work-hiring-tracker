@@ -124,7 +124,7 @@
 
 [data-theme='green'].dark,
 .dark [data-theme='green'] {
-  --scheme-page: #0d120b;
+  --scheme-page: #1a2e1d;
   --scheme-panel: #121810;
   --scheme-raised: #171e15;
   --scheme-fill: #192117;
