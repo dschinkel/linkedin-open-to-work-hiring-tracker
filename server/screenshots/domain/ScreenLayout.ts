@@ -1,3 +1,5 @@
+import type { AvatarCircle, Pixels } from './FrameDetection.ts'
+
 /** A word found by OCR, with its box in image pixels and how sure OCR was (0–100). */
 export interface TextBox {
   text: string
@@ -18,6 +20,8 @@ const notAHeadline = /^(followed by|\d+ mutual|and \d+ others|follow|following|m
 const trustworthyConfidence = 60
 
 const actionButton = /^(follow|following|message|connect|pending|remove)$/i
+/** "Followed by Sam and John" or "12 mutual connections" under a title; the little faces before it can read as letters ("Hp Followed by…"). */
+const sharedConnections = /\bfollowed by\b|\bmutual connections?\b/i
 /** LinkedIn's own heading above the list: "Dave's Network", "Following  Followers", "1,452 people are following you". */
 const listHeading = /(^|'s )network$|^(following|followers|connections)$|people (are following you|you follow)|^[\d,]+ (followers|connections)$/i
 
@@ -39,10 +43,84 @@ export function readNameStrip(words: TextBox[], rowPitch: number): NameBlock[] {
   return splitIntoBlocksBy(listLines, rowPitch * 0.3).map(toNameBlock)
 }
 
+/** Every photo in the column is a person; these are the ones no name was read beside. */
+export function photosWithoutAName(photos: AvatarCircle[], names: NameBlock[]): AvatarCircle[] {
+  return photos.filter((photo) => !names.some((name) => sitsBeside(name, photo)))
+}
+
+/** A person's name and title sit level with their photo, give or take a little. */
+export function sitsBeside(name: NameBlock, photo: AvatarCircle): boolean {
+  return Math.abs(photo.centreY - (name.top + name.bottom) / 2) <= photo.radius * 1.2
+}
+
+/**
+ * On LinkedIn a name starts level with the top of its photo and the title sits below it, about halfway down. Text
+ * starting that low beside a photo is a title whose name went unread, not a name.
+ */
+export function startsLevelWithTheTopOf(name: NameBlock, photo: AvatarCircle): boolean {
+  return Math.abs(name.top - (photo.centreY - photo.radius)) <= photo.radius * 0.5
+}
+
+/**
+ * Where to start reading at or above `y` without cutting through anyone's text: the middle of the first blank band
+ * tall enough to lie between two people (the gap between a name and its title is much smaller), or the top of the image.
+ */
+export function gapBetweenRowsAbove(pixels: Pixels, { left, right }: { left: number; right: number }, y: number, rowPitch: number): number {
+  const gapBetweenPeople = Math.max(2, Math.round(rowPitch * 0.2))
+  let blankRows = 0
+  for (let row = Math.min(pixels.height - 1, Math.round(y)); row >= 0; row -= 1) {
+    blankRows = hasText(pixels, row, left, right) ? 0 : blankRows + 1
+    if (blankRows >= gapBetweenPeople) return row + Math.floor(gapBetweenPeople / 2)
+  }
+  return 0
+}
+
+/**
+ * Whether this text is what is left of a row whose name the top of the image cut through: going up from it, there
+ * is more text running into the top edge before any gap between people. A name whole at the very top has nothing
+ * above it.
+ */
+export function isCutByTheTop(pixels: Pixels, { left, right }: { left: number; right: number }, name: NameBlock, rowPitch: number): boolean {
+  const gapBetweenPeople = Math.max(2, Math.round(rowPitch * 0.2))
+  let blankRows = 0
+  for (let row = Math.round(name.top) - 1; row >= 0; row -= 1) {
+    blankRows = hasText(pixels, row, left, right) ? 0 : blankRows + 1
+    if (blankRows >= gapBetweenPeople) return false
+  }
+  return blankRows < Math.round(name.top)
+}
+
+/** Text is dark (black names, grey titles); the grey lines between people and light page colours are not. */
+function hasText({ data, width }: Pixels, row: number, left: number, right: number): boolean {
+  for (let x = Math.max(0, left); x < Math.min(width, right); x += 2) {
+    const offset = (row * width + x) * 4
+    if (data[offset] * 0.299 + data[offset + 1] * 0.587 + data[offset + 2] * 0.114 < 170) return true
+  }
+  return false
+}
+
+/**
+ * A name starting less than a line of text above the bottom of the image was cut through by it, and OCR only
+ * guesses at half-letters. The person shows whole in the next screenshot.
+ */
+export function isCutByTheBottom(name: NameBlock, imageHeight: number, lineHeight: number): boolean {
+  return name.top + lineHeight > imageHeight
+}
+
+/**
+ * A person on the list has a title under their name. Above the photos the reader could find, a lone line is more
+ * likely LinkedIn's or the browser's own text (the search box, a bookmark) than a person, so only people with a
+ * title count there.
+ */
+export function hasATitle(name: NameBlock): boolean {
+  return name.headline !== null
+}
+
 /**
  * Names and titles all start at one left edge. Text elsewhere in the strip (the page sidebar, the search box,
- * browser bookmarks) starts somewhere else, and would otherwise bridge the gap between two people. A name with
- * an emoji before it starts a little right of the edge, so it counts when a title sits right under it.
+ * browser bookmarks) starts somewhere else, and would otherwise bridge the gap between two people. A name or title
+ * with an emoji before it starts a little right of the edge, so it counts when a title sits right under it or a
+ * name right above it.
  */
 function linesOfTheList(lines: TextLine[], rowPitch: number): TextLine[] {
   const tolerance = rowPitch * 0.12
@@ -50,16 +128,20 @@ function linesOfTheList(lines: TextLine[], rowPitch: number): TextLine[] {
   const edge = lines.map((line) => line.x0).sort((a, b) => startsNear(b).length - startsNear(a).length || a - b)[0]
   if (edge === undefined) return []
   const aligned = startsNear(edge)
-  const nudgedNames = lines.filter((line) => line.x0 - edge > tolerance && line.x0 - edge <= rowPitch * 0.3 && hasTitleUnder(line, aligned, rowPitch))
-  return [...aligned, ...nudgedNames]
+  const nudged = lines.filter((line) => line.x0 - edge > tolerance && line.x0 - edge <= rowPitch * 0.3 && (hasTitleUnder(line, aligned, rowPitch) || hasNameAbove(line, aligned, rowPitch)))
+  return [...aligned, ...nudged]
 }
 
 function hasTitleUnder(name: TextLine, aligned: TextLine[], rowPitch: number): boolean {
   return aligned.some((line) => line.y0 >= name.y1 && line.y0 - name.y1 <= rowPitch * 0.2)
 }
 
+function hasNameAbove(title: TextLine, aligned: TextLine[], rowPitch: number): boolean {
+  return aligned.some((line) => title.y0 >= line.y1 && title.y0 - line.y1 <= rowPitch * 0.2)
+}
+
 function isReadableLine(line: TextLine): boolean {
-  return line.bestConfidence >= trustworthyConfidence && /[A-Za-z]{2}/.test(line.text) && !actionButton.test(line.text) && !listHeading.test(line.text)
+  return line.bestConfidence >= trustworthyConfidence && /[A-Za-z]{2}/.test(line.text) && !actionButton.test(line.text) && !listHeading.test(line.text) && !sharedConnections.test(line.text)
 }
 
 function toNameBlock(block: TextLine[]): NameBlock {
@@ -123,9 +205,13 @@ function joinWord(line: TextLine, word: TextBox): TextLine {
   }
 }
 
-/** Drops LinkedIn's connection-degree and pronoun suffixes: "Jane Smith · 2nd", "Jane Smith (She/Her)". */
+/**
+ * Drops LinkedIn's connection-degree and pronoun suffixes ("Jane Smith · 2nd", "Jane Smith (She/Her)") and quote
+ * marks OCR sees in an emoji before a name, so one person reads the same in every screenshot.
+ */
 export function cleanName(text: string): string {
   return text
+    .replace(/^[“”"'‘’«»]+\s*/, '')
     .replace(/\s*[•·]\s*(1st|2nd|3rd\+?)\s*$/i, '')
     .replace(/\s*\((he|she|they)\/\w+\)\s*$/i, '')
     .trim()

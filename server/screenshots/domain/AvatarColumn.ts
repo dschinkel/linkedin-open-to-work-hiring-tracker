@@ -13,13 +13,25 @@ const circleFill = { least: 0.62, most: 0.95 }
 
 /**
  * Finds every person on a LinkedIn list by their profile photo: the photos are round, the same size, and
- * stacked in one column. Browser menus, bookmark icons, and letters don't form such a column.
+ * stacked in one column. Browser menus, bookmark icons, and letters don't form such a column. A photo cut by the
+ * top of the image is no longer round; it is placed where its whole circle would be, reaching above the image.
  */
 export function findAvatarColumn(pixels: Pixels): AvatarCircle[] {
-  const blobs = roundBlobs(pixels)
-  const columns = groupIntoColumns(blobs)
+  const shapes = inkShapes(pixels)
+  const columns = groupIntoColumns(shapes.map(asRoundBlob).filter((blob) => blob !== null))
   const best = columns.sort((a, b) => medianSize(b) - medianSize(a) || b.length - a.length)[0] ?? []
-  return best.sort((a, b) => a.top - b.top).map((blob) => ({ centreX: blob.left + blob.size / 2, centreY: blob.top + blob.size / 2, radius: blob.size / 2 }))
+  const cutPhoto = best.length > 0 ? photoCutByTheTop(shapes, best) : null
+  return [...(cutPhoto ? [cutPhoto] : []), ...best.filter((blob) => blob.top > 0)]
+    .sort((a, b) => a.top - b.top)
+    .map((blob) => ({ centreX: blob.left + blob.size / 2, centreY: blob.top + blob.size / 2, radius: blob.size / 2 }))
+}
+
+/** The shape touching the top of the image in the photo column, as wide as a photo: the lower part of a cut photo. */
+function photoCutByTheTop(shapes: Component[], column: Blob[]): Blob | null {
+  const size = medianSize(column)
+  const left = column[0].left
+  const cut = shapes.find((shape) => shape.minY === 0 && Math.abs(shape.minX - left) <= size * 0.3 && Math.abs(shape.maxX - shape.minX + 1 - size) <= size * 0.25)
+  return cut ? { left: cut.minX, top: cut.maxY + 1 - size, size } : null
 }
 
 /**
@@ -31,6 +43,18 @@ export function rowSpacing(photos: AvatarCircle[]): number {
   const rowGaps = gaps.filter((gap) => gap >= photos[0].radius * 2)
   return rowGaps.length > 0 ? Math.min(...rowGaps) : photos[0].radius * 3
 }
+
+/**
+ * Whether a row was cut by the top of the image: its photo, or the spot where its photo should be, reaches well
+ * past the top edge. A name starts level with the top of its photo, so such a row has lost its name and what is
+ * left beside it is only a title. A row cut by the bottom edge keeps its name.
+ */
+export function hasLostItsName({ centreY, radius }: AvatarCircle): boolean {
+  return centreY - radius < -radius * cutSliver
+}
+
+/** A photo (and the name level with it) cut by no more than this share of its radius still reads. */
+const cutSliver = 0.2
 
 /**
  * Whether a spot where a photo should be sits on the web page: the ring just outside it is the page's own
@@ -57,17 +81,17 @@ function colourAt(data: Pixels['data'], offset: number): number[] {
   return [data[offset], data[offset + 1], data[offset + 2]]
 }
 
-function roundBlobs(pixels: Pixels): Blob[] {
+/** Every connected patch of ink at least as big as the smallest photo. */
+function inkShapes(pixels: Pixels): Component[] {
   const ink = inkMask(pixels)
   const seen = new Uint8Array(pixels.width * pixels.height)
-  const blobs: Blob[] = []
+  const shapes: Component[] = []
   for (let index = 0; index < ink.length; index += 1) {
     if (!ink[index] || seen[index]) continue
     const component = floodFill(ink, seen, index, pixels.width, pixels.height)
-    const blob = asRoundBlob(component)
-    if (blob) blobs.push(blob)
+    if (component.maxX - component.minX + 1 >= smallestPhoto) shapes.push(component)
   }
-  return blobs
+  return shapes
 }
 
 interface Component {
