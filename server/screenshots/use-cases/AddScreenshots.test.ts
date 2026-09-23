@@ -62,4 +62,10 @@ describe('adding dropped screenshots', () => {
 
     expect(inbox.stored).toEqual([])
   })
+
+  it('tells the uploader a PDF is read when dropped in the app', async () => {
+    const add = addScreenshots({ inboxFolder: inboxHolding([]), trackerStore: emptyStore(), analyzeWaitingScreenshots: async () => nothingImported })
+
+    expect((await add.addScreenshots({ files: [png('export.pdf')] })).rejected).toEqual([{ fileName: 'export.pdf', reason: 'PDFs are read when dropped in the app' }])
+  })
 })

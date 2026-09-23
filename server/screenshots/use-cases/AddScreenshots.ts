@@ -1,6 +1,6 @@
 import type { AddScreenshotsRequest, AddScreenshotsResult } from '../../../contracts/api.ts'
 import type { TrackerStore } from '../../tracker/outbound/persistence/TrackerStore.ts'
-import { acceptedScreenshotName } from '../domain/ScreenshotFileName.ts'
+import { acceptedScreenshotName, refusalReason } from '../domain/ScreenshotFileName.ts'
 import type { InboxFolder } from '../outbound/filesystem/InboxFolder.ts'
 import type { AnalysisReport } from './AnalyzeInbox.ts'
 
@@ -16,7 +16,7 @@ type ScreenshotFile = AddScreenshotsRequest['files'][number]
 export const addScreenshots = ({ inboxFolder, trackerStore, analyzeWaitingScreenshots }: AddScreenshotsPorts) => {
   const addOne = async (file: ScreenshotFile, result: AddScreenshotsResult): Promise<void> => {
     const name = acceptedScreenshotName(file.fileName)
-    if (name === null) return void result.rejected.push({ fileName: file.fileName, reason: 'Not a PNG, JPG, or WebP image' })
+    if (name === null) return void result.rejected.push({ fileName: file.fileName, reason: refusalReason(file.fileName) })
     if (trackerStore.knowsScreenshot(name)) return void result.rejected.push({ fileName: name, reason: 'Already imported' })
     if ((await inboxFolder.store(name, file.dataBase64)) === 'already-present') return void result.rejected.push({ fileName: name, reason: 'Already in the inbox' })
     trackerStore.recordWaitingScreenshot(name)

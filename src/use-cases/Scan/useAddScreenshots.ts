@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { type ChangeEvent, type DragEvent, useState } from 'react'
 import type { AddScreenshotsRequest, AddScreenshotsResult } from '@contracts/api'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
+import { browserPdfReader, type PdfDocument, type PdfReader } from './pdfPages'
 import { type ScanRepository, scanRepositoryFor } from './ScanRepository'
 
 export interface AddScreenshotsView {
@@ -25,20 +26,28 @@ interface UploadTotals {
   peopleInScan: number
 }
 
-const acceptedTypes = 'image/png,image/jpeg,image/webp'
+/** One screenshot waiting to go up: a dropped image, or one page of a dropped PDF drawn as a PNG. */
+interface WaitingScreenshot {
+  fileName: string
+  label: string
+  contents: () => Promise<Blob>
+}
+
+const acceptedTypes = 'image/png,image/jpeg,image/webp,application/pdf'
 
 /**
  * Drag-and-drop (or pick) screenshots straight into the inbox. Files go up one at a time, so a
  * big batch of full-page captures never becomes one huge request, and one bad file can't sink the rest.
+ * A PDF counts as one screenshot per page, each named "<pdf name> - page N.png".
  */
-export function useAddScreenshots(injectedRepository?: ScanRepository): AddScreenshotsView {
+export function useAddScreenshots(injectedRepository?: ScanRepository, injectedPdfReader: PdfReader = browserPdfReader): AddScreenshotsView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? scanRepositoryFor(api)
   const queryClient = useQueryClient()
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [progressMessage, setProgressMessage] = useState('')
   const upload = useMutation({
-    mutationFn: (files: File[]) => uploadOneByOne(files, repository, setProgressMessage),
+    mutationFn: (files: File[]) => uploadOneByOne(files, { repository, pdfReader: injectedPdfReader, reportProgress: setProgressMessage }),
     onSettled: () => {
       setProgressMessage('')
       void queryClient.invalidateQueries()
@@ -73,35 +82,83 @@ export function useAddScreenshots(injectedRepository?: ScanRepository): AddScree
   }
 }
 
-async function uploadOneByOne(files: File[], repository: ScanRepository, reportProgress: (message: string) => void): Promise<UploadTotals> {
+interface UploadDependencies {
+  repository: ScanRepository
+  pdfReader: PdfReader
+  reportProgress: (message: string) => void
+}
+
+async function uploadOneByOne(files: File[], { repository, pdfReader, reportProgress }: UploadDependencies): Promise<UploadTotals> {
   const totals: UploadTotals = { saved: [], rejected: [], importedCount: 0, failedCount: 0, peopleInScan: 0 }
-  for (const [position, file] of files.entries()) {
-    reportProgress(`Adding ${position + 1} of ${files.length}: ${file.name}${peopleSoFar(totals)}`)
-    await uploadOne(file, repository, totals)
+  const screenshots = await screenshotsIn(files, pdfReader, totals, reportProgress)
+  for (const [position, screenshot] of screenshots.entries()) {
+    reportProgress(`Adding ${position + 1} of ${screenshots.length}: ${screenshot.label}${peopleSoFar(totals)}`)
+    await uploadOne(screenshot, repository, totals)
   }
   return totals
 }
 
-async function uploadOne(file: File, repository: ScanRepository, totals: UploadTotals): Promise<void> {
+/** Every screenshot in the drop, in order: images as they are, PDFs opened into their pages. A PDF that won't open is skipped. */
+async function screenshotsIn(files: File[], pdfReader: PdfReader, totals: UploadTotals, reportProgress: (message: string) => void): Promise<WaitingScreenshot[]> {
+  const screenshots: WaitingScreenshot[] = []
+  for (const file of files) {
+    if (!isPdf(file)) {
+      screenshots.push({ fileName: file.name, label: file.name, contents: async () => file })
+      continue
+    }
+    reportProgress(`Opening ${file.name}`)
+    try {
+      screenshots.push(...pagesOf(file, await pdfReader.open(file)))
+    } catch (error) {
+      totals.rejected.push({ fileName: file.name, reason: `Couldn't open this PDF (${messageOf(error)})` })
+    }
+  }
+  return screenshots
+}
+
+function pagesOf(pdf: File, opened: PdfDocument): WaitingScreenshot[] {
+  const baseName = pdf.name.replace(/\.pdf$/i, '')
+  return Array.from({ length: opened.pageCount }, (_, index) => ({
+    fileName: `${baseName} - page ${index + 1}.png`,
+    label: `${pdf.name} page ${index + 1}`,
+    contents: () => opened.renderPage(index + 1),
+  }))
+}
+
+function isPdf(file: File): boolean {
+  return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
+}
+
+async function uploadOne(screenshot: WaitingScreenshot, repository: ScanRepository, totals: UploadTotals): Promise<void> {
+  let upload: AddScreenshotsRequest['files'][number]
   try {
-    const result = await repository.addScreenshots([await toUpload(file)])
+    upload = { fileName: screenshot.fileName, dataBase64: toBase64(await (await screenshot.contents()).arrayBuffer()) }
+  } catch (error) {
+    return void totals.rejected.push({ fileName: screenshot.fileName, reason: `Couldn't draw this page (${messageOf(error)})` })
+  }
+  try {
+    const result = await repository.addScreenshots([upload])
     totals.saved.push(...result.saved)
     totals.rejected.push(...result.rejected)
     totals.importedCount += result.importedCount
     totals.failedCount += result.failedCount
     totals.peopleInScan = Math.max(totals.peopleInScan, result.peopleInScan)
   } catch (error) {
-    totals.rejected.push({ fileName: file.name, reason: `Upload failed (${error instanceof Error ? error.message : 'unknown error'})` })
+    totals.rejected.push({ fileName: screenshot.fileName, reason: `Upload failed (${messageOf(error)})` })
   }
 }
 
-/** One line for the whole batch, e.g. "23 screenshots added. 21 read, 2 couldn't be read. 480 people in this scan." */
+function messageOf(error: unknown): string {
+  return error instanceof Error ? error.message : 'unknown error'
+}
+
 /** Live running total while a batch uploads, e.g. " · 142 people found so far". */
 function peopleSoFar(totals: UploadTotals): string {
   if (totals.importedCount === 0) return ''
   return ` · ${plural(totals.peopleInScan, 'person', 'people')} found so far`
 }
 
+/** One line for the whole batch, e.g. "23 screenshots added. 21 read, 2 couldn't be read. 480 people in this scan." */
 function summarize(totals: UploadTotals): string {
   const added = `${plural(totals.saved.length, 'screenshot')} added${totals.rejected.length > 0 ? `, ${totals.rejected.length} skipped` : ''}.`
   const read = totals.importedCount + totals.failedCount > 0 ? ` ${totals.importedCount} read${totals.failedCount > 0 ? `, ${totals.failedCount} couldn't be read` : ''}.` : ''
@@ -111,10 +168,6 @@ function summarize(totals: UploadTotals): string {
 
 function plural(count: number, one: string, many = `${one}s`): string {
   return `${count} ${count === 1 ? one : many}`
-}
-
-async function toUpload(file: File): Promise<AddScreenshotsRequest['files'][number]> {
-  return { fileName: file.name, dataBase64: toBase64(await file.arrayBuffer()) }
 }
 
 function toBase64(buffer: ArrayBuffer): string {

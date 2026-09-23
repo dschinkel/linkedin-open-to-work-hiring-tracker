@@ -1,4 +1,4 @@
-import { acceptedScreenshotName } from './ScreenshotFileName.ts'
+import { acceptedScreenshotName, refusalReason } from './ScreenshotFileName.ts'
 
 describe('dropped screenshot names', () => {
   it('accepts a GoFullPage capture', () => {
@@ -19,5 +19,15 @@ describe('dropped screenshot names', () => {
 
   it('refuses hidden files', () => {
     expect(acceptedScreenshotName('.sneaky.png')).toBeNull()
+  })
+})
+
+describe('why a dropped file is refused', () => {
+  it('says a PDF is read when dropped in the app', () => {
+    expect(refusalReason('export.PDF')).toBe('PDFs are read when dropped in the app')
+  })
+
+  it('says any other file is not an image', () => {
+    expect(refusalReason('notes.txt')).toBe('Not a PNG, JPG, or WebP image')
   })
 })

@@ -3,3 +3,6 @@ allowBuilds:
   tesseract.js: false
 minimumReleaseAgeExclude:
   - cn@0.4.0
+ignoredOptionalDependencies:
+  # pdfjs-dist only uses it to draw PDFs in Node; the app renders PDF pages in the browser.
+  - '@napi-rs/canvas'

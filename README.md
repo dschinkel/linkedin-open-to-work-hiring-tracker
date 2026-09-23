@@ -96,6 +96,10 @@ Scroll manually and take screenshots as you go. On macOS:
 
 Overlapping screenshots are fine, because people are de-duplicated. macOS names such as `Screenshot 2026-09-22 at 9.01.12 AM.png` are dated automatically.
 
+### A PDF of screenshots
+
+You can also drop a PDF whose pages are screenshots (for example, several screenshots exported as one PDF). Each page is drawn as its own screenshot, named `<pdf name> - page N.png`, at twice the page size or the resolution of the picture on the page, whichever is sharper. Put the date in the PDF's name (for example `followers 2026-09-22.pdf`) to date the scan; otherwise it's dated the day you drop it. PDFs are only read when dropped in the app: a PDF copied straight into an inbox folder is skipped, and the server log says so.
+
 ### Screenshot rules
 
 1. Drop screenshots on the Dashboard, or copy them into that dashboard's inbox folder. They're read straight away; there's no button.

@@ -1,4 +1,4 @@
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import request from 'supertest'
@@ -13,8 +13,8 @@ const secondShot = 'Screenshot 2026-09-22 at 9.01.19 AM.png'
 const cardReader = screenshotCardReader(path.resolve('data/ocr'))
 
 /** The real server (Koa, SQLite, inbox folders, screenshot reader) running in a throwaway project folder. */
-function serverIn(projectRoot: string) {
-  const trackers = liveTrackers({ projectRoot, cardReader, log: () => undefined })
+function serverIn(projectRoot: string, log: (message: string) => void = () => undefined) {
+  const trackers = liveTrackers({ projectRoot, cardReader, log })
   const app = trackerKoaApp((apiRequest) => answerAudienceRequest(trackers.routesByAudience, apiRequest)).callback()
   return { http: request(app), trackers }
 }
@@ -139,6 +139,19 @@ describe('watching the inbox folders', () => {
     await new Promise((resolve) => setTimeout(resolve, 3000))
 
     expect((await http.get('/api/contacts/dashboard')).body.scanCount).toBe(0)
+    await stopWatching()
+  }, 30_000)
+
+  it('skips a PDF copied into the inbox folder and says PDFs are read when dropped in the app', async () => {
+    const project = freshProject()
+    const logged: string[] = []
+    const { trackers } = serverIn(project, (message) => logged.push(message))
+    const stopWatching = trackers.watchInboxes()
+    mkdirSync(path.join(project, 'LinkedinScreenShots/contacts'), { recursive: true })
+
+    writeFileSync(path.join(project, 'LinkedinScreenShots/contacts', 'export.pdf'), '%PDF-1.7')
+
+    await expect.poll(() => logged, { timeout: 10_000, interval: 200 }).toContain('Tracker (contacts): skipped export.pdf: PDFs are read when dropped in the app')
     await stopWatching()
   }, 30_000)
 })

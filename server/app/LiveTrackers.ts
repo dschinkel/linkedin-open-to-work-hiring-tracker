@@ -75,6 +75,7 @@ function liveAudience(audience: Audience, trackerStore: TrackerStore, projectRoo
         trackerStore.recordWaitingScreenshot(fileName)
         void analyzeWaitingScreenshots().then((report) => log(`Tracker (${audience}): imported ${report.importedFiles.length}, failed ${report.failedFiles.length}`))
       },
+      onFileSkipped: (fileName, reason) => log(`Tracker (${audience}): skipped ${fileName}: ${reason}`),
     })
   return { routes, watch, inboxFolder }
 }

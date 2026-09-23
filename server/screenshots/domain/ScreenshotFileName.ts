@@ -10,6 +10,15 @@ export function acceptedScreenshotName(fileName: string): string | null {
   return hasScreenshotExtension(name) ? name : null
 }
 
+/** Why a dropped file isn't taken as a screenshot. PDFs are split into page screenshots by the app, before they are uploaded. */
+export function refusalReason(fileName: string): string {
+  return isPdfName(fileName) ? 'PDFs are read when dropped in the app' : 'Not a PNG, JPG, or WebP image'
+}
+
+export function isPdfName(fileName: string): boolean {
+  return fileName.trim().toLowerCase().endsWith('.pdf')
+}
+
 function hasScreenshotExtension(name: string): boolean {
   const lowerName = name.toLowerCase()
   return screenshotExtensions.some((extension) => lowerName.endsWith(extension))
