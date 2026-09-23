@@ -123,7 +123,7 @@ function withinThreshold<Status extends string>(reading: Classification<Status>,
 }
 
 function describeWarning(uncertainCount: number, unreadable: number, peopleCount: number): string | null {
-  if (unreadable > peopleCount / 2) return 'Photos are too small to read #OPENTOWORK / #HIRING frames. Take screenshots at 75–100% browser zoom.'
+  if (unreadable > peopleCount / 2) return 'Photos are too small to read #OPENTOWORK / #HIRING frames. Take screenshots at 67–100% browser zoom.'
   return uncertainCount > 0 ? `${uncertainCount} uncertain avatar classification(s)` : null
 }
 
