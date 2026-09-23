@@ -44,19 +44,19 @@ This is the safest option because nothing is automated: you scroll LinkedIn like
 
 Scroll manually and take screenshots as you go. On macOS:
 
-- `Shift+Cmd+3`: capture the whole screen
-- `Shift+Cmd+4`: drag to capture just the connections list
-- `Shift+Cmd+5`: open the screenshot toolbar (screen, window, or selection, plus where to save)
+`Shift+Cmd+3`: capture the whole screen<br>
+`Shift+Cmd+4`: drag to capture just the connections list<br>
+`Shift+Cmd+5`: open the screenshot toolbar (screen, window, or selection, plus where to save)
 
 Overlapping screenshots are fine, because people are de-duplicated. macOS names such as `Screenshot 2026-09-22 at 9.01.12 AM.png` are dated automatically.
 
 ### Screenshot rules
 
-- Drag screenshots onto the drop box on the Dashboard, or copy them into `LinkedinScreenShots/`. Only PNG, JPG, and WebP files are accepted, and a file already in the inbox is skipped.
-- Screenshots from the **same date** are grouped into **one scan**.
-- Take a scan regularly (daily or weekly) so trends and transitions have history to compare.
-- Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).
-- Screenshots contain real people's names. `LinkedinScreenShots/` and `data/` are **git-ignored**, so never force-add them.
+1. Drag screenshots onto the drop box on the Dashboard, or copy them into `LinkedinScreenShots/`. Only PNG, JPG, and WebP files are accepted, and a file already in the inbox is skipped.
+2. Screenshots from the **same date** are grouped into **one scan**.
+3. Take a scan regularly (daily or weekly) so trends and transitions have history to compare.
+4. Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).
+5. Screenshots contain real people's names. `LinkedinScreenShots/` and `data/` are **git-ignored**, so never force-add them.
 
 ---
 
@@ -64,8 +64,8 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
 
 ### Prerequisites
 
-- Node.js 20.19+ (22+ recommended)
-- pnpm 10+ (`npm install -g pnpm`)
+Node.js 26.10+ (the version is pinned in `.nvmrc`, so `nvm install && nvm use` picks it up)<br>
+pnpm 12+ (`npm install -g pnpm`)
 
 ### Start
 
