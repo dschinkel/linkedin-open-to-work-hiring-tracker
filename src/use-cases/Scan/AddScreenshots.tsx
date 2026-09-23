@@ -21,12 +21,12 @@ export function AddScreenshots() {
       <span className="max-w-measure text-label text-muted-foreground">PNG, JPG, WebP, or PDF (each PDF page counts as one screenshot). Files already added are skipped.</span>
       <input id="add-screenshots" type="file" multiple accept={drop.acceptedTypes} className="sr-only" onChange={drop.handleFilesChosen} />
       {drop.isUploading && (
-        <span className="upload-progress inline-flex items-center gap-2 text-sm font-semibold" role="status">
-          <LoaderCircle className="size-4 animate-spin" />
+        <span className="upload-progress inline-flex items-center gap-2.5 text-lg font-bold sm:text-xl" role="status">
+          <LoaderCircle className="size-5 animate-spin sm:size-6" />
           {drop.progressMessage}
         </span>
       )}
-      {drop.resultMessage && <span className="text-sm font-medium">{drop.resultMessage}</span>}
+      {drop.resultMessage && <span className="text-lg font-bold sm:text-xl">{drop.resultMessage}</span>}
       <ul className="text-xs text-muted-foreground">
         {drop.skippedFiles.map((skipped) => (
           <li key={skipped}>{skipped}</li>
