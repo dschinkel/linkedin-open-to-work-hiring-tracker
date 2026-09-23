@@ -33,7 +33,7 @@ export function useTracker(mode: TrackerMode): TrackerView {
     queryClient,
     environment,
     navItems: navItemsUnder(environment.routeBase),
-    logoSrc: `${import.meta.env.BASE_URL}favicon.svg`,
+    logoSrc: `${import.meta.env.BASE_URL}logo.svg`,
     showDemoBanner: environment.isDemo,
     showDemoInvite: !environment.isDemo,
     showExitDemo: environment.isDemo && !isStaticDemoBuild,

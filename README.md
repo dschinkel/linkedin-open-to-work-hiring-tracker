@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/favicon.svg" alt="Open-to-Work & Hiring Tracker icon" width="160" />
+  <img src="public/logo.svg" alt="Open-to-Work & Hiring Tracker icon" width="160" />
 </p>
 
 <h4 align="center">This app is vibe-coded, it is what it is, don't expect super clean</h4>
