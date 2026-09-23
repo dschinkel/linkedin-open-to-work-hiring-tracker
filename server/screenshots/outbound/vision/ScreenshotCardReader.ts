@@ -2,7 +2,7 @@ import { mkdirSync } from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
 import { createWorker, PSM, type Worker } from 'tesseract.js'
-import { findAvatarColumn } from '../../domain/AvatarColumn.ts'
+import { findAvatarColumn, rowSpacing, sitsOnThePage } from '../../domain/AvatarColumn.ts'
 import type { DetectedCard } from '../../domain/Deduplication.ts'
 import { type AvatarCircle, type Pixels, readFrames } from '../../domain/FrameDetection.ts'
 import { type NameBlock, readNameStrip, type TextBox } from '../../domain/ScreenLayout.ts'
@@ -19,6 +19,8 @@ interface NameStrip {
   width: number
   height: number
   scale: number
+  /** Real text starts this far in; a word starting closer to the left edge was cut by it. */
+  cutWordEdge: number
 }
 
 /**
@@ -41,10 +43,15 @@ export const screenshotCardReader = (cacheFolder = path.resolve('data/ocr')): Ca
     const pixels = await decode(image)
     const photos = findAvatarColumn(pixels)
     if (photos.length === 0) return []
-    const pitch = rowPitch(photos)
+    const pitch = rowSpacing(photos)
     const strip = nameStripBeside(photos, pitch, pixels)
-    const names = readNameStrip(await readStrip(await ocr(), image, strip), pitch)
-    return names.map((name) => toCard(name, photoFor(name, photos), pixels, fileName))
+    const words = await readStrip(await ocr(), image, strip)
+    if (process.env.DEBUG_OCR) console.log(JSON.stringify({ strip, pitch, words: words.map((w) => [w.text, Math.round(w.x0), Math.round(w.y0), Math.round(w.y1), Math.round(w.confidence)]) }))
+    const names = readNameStrip(words, pitch)
+    return names
+      .map((name) => ({ name, photo: photoFor(name, photos) }))
+      .filter(({ photo }) => photos.includes(photo) || sitsOnThePage(pixels, photo))
+      .map(({ name, photo }) => toCard(name, photo, pixels, fileName))
   }
 
   return { readCards }
@@ -55,19 +62,16 @@ async function decode(image: Buffer): Promise<Pixels> {
   return { data, width: info.width, height: info.height }
 }
 
-function rowPitch(photos: AvatarCircle[]): number {
-  const gaps = photos.slice(1).map((photo, index) => photo.centreY - photos[index].centreY).sort((a, b) => a - b)
-  return gaps.length > 0 ? gaps[Math.floor(gaps.length / 2)] : photos[0].radius * 3
-}
-
-/** The text column right of the photos, from a row above the first photo to a row below the last (for empty photos). */
+/**
+ * The text column right of the photos, from two rows above the first photo found (a photo can go unfound) to the
+ * bottom, but below the browser's own toolbars.
+ */
 function nameStripBeside(photos: AvatarCircle[], pitch: number, { width, height }: Pixels): NameStrip {
   const diameter = photos[0].radius * 2
   const left = Math.round(Math.max(...photos.map((photo) => photo.centreX + photo.radius)) + diameter * 0.12)
-  const top = Math.max(0, Math.round(photos[0].centreY - pitch * 1.5))
-  const bottom = Math.min(height, Math.round((photos.at(-1) as AvatarCircle).centreY + pitch * 1.5))
+  const top = Math.max(0, Math.round(photos[0].centreY - pitch * 2))
   const scale = Math.min(6, Math.max(1, Math.round(readableTextHeight / (diameter * nameToPhotoRatio))))
-  return { left, top, width: Math.min(width - left, Math.round(diameter * 18)), height: bottom - top, scale }
+  return { left, top, width: Math.min(width - left, Math.round(diameter * 18)), height: height - top, scale, cutWordEdge: diameter * 0.07 }
 }
 
 async function readStrip(worker: Worker, image: Buffer, strip: NameStrip): Promise<TextBox[]> {
@@ -83,6 +87,7 @@ async function readStrip(worker: Worker, image: Buffer, strip: NameStrip): Promi
     .flatMap((block) => block.paragraphs)
     .flatMap((paragraph) => paragraph.lines)
     .flatMap((line) => line.words)
+    .filter((word) => word.bbox.x0 / strip.scale >= strip.cutWordEdge)
     .map((word) => ({
       text: word.text,
       confidence: word.confidence,

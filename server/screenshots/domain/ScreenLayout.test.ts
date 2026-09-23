@@ -20,6 +20,34 @@ describe('reading names beside the photo column', () => {
     ])
   })
 
+  it('ignores text beside the list, like the page sidebar, even where it sits between two people', () => {
+    const sidebar = [word('About', 900, 40), word('Privacy', 900, 120), word('Help', 900, 200), word('Center', 950, 200)]
+
+    expect(readNameStrip([...nameStrip, ...sidebar], pitch).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing', 'Grace Hopper'])
+  })
+
+  it('ignores header text that starts a little right of the names', () => {
+    const searchBox = [word("I'm", 115, 20), word('looking', 150, 20)]
+
+    expect(readNameStrip([...searchBox, ...nameStrip], pitch).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing', 'Grace Hopper'])
+  })
+
+  it('keeps a name that starts a little right because of an emoji before it', () => {
+    const emojiName = [word('Adrian', 120, 360), word('Kodja', 180, 360), word('Mentor', 100, 382)]
+
+    expect(readNameStrip([...nameStrip, ...emojiName], pitch).map((person) => [person.displayName, person.headline])).toContainEqual(['Adrian Kodja', 'Mentor'])
+  })
+
+  it('skips the heading of the list', () => {
+    const heading = [word("Dave's", 100, -80), word('Network', 160, -80), word('1,452', 100, -40), word('people', 150, -40), word('are', 210, -40), word('following', 240, -40), word('you', 330, -40)]
+
+    expect(readNameStrip([...heading, ...nameStrip], pitch).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing', 'Grace Hopper'])
+  })
+
+  it('keeps initials in names', () => {
+    expect(readNameStrip([word('Azad', 100, 60), word('A.', 145, 60)], pitch).map((person) => person.displayName)).toEqual(['Azad A.'])
+  })
+
   it('never mistakes the Follow button for a name', () => {
     expect(readNameStrip([word('Follow', 600, 70)], pitch)).toEqual([])
   })

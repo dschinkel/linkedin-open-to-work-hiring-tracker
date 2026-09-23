@@ -22,6 +22,41 @@ export function findAvatarColumn(pixels: Pixels): AvatarCircle[] {
   return best.sort((a, b) => a.top - b.top).map((blob) => ({ centreX: blob.left + blob.size / 2, centreY: blob.top + blob.size / 2, radius: blob.size / 2 }))
 }
 
+/**
+ * How far apart one person's row is from the next. The closest pair of photos is one row apart; a median would
+ * stretch across rows whose photo wasn't found (light photos blend into the page) and merge several people.
+ */
+export function rowSpacing(photos: AvatarCircle[]): number {
+  const gaps = photos.slice(1).map((photo, index) => photo.centreY - photos[index].centreY)
+  const rowGaps = gaps.filter((gap) => gap >= photos[0].radius * 2)
+  return rowGaps.length > 0 ? Math.min(...rowGaps) : photos[0].radius * 3
+}
+
+/**
+ * Whether a spot where a photo should be sits on the web page: the ring just outside it is the page's own
+ * background. Text beside a spot in the browser's toolbars or bookmarks bar is not a person.
+ */
+export function sitsOnThePage(pixels: Pixels, spot: AvatarCircle): boolean {
+  const background = backgroundColours(pixels.data, pixels.width * pixels.height)
+  const ring = ringAround(spot, pixels)
+  const onBackground = ring.filter((offset) => background.some((colour) => distance(colourAt(pixels.data, offset), colour) <= 45))
+  return ring.length > 0 && onBackground.length / ring.length >= 0.75
+}
+
+function ringAround({ centreX, centreY, radius }: AvatarCircle, { width, height }: Pixels): number[] {
+  const offsets: number[] = []
+  for (let degrees = 0; degrees < 360; degrees += 10) {
+    const x = Math.round(centreX + Math.cos((degrees * Math.PI) / 180) * radius * 1.3)
+    const y = Math.round(centreY + Math.sin((degrees * Math.PI) / 180) * radius * 1.3)
+    if (x >= 0 && x < width && y >= 0 && y < height) offsets.push((y * width + x) * 4)
+  }
+  return offsets
+}
+
+function colourAt(data: Pixels['data'], offset: number): number[] {
+  return [data[offset], data[offset + 1], data[offset + 2]]
+}
+
 function roundBlobs(pixels: Pixels): Blob[] {
   const ink = inkMask(pixels)
   const seen = new Uint8Array(pixels.width * pixels.height)

@@ -16,6 +16,8 @@ const notAHeadline = /^(followed by|\d+ mutual|and \d+ others|follow|following|m
 const trustworthyConfidence = 60
 
 const actionButton = /^(follow|following|message|connect|pending|remove)$/i
+/** LinkedIn's own heading above the list: "Dave's Network", "Following  Followers", "1,452 people are following you". */
+const listHeading = /(^|'s )network$|^(following|followers|connections)$|people (are following you|you follow)|^[\d,]+ (followers|connections)$/i
 
 /** One person's text as read beside the photo column: name first, then title. */
 export interface NameBlock {
@@ -30,8 +32,32 @@ export interface NameBlock {
  * Lines that sit close together belong to one person; a bigger gap starts the next person.
  */
 export function readNameStrip(words: TextBox[], rowPitch: number): NameBlock[] {
-  const lines = groupIntoLines(words.filter(isRealWord)).filter((line) => !actionButton.test(line.text)).sort((a, b) => a.y0 - b.y0)
-  return splitIntoBlocksBy(lines, rowPitch * 0.3).map(toNameBlock)
+  const lines = groupIntoLines(words.filter(isRealWord)).filter(isReadableLine)
+  const listLines = linesOfTheList(lines, rowPitch).sort((a, b) => a.y0 - b.y0)
+  return splitIntoBlocksBy(listLines, rowPitch * 0.3).map(toNameBlock)
+}
+
+/**
+ * Names and titles all start at one left edge. Text elsewhere in the strip (the page sidebar, the search box,
+ * browser bookmarks) starts somewhere else, and would otherwise bridge the gap between two people. A name with
+ * an emoji before it starts a little right of the edge, so it counts when a title sits right under it.
+ */
+function linesOfTheList(lines: TextLine[], rowPitch: number): TextLine[] {
+  const tolerance = rowPitch * 0.12
+  const startsNear = (edge: number) => lines.filter((line) => Math.abs(line.x0 - edge) <= tolerance)
+  const edge = lines.map((line) => line.x0).sort((a, b) => startsNear(b).length - startsNear(a).length || a - b)[0]
+  if (edge === undefined) return []
+  const aligned = startsNear(edge)
+  const nudgedNames = lines.filter((line) => line.x0 - edge > tolerance && line.x0 - edge <= rowPitch * 0.3 && hasTitleUnder(line, aligned, rowPitch))
+  return [...aligned, ...nudgedNames]
+}
+
+function hasTitleUnder(name: TextLine, aligned: TextLine[], rowPitch: number): boolean {
+  return aligned.some((line) => line.y0 >= name.y1 && line.y0 - name.y1 <= rowPitch * 0.2)
+}
+
+function isReadableLine(line: TextLine): boolean {
+  return /[A-Za-z]{2}/.test(line.text) && !actionButton.test(line.text) && !listHeading.test(line.text)
 }
 
 function toNameBlock(block: TextLine[]): NameBlock {
@@ -55,8 +81,9 @@ function splitIntoBlocksBy(lines: TextLine[], gapBetweenPeople: number): TextLin
   return blocks
 }
 
+/** A trustworthy word, or an initial like the "A." in "Azad A.". */
 function isRealWord(word: TextBox): boolean {
-  return word.confidence >= trustworthyConfidence && /[A-Za-z]{2}/.test(word.text)
+  return word.confidence >= trustworthyConfidence && (/[A-Za-z]{2}/.test(word.text) || /^[A-Z]\.$/.test(word.text))
 }
 
 /** Words that sit on the same baseline and close together become one line of text. */
