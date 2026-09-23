@@ -1,6 +1,6 @@
 /*
  * Stylesheet entry. Order matters: libraries first, then this app's layers from most general to most specific.
- *   fonts.css         Geist Mono, self-hosted via fontsource
+ *   fonts.css         Geist Mono, self-hosted subsets
  *   themes.css        3 color themes (Neutral, Ocean, Green) x light/dark, as role colors (--scheme-*)
  *   tokens.css        semantic tokens → Tailwind theme (colors, type scale, shadows, animations)
  *   base.css          element defaults

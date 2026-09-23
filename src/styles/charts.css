@@ -14,15 +14,27 @@
   @apply border-muted-foreground shadow-block;
 }
 
-/* Zoom brush: a dim track, a faint prompt-colored selection, prompt-colored handles. */
+/* Zoom brush: a slim hairline track with a faint selection band and small muted handles, so it stays out of the way. */
 [data-slot='chart'] .recharts-brush > rect:first-child {
-  @apply fill-muted stroke-border;
+  @apply fill-transparent stroke-border;
 }
 
 [data-slot='chart'] .recharts-brush-slide {
-  @apply fill-prompt-fill/12;
+  @apply fill-muted-foreground/15;
 }
 
 [data-slot='chart'] .recharts-brush-traveller > rect {
-  @apply fill-prompt-fill stroke-transparent;
+  @apply fill-muted-foreground stroke-transparent;
+}
+
+[data-slot='chart'] .recharts-brush-traveller > line {
+  @apply stroke-card;
+}
+
+/* End-of-line value labels: a thin halo in the panel color keeps them legible where they cross gridlines. */
+[data-slot='chart'] .recharts-reference-dot text {
+  paint-order: stroke;
+  stroke: var(--card);
+  stroke-width: 3px;
+  stroke-linejoin: round;
 }

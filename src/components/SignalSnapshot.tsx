@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { FrameRing } from './FrameRing'
-import type { Signal } from './frameRingCells'
+import type { Signal } from './frameRingArc'
 import { type DeltaTone, snapshotLayout } from './signalSnapshotLayout'
 import type { StatTileView } from './StatTile'
 

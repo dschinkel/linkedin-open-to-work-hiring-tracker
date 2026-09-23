@@ -111,7 +111,7 @@
 
 @theme {
   /* One monospace family for everything: body, headings, figures. */
-  --font-sans: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-mono: var(--font-sans);
   --font-heading: var(--font-sans);
 
@@ -154,12 +154,13 @@
   /* Hard offset shadows, like a window drawn one cell down and right. */
   --shadow-block: 4px 4px 0 0 var(--scheme-shadow);
 
-  --animate-cell-on: cell-on 90ms linear backwards;
+  --animate-ring-draw: ring-draw 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms backwards;
   --animate-invite-pulse: invite-pulse 1.8s ease-out 0.4s 5;
   --animate-upload-progress: upload-progress 2.4s ease-in-out infinite;
 
-  @keyframes cell-on {
-    from { opacity: 0; }
+  /* The frame arc draws itself in once: it starts fully offset (hidden) and settles at its length. */
+  @keyframes ring-draw {
+    from { stroke-dashoffset: var(--arc); }
   }
 
   @keyframes invite-pulse {

@@ -6,7 +6,7 @@ Tailwind v4, CSS-first (there is no `tailwind.config.js`). `src/index.css` impor
 
 | File | Holds | Layer |
 | --- | --- | --- |
-| `fonts.css` | Geist Mono, self-hosted from `@fontsource-variable/geist-mono` | unlayered |
+| `fonts.css` | Geist Mono `@font-face` rules for the self-hosted subsets in `src/assets/fonts/geist-mono/` (see its README) | unlayered |
 | `themes.css` | 3 color themes (Neutral, Ocean, Green) × light/dark, each as the same 11 role colors (`--scheme-*`), plus per-mode signal colors that never change per theme | unlayered |
 | `tokens.css` | Semantic tokens (shadcn's contract + app signals) pointing at scheme roles → Tailwind theme: colors, type scale, tracking, shadows, animations | `@theme` |
 | `base.css` | Element defaults: font, selection, focus ring | `base` |

@@ -1,6 +1,30 @@
 /*
- * Geist Mono, self-hosted from @fontsource-variable/geist-mono: one variable-weight file per script subset,
- * loaded only when a page uses a character from that subset. Glyphs outside its subsets fall back to the
- * system monospace font.
+ * Geist Mono, self-hosted as variable-weight subsets of just the characters this UI uses: about 55 KB for every
+ * weight, upright and italic. Geist Mono has no Greek, so the one Greek letter the UI shows (Δ, in "7-day Δ") comes
+ * from a single-glyph file cut from Commit Mono; unicode-range makes the browser use it for that character only.
+ * How the files were made, and their licenses: src/assets/fonts/geist-mono/README.md.
  */
-@import "@fontsource-variable/geist-mono";
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/geist-mono/geist-mono-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/geist-mono/geist-mono-italic-variable.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('../assets/fonts/geist-mono/delta-from-commit-mono.woff2') format('woff2');
+  unicode-range: U+0394;
+}

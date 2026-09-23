@@ -9,7 +9,6 @@ import { StatGrid } from '@/components/StatGrid'
 import { HiringTrendCharts } from './HiringTrendCharts'
 import { ObservedDuration } from './ObservedDuration'
 import {
-  formatCountTick,
   formatDateTick,
   formatRateTick,
   matchedRateSeries,
@@ -50,7 +49,7 @@ export function ViewTrends() {
               <BarComparisonChart data={trends.points} xKey="scanDate" zoomGroup="trends" series={openStatusChangeSeries} formatX={formatDateTick} />
             </SectionCard>
             <SectionCard title="Net Open-to-Work flow" description="Positive: more entries than exits. Negative: more exits than entries.">
-              <LineTrendChart data={trends.points} xKey="scanDate" zoomGroup="trends" series={netFlowSeries} formatX={formatDateTick} formatY={formatCountTick} showZeroLine />
+              <BarComparisonChart data={trends.points} xKey="scanDate" zoomGroup="trends" series={netFlowSeries} formatX={formatDateTick} />
             </SectionCard>
             <SectionCard
               title="Entry and removal rates"

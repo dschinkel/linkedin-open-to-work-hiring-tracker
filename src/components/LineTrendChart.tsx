@@ -1,20 +1,21 @@
 import { useMemo } from 'react'
-import { Area, Brush, CartesianGrid, ComposedChart, Line, ReferenceLine, XAxis, YAxis } from 'recharts'
+import { Brush, CartesianGrid, Line, LineChart, ReferenceDot, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip } from '@/components/ui/chart'
 import { chartConfigFor } from './chartConfig'
-import { chartAxisTick, chartGridDash } from './chartStyles'
+import { inDrawOrder, isTrendLine, latestTrendPoints, niceScale, plottedValues } from './chartData'
+import { chartAxisTick, chartBrush, chartTickGap, endLabelFont, lineChartMargin } from './chartStyles'
 import { FormattedChartTooltip } from './FormattedChartTooltip'
 
 export interface ChartSeries {
   key: string
   label: string
   color: string
-  dashed?: boolean
-  showDots?: boolean
-  /** Shade the space under the line in the series color. */
-  isFilled?: boolean
-  /** Bars only: fill with diagonal hatching instead of a solid color, e.g. removals. */
-  isHatched?: boolean
+  /** Lines: a `trend` is drawn bold and labelled with its latest value; `context` is drawn thin and faint behind it. */
+  role?: 'trend' | 'context'
+  /** Bars: drawn below the zero line, so exits hang under entries on the same day. */
+  isBelowZero?: boolean
+  /** Bars: color for values under zero, for a signed series such as net flow. */
+  negativeColor?: string
 }
 
 interface LineTrendChartProps {
@@ -25,64 +26,57 @@ interface LineTrendChartProps {
   /** Charts sharing a zoomGroup zoom and show tooltips together. */
   zoomGroup?: string
   formatY: (value: number) => string
-  showZeroLine?: boolean
 }
 
-const activeDot = { r: 3, strokeWidth: 0, fill: 'var(--prompt-fill)' }
+const trendActiveDot = { r: 3.5, strokeWidth: 2, stroke: 'var(--card)' }
 
-/** Stepped lines like a plotter, with hatched fill under filled series. */
-export function LineTrendChart({ data, xKey, series, formatX, zoomGroup, formatY, showZeroLine = false }: LineTrendChartProps) {
-  const config = useMemo(() => chartConfigFor(series), [series])
+/**
+ * Straight segments between scans. Context lines sit faint underneath; trend lines are bold and end in a dot labelled
+ * with the latest value in the right margin. The vertical scale fits the data with round steps rather than starting at
+ * zero, so movement is visible.
+ */
+export function LineTrendChart({ data, xKey, series, formatX, zoomGroup, formatY }: LineTrendChartProps) {
+  const config = useMemo(() => chartConfigFor(series, 'line'), [series])
+  const ordered = useMemo(() => inDrawOrder(series), [series])
+  const scale = useMemo(() => niceScale(plottedValues(data, series)), [data, series])
+  const endpoints = useMemo(() => latestTrendPoints(data, xKey, series), [data, xKey, series])
 
   return (
     <ChartContainer config={config} className="aspect-auto h-75 w-full">
-      <ComposedChart data={data} syncId={zoomGroup} margin={{ top: 8, right: 8, bottom: 0, left: -8 }}>
-        <defs>
-          {series
-            .filter((line) => line.isFilled)
-            .map((line) => (
-              <pattern key={line.key} id={`fill-${line.key}`} width={6} height={6} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                <line x1={0} y1={0} x2={0} y2={6} stroke={`var(--color-${line.key})`} strokeWidth={1} strokeOpacity={0.35} />
-              </pattern>
-            ))}
-        </defs>
-        <CartesianGrid strokeDasharray={chartGridDash} />
-        <XAxis dataKey={xKey} tickFormatter={formatX} tick={chartAxisTick} minTickGap={28} tickLine={false} />
-        <YAxis tickFormatter={formatY} tick={chartAxisTick} width={56} axisLine={false} tickLine={false} />
-        <ChartTooltip cursor={{ stroke: 'var(--prompt-fill)', strokeDasharray: '2 3' }} content={<FormattedChartTooltip config={config} formatValue={formatY} formatLabel={formatX} />} />
-        <ChartLegend verticalAlign="top" align="left" content={<ChartLegendContent className="justify-start" />} />
-        <Brush dataKey={xKey} height={22} travellerWidth={8} tickFormatter={formatX} stroke="var(--border)" fill="var(--muted)" />
-        {showZeroLine && <ReferenceLine y={0} stroke="var(--muted-foreground)" />}
-        {series.map((line) =>
-          line.isFilled ? (
-            <Area
-              key={line.key}
-              type="stepAfter"
-              dataKey={line.key}
-              stroke={`var(--color-${line.key})`}
-              strokeWidth={1.5}
-              fill={`url(#fill-${line.key})`}
-              dot={line.showDots ?? false}
-              activeDot={activeDot}
-              connectNulls
-              isAnimationActive={false}
-            />
-          ) : (
-            <Line
-              key={line.key}
-              type={line.dashed ? 'linear' : 'stepAfter'}
-              dataKey={line.key}
-              stroke={`var(--color-${line.key})`}
-              strokeWidth={1.5}
-              strokeDasharray={line.dashed ? '2 3' : undefined}
-              dot={line.showDots ?? false}
-              activeDot={activeDot}
-              connectNulls
-              isAnimationActive={false}
-            />
-          ),
-        )}
-      </ComposedChart>
+      <LineChart data={data} syncId={zoomGroup} margin={lineChartMargin}>
+        <CartesianGrid vertical={false} stroke="var(--border)" />
+        <XAxis dataKey={xKey} tickFormatter={formatX} tick={chartAxisTick} minTickGap={chartTickGap} axisLine={false} tickLine={false} tickMargin={8} />
+        <YAxis domain={scale?.domain ?? ['auto', 'auto']} ticks={scale?.ticks} tickFormatter={formatY} tick={chartAxisTick} width={56} axisLine={false} tickLine={false} />
+        <ChartTooltip cursor={{ stroke: 'var(--muted-foreground)', strokeOpacity: 0.5 }} content={<FormattedChartTooltip config={config} formatValue={formatY} formatLabel={formatX} />} />
+        <ChartLegend verticalAlign="top" align="left" content={<ChartLegendContent className="justify-start pb-2" />} />
+        <Brush dataKey={xKey} {...chartBrush} tickFormatter={formatX} />
+        {ordered.map((line) => (
+          <Line
+            key={line.key}
+            type="linear"
+            dataKey={line.key}
+            stroke={`var(--color-${line.key})`}
+            strokeWidth={isTrendLine(line) ? 2 : 1.25}
+            strokeOpacity={isTrendLine(line) ? 1 : 0.4}
+            dot={false}
+            activeDot={isTrendLine(line) ? trendActiveDot : false}
+            connectNulls
+            isAnimationActive={false}
+          />
+        ))}
+        {endpoints.map((point) => (
+          <ReferenceDot
+            key={point.key}
+            x={point.x}
+            y={point.y}
+            r={3.5}
+            fill={`var(--color-${point.key})`}
+            stroke="var(--card)"
+            strokeWidth={2}
+            label={{ value: formatY(point.y), position: 'right', offset: 8, ...endLabelFont, fill: `var(--color-${point.key})` }}
+          />
+        ))}
+      </LineChart>
     </ChartContainer>
   )
 }
