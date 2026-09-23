@@ -8,8 +8,9 @@ export function App() {
   return (
     <BrowserRouter basename={basename}>
       <Routes>
-        <Route path="/demo/*" element={<Tracker mode="demo" />} />
-        <Route path="/*" element={isStaticDemoBuild ? <Navigate to="/demo" replace /> : <Tracker mode="live" />} />
+        {/* Keyed by mode so switching to the demo builds a fresh tracker (and query cache) instead of reusing the live one. */}
+        <Route path="/demo/*" element={<Tracker key="demo" mode="demo" />} />
+        <Route path="/*" element={isStaticDemoBuild ? <Navigate to="/demo" replace /> : <Tracker key="live" mode="live" />} />
       </Routes>
     </BrowserRouter>
   )

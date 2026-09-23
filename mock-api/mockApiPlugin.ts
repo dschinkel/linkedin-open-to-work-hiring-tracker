@@ -2,6 +2,7 @@ import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
 import type { Network } from './domain/observation.ts'
 import { defaultSettings } from './defaultSettings.ts'
+import { folderInbox } from './folderInbox.ts'
 import { type ApiRequest, routeRequest } from './routes.ts'
 import { generateSampleNetwork } from './seed/generateSampleNetwork.ts'
 import { createTrackerApi } from './trackerApi.ts'
@@ -19,7 +20,8 @@ export function mockApiPlugin(): Plugin {
   return {
     name: 'tracker-mock-api',
     configureServer(server) {
-      const api = createTrackerApi(sampleNetwork(scenarioFromEnvironment()), defaultSettings, { analyzeMessage: notBuiltYet })
+      const screenshotInbox = folderInbox(server.config.root, () => api.settings().inboxDirectory)
+      const api = createTrackerApi(sampleNetwork(scenarioFromEnvironment()), defaultSettings, { analyzeMessage: notBuiltYet, screenshotInbox })
       server.middlewares.use('/api', (request, response) => {
         void answer(request, response, (apiRequest) => routeRequest(api, apiRequest))
       })
@@ -49,7 +51,7 @@ async function answer(
   route: (apiRequest: ApiRequest) => ReturnType<typeof routeRequest>,
 ): Promise<void> {
   const url = new URL((request as IncomingMessage & { originalUrl?: string }).originalUrl ?? request.url ?? '/', 'http://localhost')
-  const result = route({
+  const result = await route({
     method: request.method ?? 'GET',
     path: url.pathname,
     query: Object.fromEntries(url.searchParams),

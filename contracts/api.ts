@@ -200,3 +200,18 @@ export type Settings = z.infer<typeof settingsSchema>
 
 export const processingResultSchema = z.object({ message: z.string() })
 export type ProcessingResult = z.infer<typeof processingResultSchema>
+
+export const addScreenshotsRequestSchema = z.object({
+  files: z
+    .array(z.object({ fileName: z.string().min(1).max(255), dataBase64: z.string().min(1) }))
+    .min(1)
+    .max(100),
+})
+export type AddScreenshotsRequest = z.infer<typeof addScreenshotsRequestSchema>
+
+export const addScreenshotsResultSchema = z.object({
+  saved: z.array(z.string()),
+  rejected: z.array(z.object({ fileName: z.string(), reason: z.string() })),
+  message: z.string(),
+})
+export type AddScreenshotsResult = z.infer<typeof addScreenshotsResultSchema>

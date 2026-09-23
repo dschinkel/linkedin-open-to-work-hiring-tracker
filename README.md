@@ -32,7 +32,7 @@ The app never logs into LinkedIn, crawls profiles, or automates your browser. **
 2. Open your connections list: <https://www.linkedin.com/mynetwork/invite-connect/connections/>
 3. Scroll down until the connections you want to track have loaded.
 4. Click the GoFullPage icon (or press `Alt+Shift+P`). It captures the whole scrolled page as a single image.
-5. Download the PNG and drop it into `LinkedinScreenShots/` in this project.
+5. Download the PNG and drag it onto the **drop box** on the Dashboard (or Scans page), or copy it into `LinkedinScreenShots/` yourself.
 
 GoFullPage file names include the date (for example `screencapture-linkedin-com-mynetwork-2026-09-22-09_01_12.png`), and the app uses that date for the scan.
 
@@ -50,6 +50,7 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
 
 ### Screenshot rules
 
+- Drag screenshots onto the drop box on the Dashboard, or copy them into `LinkedinScreenShots/`. Only PNG, JPG, and WebP files are accepted, and a file already in the inbox is skipped.
 - Screenshots from the **same date** are grouped into **one scan**.
 - Take a scan regularly (daily or weekly) so trends and transitions have history to compare.
 - Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).

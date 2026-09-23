@@ -1,4 +1,6 @@
 import type {
+  AddScreenshotsRequest,
+  AddScreenshotsResult,
   CompanyHiring,
   Dashboard,
   HiringPeopleQuery,
@@ -21,6 +23,7 @@ import { entryExitRatio } from './domain/rates.ts'
 import { scanQuality } from './domain/scanQuality.ts'
 import { withinWindow } from './domain/timeWindow.ts'
 import { buildTimeline } from './domain/timeline.ts'
+import { addScreenshots, type ScreenshotInbox } from './screenshotInbox.ts'
 
 const whoIsHiringPreviewSize = 6
 
@@ -35,10 +38,13 @@ export interface TrackerApi {
   saveSettings: (settings: Settings) => Settings
   analyzeNewScreenshots: () => ProcessingResult
   reprocessScan: (scanId: string) => ProcessingResult | null
+  addScreenshots: (request: AddScreenshotsRequest) => Promise<AddScreenshotsResult>
 }
 
 export interface TrackerApiOptions {
   analyzeMessage: string
+  /** Where dropped screenshots are stored. Without one (the demo), nothing is saved. */
+  screenshotInbox?: ScreenshotInbox
 }
 
 /** Serves the Koa API contract from an in-memory network, computed once. */
@@ -58,6 +64,7 @@ export function createTrackerApi(network: Network, initialSettings: Settings, op
     settings: () => settings,
     saveSettings: (next) => (settings = next),
     analyzeNewScreenshots: () => ({ message: options.analyzeMessage }),
+    addScreenshots: (request) => (options.screenshotInbox ? addScreenshots(options.screenshotInbox, request) : Promise.resolve(nothingSaved(request))),
     reprocessScan: (scanId) => (timeline.some((summary) => summary.id === scanId) ? { message: 'Scan reprocessed. Results unchanged.' } : null),
   }
 }
@@ -111,6 +118,14 @@ function toTrendPoint(summary: ScanSummary, timeline: ScanSummary[]): TrendPoint
     addedHiring: summary.hiring.added,
     removedHiring: summary.hiring.removed,
     netHiring: summary.hiring.net,
+  }
+}
+
+function nothingSaved(request: AddScreenshotsRequest): AddScreenshotsResult {
+  return {
+    saved: [],
+    rejected: request.files.map((file) => ({ fileName: file.fileName, reason: 'Demo only' })),
+    message: 'This is the demo, so screenshots are not saved. Run the app locally to add your own.',
   }
 }
 

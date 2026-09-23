@@ -1,4 +1,7 @@
 import {
+  addScreenshotsResultSchema,
+  type AddScreenshotsRequest,
+  type AddScreenshotsResult,
   processingResultSchema,
   scanDetailSchema,
   scanHistorySchema,
@@ -14,6 +17,7 @@ export interface ScanRepository {
   detail: (scanId: string) => Promise<ScanDetail>
   analyzeNewScreenshots: () => Promise<ProcessingResult>
   reprocess: (scanId: string) => Promise<ProcessingResult>
+  addScreenshots: (files: AddScreenshotsRequest['files']) => Promise<AddScreenshotsResult>
 }
 
 export function scanRepositoryFor(api: ApiClient): ScanRepository {
@@ -21,6 +25,7 @@ export function scanRepositoryFor(api: ApiClient): ScanRepository {
     history: async (window) => (await api.getJson(`/api/scans?${queryString({ window })}`, scanHistorySchema)).scans,
     detail: (scanId) => api.getJson(`/api/scans/${encodeURIComponent(scanId)}`, scanDetailSchema),
     analyzeNewScreenshots: () => api.sendJson('POST', '/api/scans', processingResultSchema),
+    addScreenshots: (files) => api.sendJson('POST', '/api/screenshots', addScreenshotsResultSchema, { files }),
     reprocess: (scanId) => api.sendJson('POST', `/api/scans/${encodeURIComponent(scanId)}/reprocess`, processingResultSchema),
   }
 }

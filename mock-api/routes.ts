@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { hiringPeopleQuerySchema, settingsSchema, timeWindowSchema } from '../contracts/api.ts'
+import { addScreenshotsRequestSchema, hiringPeopleQuerySchema, settingsSchema, timeWindowSchema } from '../contracts/api.ts'
 import type { TrackerApi } from './trackerApi.ts'
 
 export interface ApiRequest {
@@ -17,7 +17,7 @@ export interface ApiResponse {
 interface Route {
   method: 'GET' | 'POST' | 'PUT'
   pattern: RegExp
-  respond: (api: TrackerApi, request: ApiRequest, params: string[]) => ApiResponse
+  respond: (api: TrackerApi, request: ApiRequest, params: string[]) => ApiResponse | Promise<ApiResponse>
 }
 
 const windowQuery = z.object({ window: timeWindowSchema.default('90d') })
@@ -32,6 +32,7 @@ const routes: Route[] = [
   { method: 'POST', pattern: /^\/api\/scans$/, respond: (api) => ok(api.analyzeNewScreenshots()) },
   { method: 'GET', pattern: /^\/api\/scans\/([\w-]+)$/, respond: (api, _request, [scanId]) => orNotFound(api.scanDetail(scanId)) },
   { method: 'POST', pattern: /^\/api\/scans\/([\w-]+)\/reprocess$/, respond: (api, _request, [scanId]) => orNotFound(api.reprocessScan(scanId)) },
+  { method: 'POST', pattern: /^\/api\/screenshots$/, respond: async (api, request) => ok(await api.addScreenshots(addScreenshotsRequestSchema.parse(request.body))) },
   { method: 'GET', pattern: /^\/api\/analytics\/trends$/, respond: (api, request) => ok(api.trends(windowQuery.parse(request.query).window)) },
   { method: 'GET', pattern: /^\/api\/hiring\/people$/, respond: (api, request) => ok(api.hiringPeople(hiringPeopleQuerySchema.parse(request.query))) },
   { method: 'GET', pattern: /^\/api\/hiring\/companies$/, respond: (api) => ok(api.hiringCompanies()) },
@@ -40,7 +41,7 @@ const routes: Route[] = [
 ]
 
 /** Matches a request to a route and validates its input with Zod at the boundary. */
-export function routeRequest(api: TrackerApi, request: ApiRequest): ApiResponse {
+export async function routeRequest(api: TrackerApi, request: ApiRequest): Promise<ApiResponse> {
   for (const route of routes) {
     const match = route.method === request.method ? route.pattern.exec(request.path) : null
     if (match) return respondSafely(route, api, request, match.slice(1))
@@ -48,11 +49,11 @@ export function routeRequest(api: TrackerApi, request: ApiRequest): ApiResponse 
   return notFound()
 }
 
-function respondSafely(route: Route, api: TrackerApi, request: ApiRequest, params: string[]): ApiResponse {
+async function respondSafely(route: Route, api: TrackerApi, request: ApiRequest, params: string[]): Promise<ApiResponse> {
   try {
-    return route.respond(api, request, params)
+    return await route.respond(api, request, params)
   } catch (error) {
     if (error instanceof z.ZodError) return { status: 400, body: { error: 'Invalid request', issues: error.issues } }
-    throw error
+    return { status: 500, body: { error: error instanceof Error ? error.message : 'Unexpected error' } }
   }
 }

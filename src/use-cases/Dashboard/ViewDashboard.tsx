@@ -6,6 +6,7 @@ import { buttonVariants } from '@/components/ui/button'
 import { HiringSnapshot } from '../Hiring/HiringSnapshot'
 import { WhoIsHiringPreview } from '../Hiring/WhoIsHiringPreview'
 import { OpenToWorkSnapshot } from '../OpenToWork/OpenToWorkSnapshot'
+import { AddScreenshots } from '../Scan/AddScreenshots'
 import { AnalyzeScreenshots } from '../Scan/AnalyzeScreenshots'
 import { ScanQualityPanel } from '../Scan/ScanQualityPanel'
 import { ViewScanHistory } from '../Scan/ViewScanHistory'
@@ -24,10 +25,11 @@ export function ViewDashboard() {
         </div>
         <AnalyzeScreenshots />
       </div>
+      <AddScreenshots />
       {dashboard.showFirstRunInvite && (
         <EmptyState
           title="No scans yet"
-          description="Drop screenshots into LinkedinScreenShots/ to create your first scan."
+          description="Drop screenshots in the box above (or into LinkedinScreenShots/). Screenshot analysis is not built yet, so they will wait in the inbox."
           action={
             dashboard.showDemoInvite && (
               <Link to={dashboard.demoHref} className={buttonVariants({ variant: 'outline' })}>

@@ -1,3 +1,4 @@
+import { AddScreenshots } from './AddScreenshots'
 import { AnalyzeScreenshots } from './AnalyzeScreenshots'
 import { ViewScanHistory } from './ViewScanHistory'
 
@@ -11,6 +12,7 @@ export function ViewScans() {
         </div>
         <AnalyzeScreenshots />
       </div>
+      <AddScreenshots />
       <ViewScanHistory />
     </>
   )
