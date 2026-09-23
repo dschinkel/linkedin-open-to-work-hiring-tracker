@@ -21,7 +21,7 @@
 
 /* A page's own heading: large, bold, tight, in the brightest ink. */
 @utility page-title {
-  @apply text-2xl leading-tight font-bold tracking-figure text-primary sm:text-display;
+  @apply text-xl leading-tight font-bold tracking-figure text-primary sm:text-display;
 }
 
 /* First-visit attention pulse on the Demo button; a steady outline instead when motion is reduced. */
