@@ -20,7 +20,9 @@ export function ViewDashboard() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-semibold">{dashboard.latestScanLabel}</h2>
-          <p className="text-sm text-muted-foreground">{dashboard.sampleLabel}</p>
+          <p className="text-lg text-muted-foreground sm:text-xl">
+            <strong className="font-bold text-foreground">{dashboard.sampledCount}</strong> {dashboard.sampleDetail}
+          </p>
         </div>
       </div>
       {dashboard.showScanReminder && (

@@ -16,7 +16,8 @@ export interface DashboardView {
   hasScans: boolean
   showFirstRunInvite: boolean
   latestScanLabel: string
-  sampleLabel: string
+  sampledCount: string
+  sampleDetail: string
   openToWorkTiles: StatTileView[]
   hiringTiles: StatTileView[]
   whoIsHiringHeadline: string
@@ -49,7 +50,8 @@ const noDashboard: DashboardFields = {
   hasScans: false,
   showFirstRunInvite: true,
   latestScanLabel: '',
-  sampleLabel: '',
+  sampledCount: '',
+  sampleDetail: '',
   openToWorkTiles: [],
   hiringTiles: [],
   whoIsHiringHeadline: '',
@@ -70,7 +72,8 @@ function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
     hasScans: true,
     showFirstRunInvite: false,
     latestScanLabel: `Latest scan: ${formatLongDate(latest.scanDate)}`,
-    sampleLabel: `${formatCount(latest.peopleCount)} people sampled · ${formatCount(dashboard.scanCount)} scans total`,
+    sampledCount: formatCount(latest.peopleCount),
+    sampleDetail: `${latest.peopleCount === 1 ? 'person' : 'people'} sampled · ${formatCount(dashboard.scanCount)} ${dashboard.scanCount === 1 ? 'scan' : 'scans'} total`,
     openToWorkTiles: describeOpenToWorkTiles(latest.openToWork),
     hiringTiles: describeHiringTiles(latest.hiring),
     whoIsHiringHeadline: describeWhoIsHiring(dashboard.whoIsHiring),

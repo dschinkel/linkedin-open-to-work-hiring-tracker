@@ -45,13 +45,13 @@ describe('dashboard at a glance', () => {
   it('shows how many people the latest scan sampled', async () => {
     const view = await readyDashboard(repositoryReturning(dashboard({ latestScan: scanSummary({ peopleCount: 1_204 }) })))
 
-    expect(view.sampleLabel).toContain('1,204')
+    expect(view.sampledCount).toBe('1,204')
   })
 
   it('shows how many scans exist in total', async () => {
     const view = await readyDashboard(repositoryReturning(dashboard({ scanCount: 1_180 })))
 
-    expect(view.sampleLabel).toContain('1,180')
+    expect(view.sampleDetail).toContain('1,180')
   })
 
   it('shows the open-to-work and hiring tiles for the latest scan', async () => {
