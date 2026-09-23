@@ -9,7 +9,7 @@ export type TrackerRouteView = { audience: Audience; redirectTo: null } | { audi
 export function useTrackerRoute(mode: TrackerMode): TrackerRouteView {
   const parsed = audienceSchema.safeParse(useParams().audience)
   const modeBase = mode === 'demo' || isStaticDemoBuild ? '/demo' : ''
-  if (!parsed.success) return { audience: null, redirectTo: `${modeBase}/contacts` }
+  if (!parsed.success) return { audience: null, redirectTo: `${modeBase}/followers` }
   if (mode === 'live' && isStaticDemoBuild) return { audience: null, redirectTo: `/demo/${parsed.data}` }
   return { audience: parsed.data, redirectTo: null }
 }

@@ -22,7 +22,7 @@ export function trackerEnvironmentFor(mode: TrackerMode, audience: Audience, tra
   }
 }
 
-export const TrackerEnvironmentContext = createContext<TrackerEnvironment>(trackerEnvironmentFor('live', 'contacts', httpTransport))
+export const TrackerEnvironmentContext = createContext<TrackerEnvironment>(trackerEnvironmentFor('live', 'followers', httpTransport))
 
 export function useTrackerEnvironment(): TrackerEnvironment {
   return useContext(TrackerEnvironmentContext)

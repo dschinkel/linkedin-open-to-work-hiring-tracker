@@ -8,7 +8,7 @@
 
 <p align="center"><em>Who in your network is looking for work, how many, and who's hiring, tracked over time.</em></p>
 
-<p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/contacts"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
+<p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
 Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**.
 
@@ -101,8 +101,8 @@ The screenshot-analysis backend (Koa + OpenCV/OCR + SQLite) is **not built yet**
 
 To see what the app does, open the demo:
 
-- **Online:** <https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/contacts>
-- **Locally:** <http://localhost:5173/demo/contacts>, or click **Demo** in the app header
+- **Online:** <https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers>
+- **Locally:** <http://localhost:5173/demo/followers>, or click **Demo** in the app header
 
 The demo has both dashboards: 500 fictional contacts and 800 fictional followers, each with its own history, so the **Followers / Contacts** toggle shows two different pictures, including a list of unfollowers and past contacts.
 
@@ -121,7 +121,7 @@ TRACKER_SAMPLE=single pnpm dev   # one scan: shows "trend data available after a
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Dev server (dashboards at `/contacts` and `/followers`, demo at `/demo/contacts` and `/demo/followers`) |
+| `pnpm dev` | Dev server (dashboards at `/followers` (default) and `/contacts`, demo at `/demo/followers` and `/demo/contacts`) |
 | `pnpm test` | Unit tests (Vitest) |
 | `pnpm typecheck` | TypeScript project check |
 | `pnpm lint` | oxlint |

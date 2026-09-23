@@ -30,6 +30,6 @@ describe('dashboard', () => {
 
     renderDashboard()
 
-    expect(await screen.findByRole('link', { name: 'Try the demo with sample data' })).toHaveAttribute('href', '/demo/contacts')
+    expect(await screen.findByRole('link', { name: 'Try the demo with sample data' })).toHaveAttribute('href', '/demo/followers')
   })
 })
