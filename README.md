@@ -10,7 +10,9 @@
 
 <p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
-Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**. The goal is a clearer picture of how your close network of contacts is doing, not a single snapshot.
+Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**.
+
+The goal is a clearer picture of how your close network of contacts is doing, not a single snapshot.
 
 The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avatars in LinkedIn screenshots that you take. It then shows:
 
@@ -85,7 +87,9 @@ To see what the app does, open the demo:
 - **Online:** <https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo>
 - **Locally:** <http://localhost:5173/demo>, or click **Demo** in the app header
 
-The demo runs entirely in your browser on a fixed sample network (500 fictional people, 180 days of made-up scans ending Sep 22, 2026). It never talks to a server or LinkedIn. Every chart can be zoomed like a stock chart: drag the handles under a chart, and the other charts on the page follow.
+The demo runs entirely in your browser on a fixed sample network (500 fictional people, 180 days of made-up scans ending Sep 22, 2026).
+
+It never talks to a server or LinkedIn. Every chart can be zoomed like a stock chart: drag the handles under a chart, and the other charts on the page follow.
 
 To fill the local app at `/` with sample data instead of the empty state:
 
