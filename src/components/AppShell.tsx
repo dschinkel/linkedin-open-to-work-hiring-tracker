@@ -24,7 +24,7 @@ export function AppShell({ title, subtitle, logoSrc, navItems, banner, headerAct
       <header className="border-b">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-4 px-4 py-4">
           <div className="flex items-center gap-3">
-            <img src={logoSrc} alt="" className="size-9" />
+            <img src={logoSrc} alt="" className="h-8 w-auto" />
             <div>
               <h1 className="text-lg font-semibold">{title}</h1>
               <p className="text-xs text-muted-foreground">{subtitle}</p>

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/favicon.svg" alt="Open-to-Work & Hiring Tracker icon" width="112" />
+  <img src="public/favicon.svg" alt="Open-to-Work & Hiring Tracker icon" width="160" />
 </p>
 
 <h4 align="center">This app is vibe-coded, it is what it is, don't expect super clean</h4>
@@ -38,7 +38,7 @@ GoFullPage file names include the date (for example `screencapture-linkedin-com-
 
 > **Heads-up: GoFullPage carries some risk.** It captures the page by scrolling it automatically, and LinkedIn may treat automated scrolling or capturing as scraping by an application. That could get your account flagged or restricted. If you want to be sure you won't get dinged, scroll and take the screenshots yourself (see below).
 
-### <img src="https://img.shields.io/badge/Safest-2ea043?style=flat-square" alt="Safest" align="absmiddle"> scroll and take screenshots yourself
+### <img src="https://img.shields.io/badge/Safest-2ea043?style=flat-square" alt="Safest" align="absmiddle"> Scroll and take screenshots yourself
 
 This is the safest option because nothing is automated: you scroll LinkedIn like any normal visitor and use your operating system's own screenshot tool. No browser extension or app touches the LinkedIn page, so there is nothing for LinkedIn to flag as scraping.
 
