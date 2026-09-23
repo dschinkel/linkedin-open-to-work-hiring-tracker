@@ -15,6 +15,8 @@ export interface DataColumn {
 export interface DataCell {
   text: string
   note?: string
+  /** What the column sorts by when the shown text would sort wrongly (dates, counts). */
+  sortValue?: string | number
 }
 
 export interface DataRow {

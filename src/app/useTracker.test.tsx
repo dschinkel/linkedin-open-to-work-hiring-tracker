@@ -28,28 +28,28 @@ afterEach(() => {
 })
 
 describe('tracker navigation', () => {
-  it('lists unfollowers between hiring and scans for followers', () => {
+  it('lists open to work before hiring and unfollowers between hiring and scans for followers', () => {
     const { result } = renderTracker('demo', 'followers', '/demo/followers')
 
-    expect(result.current.navItems.map((item) => item.label)).toEqual(['Dashboard', 'Trends', 'Hiring', 'Unfollowers', 'Scans', 'Settings'])
+    expect(result.current.navItems.map((item) => item.label)).toEqual(['Dashboard', 'Trends', 'Open to Work', 'Hiring', 'Unfollowers', 'Scans', 'Settings'])
   })
 
   it('lists past contacts for contacts', () => {
     const { result } = renderTracker('demo', 'contacts', '/demo/contacts')
 
-    expect(result.current.navItems[3]).toMatchObject({ label: 'Past contacts', to: '/demo/contacts/departed' })
+    expect(result.current.navItems[4]).toMatchObject({ label: 'Past contacts', to: '/demo/contacts/departed' })
   })
 
   it('keeps every page inside the live tracker of the chosen audience', () => {
     const { result } = renderTracker('live', 'contacts', '/contacts')
 
-    expect(result.current.navItems.map((item) => item.to)).toEqual(['/contacts', '/contacts/trends', '/contacts/hiring', '/contacts/departed', '/contacts/scans', '/contacts/settings'])
+    expect(result.current.navItems.map((item) => item.to)).toEqual(['/contacts', '/contacts/trends', '/contacts/open-to-work', '/contacts/hiring', '/contacts/departed', '/contacts/scans', '/contacts/settings'])
   })
 
   it('marks the dashboard as the only page matched exactly', () => {
     const { result } = renderTracker('live', 'followers', '/followers')
 
-    expect(result.current.navItems.map((item) => item.isExact)).toEqual([true, false, false, false, false, false])
+    expect(result.current.navItems.map((item) => item.isExact)).toEqual([true, false, false, false, false, false, false])
   })
 })
 

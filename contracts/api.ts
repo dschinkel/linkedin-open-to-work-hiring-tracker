@@ -272,3 +272,16 @@ export const titleTrendsSchema = z.object({
   peopleTotal: z.number(),
 })
 export type TitleTrends = z.infer<typeof titleTrendsSchema>
+
+export const openToWorkPersonSchema = z.object({
+  personId: z.string(),
+  displayName: z.string(),
+  headline: z.string().nullable(),
+  companyName: z.string().nullable(),
+  firstSeenOpen: z.string(),
+  lastSeenOpen: z.string(),
+  wasObservedInLatestScan: z.boolean(),
+})
+export type OpenToWorkPerson = z.infer<typeof openToWorkPersonSchema>
+
+export const openToWorkPeopleSchema = z.object({ people: z.array(openToWorkPersonSchema) })

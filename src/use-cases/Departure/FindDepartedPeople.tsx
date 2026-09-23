@@ -19,7 +19,7 @@ export function FindDepartedPeople() {
           <LabeledInput id="departed-search" label="Name" placeholder="Search by name" value={departed.search} onChange={departed.searchByName} />
         </div>
         <AsyncContent status={departed.status} errorMessage={departed.errorMessage}>
-          {departed.hasPeople && <DataTable columns={departed.columns} rows={departed.rows} />}
+          {departed.hasPeople && <DataTable columns={departed.columns} rows={departed.rows} sortKey={departed.sortKey} sortDirection={departed.sortDirection} onSort={departed.sortBy} />}
           {departed.showNobodyLeft && <EmptyState title="Nobody has gone missing from your recent scans." />}
         </AsyncContent>
       </SectionCard>

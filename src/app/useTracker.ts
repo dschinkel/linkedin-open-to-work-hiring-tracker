@@ -30,6 +30,7 @@ export interface TrackerView {
 const pages = [
   { path: '', label: 'Dashboard' },
   { path: '/trends', label: 'Trends' },
+  { path: '/open-to-work', label: 'Open to Work' },
   { path: '/hiring', label: 'Hiring' },
   { path: '/scans', label: 'Scans' },
   { path: '/settings', label: 'Settings' },
@@ -91,7 +92,8 @@ function describeSize(size: NetworkSize | undefined): string | undefined {
 
 function navItemsUnder(routeBase: string, audience: Audience): NavItem[] {
   const departurePage = { path: '/departed', label: departureTitles[audience] }
-  const withDeparture = [...pages.slice(0, 3), departurePage, ...pages.slice(3)]
+  const afterHiring = pages.findIndex((page) => page.path === '/hiring') + 1
+  const withDeparture = [...pages.slice(0, afterHiring), departurePage, ...pages.slice(afterHiring)]
   return withDeparture.map((page) => ({ to: `${routeBase}${page.path}`, label: page.label, isExact: page.path === '' }))
 }
 

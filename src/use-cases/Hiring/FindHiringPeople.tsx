@@ -25,10 +25,9 @@ export function FindHiringPeople() {
             <LabeledInput id="hiring-company" label="Company" placeholder="Filter by company" value={hiring.filters.company} onChange={hiring.filterByCompany} />
             <ChoiceSelect id="hiring-status" label="Status" value={hiring.filters.status} options={hiring.statusOptions} onChange={hiring.filterByStatus} />
             <ChoiceSelect id="hiring-company-known" label="Company visibility" value={hiring.filters.companyKnown} options={hiring.companyKnownOptions} onChange={hiring.filterByCompanyKnown} />
-            <ChoiceSelect id="hiring-sort" label="Sort by" value={hiring.filters.sort} options={hiring.sortOptions} onChange={hiring.sortBy} />
           </div>
           <AsyncContent status={hiring.status} errorMessage={hiring.errorMessage}>
-            {hiring.hasPeople && <DataTable columns={hiring.columns} rows={hiring.rows} />}
+            {hiring.hasPeople && <DataTable columns={hiring.columns} rows={hiring.rows} sortKey={hiring.sortKey} sortDirection={hiring.sortDirection} onSort={hiring.sortBy} />}
             {hiring.showNoMatches && <EmptyState title="No hiring people match these filters." />}
           </AsyncContent>
         </SectionCard>

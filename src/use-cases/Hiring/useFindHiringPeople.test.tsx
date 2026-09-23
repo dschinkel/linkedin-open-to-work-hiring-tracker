@@ -6,7 +6,7 @@ import type { HiringRepository } from './HiringRepository'
 import { useFindHiringPeople } from './useFindHiringPeople'
 
 const mikeBrown = hiringPerson()
-const priyaNair = hiringPerson({ personId: 'person-priya-nair', displayName: 'Priya Nair', companyName: 'Fabrikam', companyNeedsReview: true, wasObservedInLatestScan: false })
+const priyaNair = hiringPerson({ personId: 'person-priya-nair', displayName: 'Priya Nair', lastSeenHiring: '2026-09-10', daysObservedHiring: 3, companyName: 'Fabrikam', companyNeedsReview: true, wasObservedInLatestScan: false })
 
 const companiesHiring: CompanyHiring = {
   companies: [
@@ -68,12 +68,27 @@ describe("who's hiring", () => {
     await waitFor(() => expect(queries.at(-1)).toMatchObject({ company: 'Northwind', companyKnown: 'known' }))
   })
 
-  it('sorts people by how long they have been hiring', async () => {
-    const { result, queries } = await readyHiringSearch([mikeBrown])
+  it('lists the most recently seen people first', async () => {
+    const { result } = await readyHiringSearch([priyaNair, mikeBrown])
 
-    act(() => result.current.sortBy('duration'))
+    expect(result.current.rows.map((row) => row.cells.name.text)).toEqual(['Mike Brown', 'Priya Nair'])
+  })
 
-    await waitFor(() => expect(queries.at(-1)).toMatchObject({ sort: 'duration' }))
+  it('sorts people by how long they have been hiring when that column is clicked', async () => {
+    const { result } = await readyHiringSearch([mikeBrown, priyaNair])
+
+    act(() => result.current.sortBy('days'))
+
+    expect(result.current.rows.map((row) => row.cells.name.text)).toEqual(['Priya Nair', 'Mike Brown'])
+  })
+
+  it('reverses the order when the same column is clicked again', async () => {
+    const { result } = await readyHiringSearch([mikeBrown, priyaNair])
+
+    act(() => result.current.sortBy('name'))
+    act(() => result.current.sortBy('name'))
+
+    expect([result.current.sortDirection, result.current.rows[0].cells.name.text]).toEqual(['desc', 'Priya Nair'])
   })
 
   it('keeps the chosen filters on show', async () => {

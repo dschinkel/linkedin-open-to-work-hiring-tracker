@@ -6,10 +6,11 @@ import type { DataColumn, DataRow } from '@/components/DataTable'
 import { formatPeople, formatShortDate } from '@/shared-formatting/formatMetric'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
+import { type SortedRows, useSortedRows } from '@/shared-state/useSortedRows'
 import { type DepartureRepository, departureRepositoryFor } from './DepartureRepository'
 import { departureTitles } from './departureWording'
 
-export interface DepartedPeopleView {
+export interface DepartedPeopleView extends SortedRows {
   status: LoadStatus
   errorMessage: string
   title: string
@@ -19,8 +20,6 @@ export interface DepartedPeopleView {
   searchByName: (search: string) => void
   hasPeople: boolean
   showNobodyLeft: boolean
-  columns: DataColumn[]
-  rows: DataRow[]
 }
 
 const columns: DataColumn[] = [
@@ -41,6 +40,7 @@ export function useFindDepartedPeople(injectedRepository?: DepartureRepository):
   const query = useQuery({ queryKey: ['departed'], queryFn: repository.departed })
   const threshold = query.data?.scansMissedThreshold ?? 3
   const people = (query.data?.people ?? []).filter((person) => matchesName(person, search))
+  const table = useSortedRows(columns, people.map(toRow), { key: 'lastSeen', direction: 'desc' })
 
   return {
     ...loadStatusOf(query),
@@ -51,8 +51,7 @@ export function useFindDepartedPeople(injectedRepository?: DepartureRepository):
     searchByName,
     hasPeople: people.length > 0,
     showNobodyLeft: people.length === 0,
-    columns,
-    rows: people.map(toRow),
+    ...table,
   }
 }
 
@@ -67,9 +66,9 @@ function toRow(person: DepartedPerson): DataRow {
       name: { text: person.displayName },
       headline: { text: person.headline ?? '' },
       company: { text: person.companyName ?? 'Company not visible' },
-      firstSeen: { text: formatShortDate(person.firstSeen) },
-      lastSeen: { text: formatShortDate(person.lastSeen) },
-      missed: { text: String(person.scansMissed) },
+      firstSeen: { text: formatShortDate(person.firstSeen), sortValue: person.firstSeen },
+      lastSeen: { text: formatShortDate(person.lastSeen), sortValue: person.lastSeen },
+      missed: { text: String(person.scansMissed), sortValue: person.scansMissed },
       frames: { text: describeFramesWhenLastSeen(person) },
     },
   }

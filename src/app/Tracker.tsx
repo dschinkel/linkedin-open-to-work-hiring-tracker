@@ -8,6 +8,7 @@ import { TrackerEnvironmentContext } from '@/shared-repositories/trackerEnvironm
 import { ViewDashboard } from '@/use-cases/Dashboard/ViewDashboard'
 import { FindDepartedPeople } from '@/use-cases/Departure/FindDepartedPeople'
 import { FindHiringPeople } from '@/use-cases/Hiring/FindHiringPeople'
+import { FindOpenToWorkPeople } from '@/use-cases/OpenToWork/FindOpenToWorkPeople'
 import { ViewScan } from '@/use-cases/Scan/ViewScan'
 import { ViewScans } from '@/use-cases/Scan/ViewScans'
 import { EditSettings } from '@/use-cases/Settings/EditSettings'
@@ -42,6 +43,7 @@ export function Tracker({ mode, audience }: { mode: TrackerMode; audience: Audie
           <Routes>
             <Route index element={<ViewDashboard />} />
             <Route path="trends" element={<ViewTrends />} />
+            <Route path="open-to-work" element={<FindOpenToWorkPeople />} />
             <Route path="hiring" element={<FindHiringPeople />} />
             <Route path="departed" element={<FindDepartedPeople />} />
             <Route path="scans" element={<ViewScans />} />

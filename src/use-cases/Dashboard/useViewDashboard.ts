@@ -37,10 +37,13 @@ export function useViewDashboard(injectedRepository?: DashboardRepository): Dash
   const appPath = useAppPath()
   const repository = injectedRepository ?? dashboardRepositoryFor(api)
   const query = useQuery({ queryKey: ['dashboard'], queryFn: repository.latest })
+  const fields = describeDashboard(query.data)
   return {
     ...loadStatusOf(query),
-    ...describeDashboard(query.data),
+    ...fields,
     hiringHref: appPath('/hiring'),
+    openToWorkTiles: linkTile(fields.openToWorkTiles, 'Open to Work', appPath('/open-to-work')),
+    hiringTiles: linkTile(fields.hiringTiles, 'Hiring people', appPath('/hiring')),
   }
 }
 
@@ -62,6 +65,11 @@ const noDashboard: DashboardFields = {
   showInboxNote: false,
   scanReminder: '',
   showScanReminder: false,
+}
+
+/** Points the tile with this label at the list of the people it counts. */
+function linkTile(tiles: StatTileView[], label: string, href: string): StatTileView[] {
+  return tiles.map((tile) => (tile.label === label ? { ...tile, href } : tile))
 }
 
 function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
