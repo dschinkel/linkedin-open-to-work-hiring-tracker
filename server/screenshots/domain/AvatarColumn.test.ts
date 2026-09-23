@@ -59,7 +59,7 @@ describe('telling a whole row from one cut by the top of the image', () => {
 function listWithPhotosAt(centres: number[]) {
   const page = browserShowingAList(0)
   for (const centreY of centres) {
-    for (let y = Math.max(0, centreY - 20); y < centreY + 20; y += 1) {
+    for (let y = Math.max(0, centreY - 20); y < Math.min(page.height, centreY + 20); y += 1) {
       for (let x = 80; x < 120; x += 1) if ((x - 100) ** 2 + (y - centreY) ** 2 <= 400) page.data.set([60, 60, 60, 255], (y * page.width + x) * 4)
     }
   }
@@ -67,6 +67,12 @@ function listWithPhotosAt(centres: number[]) {
 }
 
 describe('finding the column of photos', () => {
+  it('places a photo slightly cut by the bottom of the image where its whole circle would be', () => {
+    const photos = findAvatarColumn(listWithPhotosAt([100, 185, 270, 386]))
+
+    expect(photos.map((photo) => [Math.round(photo.centreY), Math.round(photo.radius)])).toEqual([[100, 20], [185, 20], [270, 20], [386, 20]])
+  })
+
   it('places a photo cut by the top of the image where its whole circle would be', () => {
     expect(findAvatarColumn(listWithPhotosAt([2, 100, 185, 270])).map((photo) => Math.round(photo.centreY))).toEqual([2, 100, 185, 270])
   })

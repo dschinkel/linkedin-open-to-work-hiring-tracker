@@ -6,15 +6,18 @@ import type { InboxFolder } from '../outbound/filesystem/InboxFolder.ts'
 import type { CardReader } from '../outbound/vision/CardReader.ts'
 import { analyzeInbox } from './AnalyzeInbox.ts'
 
-function card(displayName: string, open: boolean): Omit<DetectedCard, 'screenshotFileName'> {
+function card(displayName: string, open: boolean, photoPrint: string | null = null): Omit<DetectedCard, 'screenshotFileName'> {
   return {
     displayName,
     headline: 'Engineer at Acme',
     companyName: null,
     openToWork: { status: open ? 'OPEN' : 'NOT_OPEN', confidence: 0.97, classificationMethod: 'pixels' },
     hiring: { status: 'NOT_HIRING', confidence: 0.97, classificationMethod: 'pixels' },
+    photoPrint,
   }
 }
+
+const photoOf = (red: number, green: number, blue: number) => [red, green, blue].map((value) => value.toString(16).padStart(2, '0').repeat(64)).join('')
 
 /** A card reader that "sees" whatever people each file name was set up with; an unknown file can't be read. */
 function readerSeeing(peopleByFile: Record<string, Array<Omit<DetectedCard, 'screenshotFileName'>>>): CardReader {
@@ -132,5 +135,36 @@ describe('confidence thresholds from Settings', () => {
     await analyzeInbox({ audience: 'followers', trackerStore, inboxFolder: inboxWith(), cardReader: readerSeeing({ [first]: [card('Ana', true)] }) }).analyzeWaitingScreenshots()
 
     expect(trackerStore.readNetwork().observations[0].openToWork.status).toBe('OPEN')
+  })
+})
+
+describe('people who share a name', () => {
+  it('saves two people with one name and different photos as two people', async () => {
+    const trackerStore = storeWaitingFor([first, second])
+    const cardReader = readerSeeing({ [first]: [card('Muhammad Hassan', true, photoOf(200, 150, 90))], [second]: [card('Muhammad Hassan', false, photoOf(40, 90, 170))] })
+
+    await analyzeInbox({ audience: 'followers', trackerStore, inboxFolder: inboxWith(), cardReader }).analyzeWaitingScreenshots()
+
+    expect(new Set(trackerStore.readNetwork().people.map((person) => person.id)).size).toBe(2)
+  })
+
+  it('follows each of them from day to day by their photo', async () => {
+    const trackerStore = storeWaitingFor([first, second])
+    const theOpenOne = photoOf(200, 150, 90)
+    const cardReader = readerSeeing({
+      [first]: [card('Muhammad Hassan', true, theOpenOne)],
+      [second]: [card('Muhammad Hassan', false, photoOf(40, 90, 170))],
+      [nextDay]: [card('Muhammad Hassan', true, theOpenOne)],
+    })
+    const analyzer = analyzeInbox({ audience: 'followers', trackerStore, inboxFolder: inboxWith(), cardReader })
+    await analyzer.analyzeWaitingScreenshots()
+    trackerStore.recordWaitingScreenshot(nextDay)
+
+    await analyzer.analyzeWaitingScreenshots()
+
+    const { observations } = trackerStore.readNetwork()
+    const openOnTheFirstDay = observations.find((observation) => observation.scanId.endsWith('2026-09-22') && observation.openToWork.status === 'OPEN')
+    const onTheNextDay = observations.find((observation) => observation.scanId.endsWith('2026-09-23'))
+    expect(onTheNextDay?.personId).toBe(openOnTheFirstDay?.personId)
   })
 })

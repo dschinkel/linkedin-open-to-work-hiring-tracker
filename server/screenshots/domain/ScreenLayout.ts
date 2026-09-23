@@ -31,6 +31,8 @@ export interface NameBlock {
   headline: string | null
   top: number
   bottom: number
+  /** Where the title's line ends, when it isn't the last line of the block. */
+  headlineBottom?: number
 }
 
 /**
@@ -38,7 +40,7 @@ export interface NameBlock {
  * Lines that sit close together belong to one person; a bigger gap starts the next person.
  */
 export function readNameStrip(words: TextBox[], rowPitch: number): NameBlock[] {
-  const lines = groupIntoLines(words.filter(couldBeAWord)).filter(isReadableLine)
+  const lines = groupIntoLines(withoutSlivers(words).filter(couldBeAWord)).filter(isReadableLine)
   const listLines = linesOfTheList(lines, rowPitch).sort((a, b) => a.y0 - b.y0)
   return splitIntoBlocksBy(listLines, rowPitch * 0.3).map(toNameBlock)
 }
@@ -107,6 +109,11 @@ export function isCutByTheBottom(name: NameBlock, imageHeight: number, lineHeigh
   return name.top + lineHeight > imageHeight
 }
 
+/** A title touching the bottom of the image was cut through by it; OCR's guess at its half-letters is left out. */
+export function withoutACutTitle(name: NameBlock, imageHeight: number): NameBlock {
+  return (name.headlineBottom ?? name.bottom) >= imageHeight - 2 ? { ...name, headline: null } : name
+}
+
 /**
  * A person on the list has a title under their name. Above the photos the reader could find, a lone line is more
  * likely LinkedIn's or the browser's own text (the search box, a bookmark) than a person, so only people with a
@@ -146,11 +153,13 @@ function isReadableLine(line: TextLine): boolean {
 
 function toNameBlock(block: TextLine[]): NameBlock {
   const [name, ...rest] = block
+  const headline = rest.find((line) => !notAHeadline.test(line.text))
   return {
     displayName: cleanName(name.text),
-    headline: rest.find((line) => !notAHeadline.test(line.text))?.text ?? null,
+    headline: headline?.text ?? null,
     top: block[0].y0,
     bottom: (block.at(-1) as TextLine).y1,
+    ...(headline ? { headlineBottom: headline.y1 } : {}),
   }
 }
 
@@ -163,6 +172,13 @@ function splitIntoBlocksBy(lines: TextLine[], gapBetweenPeople: number): TextLin
     else blocks.push([line])
   }
   return blocks
+}
+
+/** A "word" far shorter than the others is a sliver of letters cut off by the edge of the image, not text. */
+function withoutSlivers(words: TextBox[]): TextBox[] {
+  const heights = words.map((word) => word.y1 - word.y0).sort((a, b) => a - b)
+  const typicalHeight = heights[Math.floor(heights.length / 2)] ?? 0
+  return words.filter((word) => word.y1 - word.y0 >= typicalHeight * 0.4)
 }
 
 /**

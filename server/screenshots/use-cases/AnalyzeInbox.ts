@@ -5,7 +5,7 @@ import type { Classification, Observation, Person, Scan, Screenshot } from '../.
 import { parseScanDate } from '../../shared/domain/ScanDate.ts'
 import type { AnalyzedDay, TrackerStore } from '../../tracker/outbound/persistence/TrackerStore.ts'
 import { bestReading, type DetectedCard, deduplicateCards, type UniquePerson } from '../domain/Deduplication.ts'
-import { personHash } from '../domain/Identity.ts'
+import { resolvePersonHashes, type SeenPerson } from '../domain/Identity.ts'
 import type { InboxFolder } from '../outbound/filesystem/InboxFolder.ts'
 import type { CardReader } from '../outbound/vision/CardReader.ts'
 
@@ -78,7 +78,8 @@ async function analyzeDay(ports: AnalyzeInboxPorts, scanDate: string, fileNames:
     report.failedFiles.push({ fileName: failed.fileName, reason: failed.failure as string })
   }
   if (readable.length === 0) return
-  const day = applyThresholds(mergeIntoDay(ports.audience, scanDate, readable, ports.trackerStore.readDay(scanDate)), ports.trackerStore.readSettings())
+  const knownPeople = ports.trackerStore.readNetwork().people
+  const day = applyThresholds(mergeIntoDay(ports.audience, scanDate, readable, { existing: ports.trackerStore.readDay(scanDate), knownPeople }), ports.trackerStore.readSettings())
   ports.trackerStore.saveAnalyzedDay(day)
   await clearImportedFiles(ports, scanDate, readable)
   report.importedFiles.push(...readable.map((reading) => reading.fileName))
@@ -127,12 +128,19 @@ function describeWarning(uncertainCount: number, unreadable: number, peopleCount
   return uncertainCount > 0 ? `${uncertainCount} uncertain avatar classification(s)` : null
 }
 
+/** What is already saved: the day's own data, and everyone seen on any day (to find people with a shared name again). */
+interface SavedSoFar {
+  existing: AnalyzedDay | null
+  knownPeople: Person[]
+}
+
 /** New cards join what was already saved for the day; someone seen again keeps the clearest reading. */
-export function mergeIntoDay(audience: Audience, scanDate: string, readings: ScreenshotReading[], existing: AnalyzedDay | null): AnalyzedDay {
+export function mergeIntoDay(audience: Audience, scanDate: string, readings: ScreenshotReading[], { existing, knownPeople }: SavedSoFar): AnalyzedDay {
   const scanId = `${audience}-${scanDate}`
   const cards = readings.flatMap((reading) => reading.cards)
   const deduplicated = deduplicateCards(cards, normalizeIdentity)
-  const newPeople = deduplicated.people.map((unique) => toPerson(audience, unique))
+  const hashes = resolvePersonHashes(deduplicated.people.map(asSeenPerson), knownPeople)
+  const newPeople = deduplicated.people.map((unique, position) => toPerson(audience, unique, hashes[position]))
   const observations = mergeObservations(existing?.observations ?? [], deduplicated.people.map((unique, position) => toObservation(scanId, newPeople[position].id, unique)), scanId)
   const people = mergePeople(existing?.people ?? [], newPeople)
   const alreadySeenToday = newPeople.filter((person) => existing?.people.some((earlier) => earlier.id === person.id)).length
@@ -146,10 +154,13 @@ export function mergeIntoDay(audience: Audience, scanDate: string, readings: Scr
   return { scan, people, observations }
 }
 
-function toPerson(audience: Audience, unique: UniquePerson): Person {
+function asSeenPerson(unique: UniquePerson): SeenPerson {
+  return { displayName: unique.card.displayName, headline: unique.card.headline, photoPrint: unique.photoPrint }
+}
+
+function toPerson(audience: Audience, unique: UniquePerson, hash: string): Person {
   const { displayName, headline, companyName } = unique.card
-  const hash = personHash({ displayName, headline, companyName })
-  return { id: `${audience}-${hash.slice(0, 20)}`, personHash: hash, displayName, headline, ...extractCompany(headline, companyName) }
+  return { id: `${audience}-${hash.slice(0, 20)}`, personHash: hash, displayName, headline, ...extractCompany(headline, companyName), photoPrint: unique.photoPrint }
 }
 
 function toObservation(scanId: string, personId: string, unique: UniquePerson): Observation {

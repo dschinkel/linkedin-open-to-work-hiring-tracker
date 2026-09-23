@@ -5,7 +5,8 @@ import { createWorker, PSM, type Worker } from 'tesseract.js'
 import { findAvatarColumn, hasLostItsName, rowSpacing, sitsOnThePage } from '../../domain/AvatarColumn.ts'
 import type { DetectedCard } from '../../domain/Deduplication.ts'
 import { type AvatarCircle, type Pixels, readFrames } from '../../domain/FrameDetection.ts'
-import { gapBetweenRowsAbove, hasATitle, isCutByTheBottom, isCutByTheTop, type NameBlock, photosWithoutAName, readNameStrip, sitsBeside, startsLevelWithTheTopOf, type TextBox } from '../../domain/ScreenLayout.ts'
+import { photoPrint } from '../../domain/PhotoPrint.ts'
+import { gapBetweenRowsAbove, hasATitle, isCutByTheBottom, isCutByTheTop, type NameBlock, photosWithoutAName, readNameStrip, sitsBeside, startsLevelWithTheTopOf, type TextBox, withoutACutTitle } from '../../domain/ScreenLayout.ts'
 import type { CardReader } from './CardReader.ts'
 
 /** OCR reads best when letters are about this many pixels tall. */
@@ -50,7 +51,7 @@ export const screenshotCardReader = (cacheFolder = path.resolve('data/ocr')): Ca
       .map((name) => ({ name, photo: photoFor(name, photos) }))
       .filter(({ photo }) => !hasLostItsName(photo))
       .filter(({ photo }) => photos.includes(photo) || sitsOnThePage(pixels, photo))
-      .map(({ name, photo }) => toCard(name, photo, pixels, fileName))
+      .map(({ name, photo }) => toCard(name, { photo, wasFound: photos.includes(photo) }, pixels, fileName))
   }
 
   return { readCards }
@@ -77,6 +78,7 @@ async function readWholeNames(worker: Worker, { image, pixels, photos }: Screens
   return [...namesOnThePage, ...namesReadAlone]
     .filter((name) => name.top >= strip.firstRowTop || hasATitle(name))
     .filter((name) => !isCutByTheBottom(name, pixels.height, lineHeight) && !isCutByTheTop(pixels, startOfTheText(strip.left, photos), name, pitch))
+    .map((name) => withoutACutTitle(name, pixels.height))
     .sort((a, b) => a.top - b.top)
 }
 
@@ -172,6 +174,17 @@ function photoFor(name: NameBlock, photos: AvatarCircle[]): AvatarCircle {
   return { centreX: nearest.centreX, centreY: centre, radius: nearest.radius }
 }
 
-function toCard(name: NameBlock, photo: AvatarCircle, pixels: Pixels, fileName: string): DetectedCard {
-  return { screenshotFileName: fileName, displayName: name.displayName, headline: name.headline, companyName: null, ...readFrames(pixels, photo) }
+/**
+ * The person's card. Their photo print comes only from a photo found in the column: where the photo is only a guessed
+ * spot (too light to find, or cut off by the edge of the screenshot), a print would be of whatever is there instead.
+ */
+function toCard(name: NameBlock, { photo, wasFound }: { photo: AvatarCircle; wasFound: boolean }, pixels: Pixels, fileName: string): DetectedCard {
+  return {
+    screenshotFileName: fileName,
+    displayName: name.displayName,
+    headline: name.headline,
+    companyName: null,
+    ...readFrames(pixels, photo),
+    photoPrint: wasFound ? photoPrint(pixels, photo) : null,
+  }
 }

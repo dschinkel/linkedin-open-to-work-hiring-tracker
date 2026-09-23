@@ -1,4 +1,4 @@
-import { cleanName, gapBetweenRowsAbove, hasATitle, isCutByTheBottom, isCutByTheTop, photosWithoutAName, readNameStrip, startsLevelWithTheTopOf, type TextBox } from './ScreenLayout.ts'
+import { cleanName, gapBetweenRowsAbove, hasATitle, isCutByTheBottom, isCutByTheTop, withoutACutTitle, photosWithoutAName, readNameStrip, startsLevelWithTheTopOf, type TextBox } from './ScreenLayout.ts'
 
 function word(text: string, x0: number, y0: number, confidence = 95): TextBox {
   return { text, x0, y0, x1: x0 + text.length * 9, y1: y0 + 18, confidence }
@@ -64,6 +64,12 @@ describe('reading names beside the photo column', () => {
     const sharedConnections = [word('Hp', 100, 360, 30), word('Followed', 130, 360), word('by', 210, 360), word('Sam', 235, 360)]
 
     expect(readNameStrip([...nameStrip, ...sharedConnections], pitch).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing', 'Grace Hopper'])
+  })
+
+  it('leaves out a sliver of a letter cut off by the bottom of the image, even beside a name', () => {
+    const sliver = { text: 'Co', x0: 212, y0: 276, x1: 232, y1: 278, confidence: 0 }
+
+    expect(readNameStrip([...nameStrip, sliver], pitch).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing', 'Grace Hopper'])
   })
 
   it('never mistakes the Follow button for a name', () => {
@@ -180,3 +186,13 @@ describe('telling a title left over from a name cut by the top of the image', ()
 function cropFromTheTop(pixels: { data: Uint8Array; width: number; height: number }, rows: number) {
   return { data: pixels.data.slice(rows * pixels.width * 4), width: pixels.width, height: pixels.height - rows }
 }
+
+describe('a title cut through by the bottom of the image', () => {
+  it('is dropped, since OCR only guesses at half-letters', () => {
+    expect(withoutACutTitle({ displayName: 'James Humelsine', headline: 'Ratired Saftware EnAainaar', top: 460, bottom: 500 }, 500).headline).toBeNull()
+  })
+
+  it('is kept when there is room below it', () => {
+    expect(withoutACutTitle({ displayName: 'James Humelsine', headline: 'Retired Software Engineer', top: 400, bottom: 440 }, 500).headline).toBe('Retired Software Engineer')
+  })
+})

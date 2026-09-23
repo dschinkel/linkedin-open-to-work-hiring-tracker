@@ -65,6 +65,7 @@ const migrations: string[] = [
      audience TEXT PRIMARY KEY,
      json TEXT NOT NULL
    );`,
+  `ALTER TABLE people ADD COLUMN photo_print TEXT`,
 ]
 
 export const defaultDatabasePath = 'data/linkedin.sqlite'
@@ -185,12 +186,13 @@ function saveAnalyzedScan(database: DatabaseSync, audience: Audience, scan: Scan
 function upsertPerson(database: DatabaseSync, audience: Audience, person: Person): void {
   database
     .prepare(
-      `INSERT INTO people (id, audience, person_hash, display_name, headline, company_name, company_confidence, company_extraction_method)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO people (id, audience, person_hash, display_name, headline, company_name, company_confidence, company_extraction_method, photo_print)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT (id) DO UPDATE SET display_name = excluded.display_name, headline = excluded.headline, company_name = excluded.company_name,
-         company_confidence = excluded.company_confidence, company_extraction_method = excluded.company_extraction_method`,
+         company_confidence = excluded.company_confidence, company_extraction_method = excluded.company_extraction_method,
+         photo_print = COALESCE(excluded.photo_print, people.photo_print)`,
     )
-    .run(person.id, audience, person.personHash, person.displayName, person.headline, person.companyName, person.companyConfidence, person.companyExtractionMethod)
+    .run(person.id, audience, person.personHash, person.displayName, person.headline, person.companyName, person.companyConfidence, person.companyExtractionMethod, person.photoPrint ?? null)
 }
 
 function insertObservation(database: DatabaseSync, observation: Observation): void {
@@ -230,6 +232,7 @@ interface PersonRow {
   company_name: string | null
   company_confidence: number | null
   company_extraction_method: string
+  photo_print: string | null
 }
 
 interface ScanRow {
@@ -268,6 +271,7 @@ function toPerson(row: PersonRow): Person {
     companyName: row.company_name,
     companyConfidence: row.company_confidence,
     companyExtractionMethod: row.company_extraction_method as CompanyExtractionMethod,
+    ...(row.photo_print ? { photoPrint: row.photo_print } : {}),
   }
 }
 

@@ -20,6 +20,8 @@ export interface Person extends CompanyExtraction {
   personHash: string
   displayName: string
   headline: string | null
+  /** Their profile photo boiled down (screenshots/domain/PhotoPrint.ts), to tell apart people who share a name. */
+  photoPrint?: string | null
 }
 
 export interface Observation {

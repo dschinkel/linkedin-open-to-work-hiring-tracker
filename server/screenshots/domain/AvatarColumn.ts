@@ -18,7 +18,7 @@ const circleFill = { least: 0.62, most: 0.95 }
  */
 export function findAvatarColumn(pixels: Pixels): AvatarCircle[] {
   const shapes = inkShapes(pixels)
-  const columns = groupIntoColumns(shapes.map(asRoundBlob).filter((blob) => blob !== null))
+  const columns = groupIntoColumns(shapes.map((shape) => asRoundBlob(shape, pixels.height)).filter((blob) => blob !== null))
   const best = columns.sort((a, b) => medianSize(b) - medianSize(a) || b.length - a.length)[0] ?? []
   const cutPhoto = best.length > 0 ? photoCutByTheTop(shapes, best) : null
   return [...(cutPhoto ? [cutPhoto] : []), ...best.filter((blob) => blob.top > 0)]
@@ -125,10 +125,11 @@ function floodFill(ink: Uint8Array, seen: Uint8Array, start: number, width: numb
   return component
 }
 
-function asRoundBlob({ minX, minY, maxX, maxY, area }: Component): Blob | null {
+/** A photo's round shape. One slightly cut by the bottom of the image still reads as round; its width is its size. */
+function asRoundBlob({ minX, minY, maxX, maxY, area }: Component, imageHeight: number): Blob | null {
   const width = maxX - minX + 1
   const height = maxY - minY + 1
-  const size = (width + height) / 2
+  const size = maxY >= imageHeight - 1 ? width : (width + height) / 2
   const squareEnough = width / height > 0.8 && width / height < 1.25
   const fill = area / (width * height)
   if (size < smallestPhoto || !squareEnough || fill < circleFill.least || fill > circleFill.most) return null

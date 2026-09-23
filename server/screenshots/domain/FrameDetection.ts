@@ -2,7 +2,7 @@ import type { Classification, HiringStatus, OpenToWorkStatus } from '../../share
 
 /** Raw RGBA pixels of a screenshot. */
 export interface Pixels {
-  data: Uint8Array | Buffer
+  data: Uint8Array
   width: number
   height: number
 }

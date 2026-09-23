@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import sharp from 'sharp'
+import type { DetectedCard } from '../../domain/Deduplication.ts'
+import { photosMatch } from '../../domain/PhotoPrint.ts'
 import { screenshotCardReader } from './ScreenshotCardReader.ts'
 
 const fixture = (name: string) => readFileSync(path.resolve('server/screenshots/fixtures', name))
@@ -18,6 +20,23 @@ describe('reading a LinkedIn followers screenshot', () => {
       ['Esme Talbot', 'Talent Partner at Umbrella Health', 'NOT_OPEN', 'HIRING'],
     ])
   }, 60_000)
+
+  it("recognises one person's photo in two overlapping screenshots, and tells different people's photos apart", async () => {
+    const first = await reader.readCards(fixture('Screenshot 2026-09-22 at 9.01.12 AM.png'), 'first.png')
+    const second = await reader.readCards(fixture('Screenshot 2026-09-22 at 9.01.19 AM.png'), 'second.png')
+    const dmitri = (cards: DetectedCard[]) => cards.find((card) => card.displayName === 'Dmitri Havel')?.photoPrint as string
+
+    expect(photosMatch(dmitri(first), dmitri(second))).toBe(true)
+    expect(photosMatch(dmitri(first), second.find((card) => card.displayName === 'Farid Nasser')?.photoPrint as string)).toBe(false)
+  }, 60_000)
+
+  it('takes no photo print where the photo is cut off by the bottom of the screenshot and only its spot is guessed', async () => {
+    const photoCutOff = await sharp(fixture('Followers full page.png')).extract({ left: 0, top: 0, width: 1800, height: throughTamsinEllerysPhoto }).png().toBuffer()
+
+    const cards = await reader.readCards(photoCutOff, 'first-part.png')
+
+    expect(cards.at(-1)).toMatchObject({ displayName: 'Tamsin Ellery', photoPrint: null })
+  }, 120_000)
 
   it('finds every person on a full-page capture of a long list', async () => {
     const cards = await reader.readCards(fixture('Followers full page.png'), 'full-page.png')
@@ -61,3 +80,5 @@ describe('reading a LinkedIn followers screenshot', () => {
 const throughSorenDrummondsName = 2255
 /** A cut through the lower half of Tamsin Ellery's name, the next person down. */
 const throughTamsinEllerysName = 2450
+/** A cut below Tamsin Ellery's name but through her photo. */
+const throughTamsinEllerysPhoto = 2485

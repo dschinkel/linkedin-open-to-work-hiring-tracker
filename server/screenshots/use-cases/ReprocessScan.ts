@@ -21,7 +21,7 @@ export const reprocessScan = ({ audience, trackerStore, inboxFolder, cardReader 
     const readings = await Promise.all(
       fileNames.map(async (fileName) => ({ fileName, cards: await cardReader.readCards(await inboxFolder.readArchived(fileName, scan.scanDate), fileName), failure: null })),
     )
-    trackerStore.saveAnalyzedDay(mergeIntoDay(audience, scan.scanDate, readings, null))
+    trackerStore.saveAnalyzedDay(mergeIntoDay(audience, scan.scanDate, readings, { existing: null, knownPeople: trackerStore.readNetwork().people }))
     return { message: `Re-read ${fileNames.length} archived screenshot${fileNames.length === 1 ? '' : 's'}.` }
   },
 })

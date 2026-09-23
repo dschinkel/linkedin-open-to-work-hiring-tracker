@@ -58,6 +58,13 @@ describe('SQLite database', () => {
     expect(reopened).toEqual({ people: [jane], scans: [scan], observations: [janeIsOpen] })
   })
 
+  it("remembers a person's photo, to tell them from others with the same name", () => {
+    const file = freshDatabaseFile()
+    followersStore(openTrackerDatabase(file)).saveAnalyzedDay({ ...janesDay, people: [{ ...jane, photoPrint: 'c89659' }] })
+
+    expect(followersStore(openTrackerDatabase(file)).readNetwork().people[0].photoPrint).toBe('c89659')
+  })
+
   it('keeps saved settings after reopening', () => {
     const file = freshDatabaseFile()
     const settings = { ...defaultSettingsFor('followers'), scanFrequency: 'weekly' as const }

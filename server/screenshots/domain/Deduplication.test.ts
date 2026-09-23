@@ -65,3 +65,61 @@ describe('overlapping screenshots', () => {
     expect(scan.people[0].openToWork.status).toBe('OPEN')
   })
 })
+
+const photoOf = (red: number, green: number, blue: number) => [red, green, blue].map((value) => value.toString(16).padStart(2, '0').repeat(64)).join('')
+const placeholderPhoto = photoOf(157, 179, 200)
+
+describe('people who share a name', () => {
+  it('counts two people with one name but different photos as two', () => {
+    const scan = deduplicateCards([card('Muhammad Hassan', 'shot-1.png', { photoPrint: photoOf(200, 150, 90) }), card('Muhammad Hassan', 'shot-2.png', { photoPrint: photoOf(40, 90, 170) })], identify)
+
+    expect(scan.people).toHaveLength(2)
+  })
+
+  it('counts two people with one name in the same screenshot as two', () => {
+    expect(deduplicateCards([card('Jane Smith', 'shot-1.png'), card('Jane Smith', 'shot-1.png')], identify).people).toHaveLength(2)
+  })
+
+  it('keeps no photo for someone showing the placeholder photo, however slightly it reads differently', () => {
+    const scan = deduplicateCards([card('Ali Khan', 'shot-1.png', { photoPrint: photoOf(157, 179, 200) }), card('Grace Hopper', 'shot-1.png', { photoPrint: photoOf(160, 180, 204) })], identify)
+
+    expect(scan.people.map((person) => person.photoPrint)).toEqual([null, null])
+  })
+
+  it('keeps the photo of each person', () => {
+    const scan = deduplicateCards([card('Jane Smith', 'shot-1.png', { photoPrint: photoOf(200, 150, 90) })], identify)
+
+    expect(scan.people[0].photoPrint).toBe(photoOf(200, 150, 90))
+  })
+})
+
+describe('names OCR misread', () => {
+  it('counts a misread name as the same person when the photo matches', () => {
+    const scan = deduplicateCards([card('Matheus Simoes', 'shot-1.png', { photoPrint: photoOf(200, 150, 90) }), card('Matheus Simbes', 'shot-2.png', { photoPrint: photoOf(200, 150, 90) }), card('Matheus Simoes', 'shot-3.png', { photoPrint: photoOf(200, 150, 90) })], identify)
+
+    expect(scan.people.map((person) => person.card.displayName)).toEqual(['Matheus Simoes'])
+  })
+
+  it('counts a name misread at the start of both words as one person when the photo matches', () => {
+    const photo = photoOf(200, 150, 90)
+    const scan = deduplicateCards([card('Tejas Deshpande', 'shot-1.png', { photoPrint: photo }), card('lejas Deshpanae', 'shot-2.png', { photoPrint: photo })], identify)
+
+    expect(scan.people).toHaveLength(1)
+  })
+
+  it('counts a name read with and without a space as one person', () => {
+    const scan = deduplicateCards([card('VanajaR.', 'shot-1.png', { headline: 'Sales Specialist' }), card('Vanaja R.', 'shot-2.png', { headline: 'Sales Specialist' })], identify)
+
+    expect(scan.people).toHaveLength(1)
+  })
+
+  it('does not take the placeholder photo, shown for many people, as proof two similar names are one person', () => {
+    const cards = [
+      card('Ali Khan', 'shot-1.png', { photoPrint: placeholderPhoto, headline: 'Nurse at Mercy General Hospital' }),
+      card('Ali Khen', 'shot-2.png', { photoPrint: placeholderPhoto, headline: 'Rust developer building compilers' }),
+      card('Grace Hopper', 'shot-2.png', { photoPrint: placeholderPhoto, headline: 'Rear Admiral' }),
+    ]
+
+    expect(deduplicateCards(cards, identify).people).toHaveLength(3)
+  })
+})
