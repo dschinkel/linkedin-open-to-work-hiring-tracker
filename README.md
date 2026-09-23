@@ -49,13 +49,23 @@ It's up to you whether you gauge your **followers** or your **contacts** (your L
 
 **Keep each dashboard consistent.** Only ever drop contacts screenshots into Contacts and followers screenshots into Followers. Mixing them would make people appear and disappear between scans, which shows up as fake transitions, fake unfollowers, and a jumpy rate.
 
-> **Zoom matters:** set the browser to **67% zoom** (`Cmd+0`, then `Cmd+-` three times). That fits about 24 people per screenshot on a laptop screen and keeps each photo big enough to read the #OPENTOWORK / #HIRING frame. Anything from 67% to 100% works; below 50% frames can't be read, and those people are marked Uncertain.
+> **Zoom matters:** set the browser to **67% zoom** (`Cmd+0`, then `Cmd+-` four times). That fits about 24 people per screenshot on a laptop screen and keeps each photo big enough to read the #OPENTOWORK / #HIRING frame. Anything from 67% to 100% works; below 50% frames can't be read, and those people are marked Uncertain.
 >
 > | Zoom | People per screenshot (laptop) | Screenshots for ~1,450 people |
 > |---|---|---|
 > | 100% | ~16 | ~105 |
 > | **67% (recommended)** | ~24 | ~65 |
 > | 50% (minimum) | ~32 | ~50 |
+>
+> **Zoom shortcuts (Chrome, Brave, Edge, Firefox):**
+>
+> | Mac | Windows / Linux | What it does |
+> |---|---|---|
+> | `Cmd+0` | `Ctrl+0` | Reset to 100% |
+> | `Cmd+-` | `Ctrl+-` | Zoom out one step (100 → 90 → 80 → 75 → 67 → 50 → 33%) |
+> | `Cmd+=` (or `Cmd++`) | `Ctrl+=` (or `Ctrl++`) | Zoom in one step |
+>
+> From 100%, pressing `Cmd+-` **four times** lands on **67%**. The browser briefly shows the zoom level in the address bar. Safari has no 67% step; use 75% there.
 >
 > **The threshold:** each profile photo must be at least **40 pixels wide in the screenshot image**. On a Retina Mac that's about **50% zoom**; at 33% photos are ~30px and frames can't be read (tested: 0 of 5 frames read, and some names misread). On a non-Retina screen photos are half as many pixels, so stay at **100%** there.
 >
