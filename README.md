@@ -10,7 +10,7 @@
 
 <p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
-> **Want to use it yourself? Fork this repo, then use your fork.** Click **Fork** at the top of this page, clone your fork, and run `pnpm install && pnpm dev` (see [Running it](#running-it)). Your screenshots are saved on your own machine in `LinkedinScreenShots/` and kept permanently; that folder is git-ignored, so they are never committed or pushed, even from a public fork.
+> **To use it:** fork this repo, clone your fork, and run `pnpm install && pnpm dev`. Your data never leaves your machine.
 
 Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**.
 
@@ -18,11 +18,15 @@ The goal is a clearer picture of how your close network of contacts is doing, no
 
 The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avatars in LinkedIn screenshots that you take. It then shows:
 
-- **Open to Work**: how many people display the frame, the rate, whether it is rising or falling, who newly added it, who removed it, net flow, entry and removal rates, and how long people stay Open to Work.
-- **Hiring**: who displays the #HIRING frame, their visible title and company, hiring-frame trends, and which companies are represented.
-- **Who left**: people who **unfollowed you** (Followers dashboard) or who you **lost as contacts** (Contacts dashboard), with when they were last seen and whether they were Open to Work or Hiring at the time. The list updates with every new day of screenshots.
-- **How many followers and contacts you have**: shown at the top next to the Followers / Contacts toggle and kept up to date. It counts everyone seen in your recent scans once, so a list captured over several screenshots, several uploads, or a few days still adds up correctly.
-- **Trust signals**: matched-cohort rates (the same people compared across scans), scan quality, and classifier confidence. These help you tell a real change from a change in who happened to be in your screenshots.
+**Open to Work:** how many people show the frame, the rate and its direction, who added or removed it, and how long people stay open.
+
+**Hiring:** who shows the #HIRING frame, their title and company, and which companies are hiring.
+
+**Who left:** who **unfollowed you** or who you **lost as contacts**, and whether they were Open to Work or Hiring when last seen.
+
+**Followers and contacts count:** shown in the header, counting each person once across your recent screenshots.
+
+**Trust signals:** matched-cohort rates, scan quality, and classifier confidence, so you can tell a real change from a different set of screenshots.
 
 > This measures a **visible public signal** in a **non-random sample** (your screenshots). It is not an unemployment rate. Removing the frame does not mean someone found a job. People who share Open to Work only with recruiters cannot be detected.
 
@@ -43,7 +47,7 @@ It's up to you whether you gauge your **followers** or your **contacts** (your L
 
 **Keep each dashboard consistent.** Only ever drop contacts screenshots into Contacts and followers screenshots into Followers. Mixing them would make people appear and disappear between scans, which shows up as fake transitions, fake unfollowers, and a jumpy rate.
 
-> **Tip: zoom out first.** Press `Cmd+-` (Windows/Linux: `Ctrl+-`) a couple of times before taking screenshots. More people fit on the screen, so each scan takes fewer screenshots and less scrolling. Don't go so small that names become hard to read; around 67–80% works well.
+> **Tip:** zoom out to about 75% (`Cmd+-`, or `Ctrl+-` on Windows/Linux) so more people fit per screenshot. Not smaller, or names get hard to read.
 
 ### Easiest: GoFullPage (Chrome or Brave) <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle">
 
@@ -203,7 +207,7 @@ It updates with every new day of screenshots, and anyone seen again drops off. I
 
 ## Roadmap
 
-The full specification is in [`linkedin-open-to-work-hiring-tracker-spec.md`](./linkedin-open-to-work-hiring-tracker-spec.md). Next steps:
+Next steps:
 
 1. Koa backend implementing the same `contracts/api.ts`, reusing `mock-api/domain/`
 2. `chokidar` watcher on `LinkedinScreenShots/contacts/` and `LinkedinScreenShots/followers/`, with originals archived by date to `data/screenshots/<audience>/`
