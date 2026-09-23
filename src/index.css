@@ -364,3 +364,17 @@
 .grid > * {
   min-width: 0;
 }
+
+/* Screenshot upload progress: flashes between the theme accent and normal text, in light and dark mode. */
+@keyframes upload-progress-flash {
+  0%, 100% { color: var(--foreground); opacity: 1; }
+  50% { color: var(--primary); opacity: 0.55; }
+}
+
+.upload-progress {
+  animation: upload-progress-flash 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upload-progress { animation: none; color: var(--primary); }
+}
