@@ -79,7 +79,9 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
 4. Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).
 5. Screenshots contain real people's names, so `LinkedinScreenShots/` and `data/` are **git-ignored**: they stay on your machine and are never committed or pushed.
 
-   **Want your screenshots saved in your fork?** If you'd like your fork's git history to keep them (for example as a backup), remove these lines from `.gitignore` in your fork:
+   **Recommendation: never push your screenshots**, not even to a private fork. They show other people's names, photos, and headlines. Your git history doesn't need them: once screenshots are analyzed, what the app learns from them is kept in a local SQLite database (see [Where your data lives](#where-your-data-lives)).
+
+   If you still want them in your fork's history, remove these lines from `.gitignore`, and only ever in a **private** fork:
 
    ```gitignore
    LinkedinScreenShots/*
@@ -87,7 +89,18 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
    data/
    ```
 
-   Only do this if your fork is **private**. In a public fork, everyone could see the names and headlines of your followers and contacts.
+### Where your data lives
+
+> **Not built yet:** the screenshot analyzer and the SQLite database are the next part of this project. Today, dropped screenshots are only saved to the inbox folder. Nothing is extracted from them yet, so **keep your screenshots**; they are currently your only copy.
+
+Once built, everything the app extracts (people, Open-to-Work and Hiring frames, scans, history) is stored in **`data/linkedin.sqlite`**, a single file on your own computer:
+
+- It's **persistent**: it survives restarts, reboots, and pulling app updates.
+- It's **not backed up by git**, because `data/` is git-ignored. You lose it if you delete the project folder, clone into a new folder, move to a new laptop, or your disk fails.
+- To keep it safe, **back it up** like any other file: Time Machine (or your usual backup), or copy `data/linkedin.sqlite` somewhere safe now and then. Restoring is copying it back.
+
+After analysis, screenshots are archived under `data/screenshots/` by date so scans can be re-analyzed when detection improves. An option to delete screenshots automatically after analysis is planned.
+
 
 ---
 
@@ -219,3 +232,4 @@ The full specification is in [`linkedin-open-to-work-hiring-tracker-spec.md`](./
 2. SQLite + Drizzle persistence (`data/linkedin.sqlite`)
 3. `chokidar` watcher on `LinkedinScreenShots/contacts/` and `LinkedinScreenShots/followers/`, with originals archived by date to `data/screenshots/<audience>/`
 4. Card detection, OCR, and OpenCV frame classification (with an optional vision-model fallback)
+5. Settings option to delete screenshots automatically after analysis (default: keep, so scans can be re-analyzed)
