@@ -20,7 +20,7 @@ export function SegmentedLinks({ label, links }: { label: string; links: Segment
           aria-current={link.isActive ? 'page' : undefined}
           className={cn(
             'rounded-md px-3 py-1 text-sm font-medium transition-colors',
-            link.isActive ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground',
+            link.isActive ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-background/60 hover:text-foreground',
           )}
         >
           {link.label}

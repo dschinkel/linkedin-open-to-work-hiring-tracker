@@ -51,8 +51,8 @@ export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
   const [environment] = useState(() => trackerEnvironmentFor(mode, audience, transport))
   const [apisByAudience] = useState(() => apisFor(mode, transport))
   const sizes = useQueries(
-    { queries: audiences.map((each) => ({ queryKey: ['network-size', each], queryFn: () => apisByAudience[each].getJson('/network-size', networkSizeSchema) })) },
-    queryClient,
+    { queries: audiences.map((each) => ({ queryKey: ['network-size', mode, each], queryFn: () => apisByAudience[each].getJson('/network-size', networkSizeSchema) })) },
+    sizeClientFor(mode),
   )
   const sizeByAudience = Object.fromEntries(audiences.map((each, position) => [each, sizes[position].data])) as Record<Audience, NetworkSize | undefined>
 
@@ -75,6 +75,17 @@ export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
 /** Live pages re-check the API every few seconds so newly analyzed screenshots appear without a reload. */
 const liveRefreshMilliseconds = 5_000
 
+/**
+ * Switching audience remounts the tracker with a fresh query cache. List sizes live in one cache per mode that
+ * outlives those remounts, so the counts in the toggle stay on screen instead of blinking out and back.
+ */
+const sizeClients = new Map<TrackerMode, QueryClient>()
+
+function sizeClientFor(mode: TrackerMode): QueryClient {
+  if (!sizeClients.has(mode)) sizeClients.set(mode, queryClientFor(mode))
+  return sizeClients.get(mode)!
+}
+
 function queryClientFor(mode: TrackerMode): QueryClient {
   const refetchInterval = mode === 'live' ? liveRefreshMilliseconds : false
   return new QueryClient({ defaultOptions: { queries: { staleTime: 0, refetchInterval, refetchOnWindowFocus: mode === 'live' } } })
@@ -85,9 +96,10 @@ function apisFor(mode: TrackerMode, transport: Transport): Record<Audience, ApiC
   return { contacts: trackerEnvironmentFor(mode, 'contacts', transport).api, followers: trackerEnvironmentFor(mode, 'followers', transport).api }
 }
 
+/** An audience with no scans yet shows 0, so an empty tab is obvious before it is opened. */
 function describeSize(size: NetworkSize | undefined): string | undefined {
-  if (!size || size.latestScanDate === null) return undefined
-  return formatCount(size.peopleCount)
+  if (!size) return undefined
+  return formatCount(size.latestScanDate === null ? 0 : size.peopleCount)
 }
 
 function navItemsUnder(routeBase: string, audience: Audience): NavItem[] {
