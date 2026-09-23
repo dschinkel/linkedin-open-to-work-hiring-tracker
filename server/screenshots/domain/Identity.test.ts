@@ -14,4 +14,11 @@ describe('person identity', () => {
 
     expect(sarah).not.toBe(john)
   })
+
+  it('stays the same when the person changes their headline', () => {
+    const before = personHash({ displayName: 'John Smith', headline: 'Staff Engineer', companyName: 'Acme' })
+    const after = personHash({ displayName: 'John Smith', headline: 'Open to new roles', companyName: null })
+
+    expect(after).toBe(before)
+  })
 })

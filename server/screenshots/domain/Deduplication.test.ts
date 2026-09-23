@@ -29,6 +29,12 @@ describe('overlapping screenshots', () => {
     expect([scan.people.length, scan.duplicateCount, scan.cardsDetected]).toEqual([8, 2, 10])
   })
 
+  it('counts someone once when their headline is cut off at the edge of one screenshot', () => {
+    const scan = deduplicateCards([card('Jane Smith', 'shot-1.png'), card('Jane Smith', 'shot-2.png', { headline: 'Staff Engin', companyName: null })], identify)
+
+    expect(scan.people.length).toBe(1)
+  })
+
   it('treats differences in case and spacing as the same person', () => {
     const scan = deduplicateCards([card('Jane Smith', 'shot-1.png'), card('JANE  SMITH ', 'shot-2.png')], identify)
 
