@@ -148,6 +148,21 @@ describe('people who share a name', () => {
     expect(new Set(trackerStore.readNetwork().people.map((person) => person.id)).size).toBe(2)
   })
 
+  it('keeps two people with one name apart when their screenshots are uploaded one at a time', async () => {
+    const trackerStore = storeWaitingFor([first])
+    const cardReader = readerSeeing({
+      [first]: [{ ...card('Muhammad Hassan', false, photoOf(200, 150, 90)), headline: 'Full Stack Developer Node.js, ReactJs, Next.js, NestJS, AWS' }],
+      [second]: [{ ...card('Muhammad Hassan', false, null), headline: 'Senior Software Engineer' }],
+    })
+    const analyzer = analyzeInbox({ audience: 'followers', trackerStore, inboxFolder: inboxWith(), cardReader })
+    await analyzer.analyzeWaitingScreenshots()
+    trackerStore.recordWaitingScreenshot(second)
+
+    await analyzer.analyzeWaitingScreenshots()
+
+    expect(trackerStore.readNetwork().people).toHaveLength(2)
+  })
+
   it('follows each of them from day to day by their photo', async () => {
     const trackerStore = storeWaitingFor([first, second])
     const theOpenOne = photoOf(200, 150, 90)

@@ -65,6 +65,14 @@ describe('telling apart people who share a name, from day to day', () => {
     expect(newcomer).not.toBe(hashOf('Sam Lee'))
   })
 
+  it('gives a newcomer with a known name, no readable photo, and a clearly different title an identity of their own', () => {
+    const known = [{ personHash: hashOf('Muhammad Hassan'), ...seen('Muhammad Hassan', first, 'Full Stack Developer Node.js, ReactJs, Next.js, NestJS, AWS') }]
+
+    const [newcomer] = resolvePersonHashes([seen('Muhammad Hassan', null, 'Senior Software Engineer')], known)
+
+    expect(newcomer).not.toBe(hashOf('Muhammad Hassan'))
+  })
+
   it('keeps one person who changed their photo', () => {
     const known = [{ personHash: hashOf('Sam Lee'), ...seen('Sam Lee', first) }]
 

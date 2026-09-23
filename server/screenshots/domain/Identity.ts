@@ -54,10 +54,14 @@ function resolveNamesakes(people: SeenPerson[], namesakes: KnownPerson[]): strin
   return people.map((person, index) => claimed.get(index) ?? claimNextNumber(person, taken))
 }
 
-/** Different photos and different titles: not the same person who changed one of them. */
+/**
+ * Someone else with the same name: a different photo and not the same title (the same person who changed only their
+ * photo keeps their title), or, with no photo on one side to compare, a clearly different title.
+ */
 function clearlySomeoneElse(person: SeenPerson, namesake: KnownPerson): boolean {
-  const differentPhotos = Boolean(person.photoPrint && namesake.photoPrint) && photosDiffer(person.photoPrint as PhotoPrint, namesake.photoPrint as PhotoPrint)
-  return differentPhotos && titleEvidence(person.headline, namesake.headline) === 'different'
+  const titles = titleEvidence(person.headline, namesake.headline)
+  if (!person.photoPrint || !namesake.photoPrint) return titles === 'different'
+  return photosDiffer(person.photoPrint, namesake.photoPrint) && titles !== 'same'
 }
 
 function samePhoto(person: SeenPerson, namesake: KnownPerson): boolean {
