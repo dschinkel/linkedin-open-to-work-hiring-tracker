@@ -18,6 +18,7 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 - **Open to Work**: how many people display the frame, the rate, whether it is rising or falling, who newly added it, who removed it, net flow, entry and removal rates, and how long people stay Open to Work.
 - **Hiring**: who displays the #HIRING frame, their visible title and company, hiring-frame trends, and which companies are represented.
+- **Who left**: people who **unfollowed you** (Followers dashboard) or who you **lost as contacts** (Contacts dashboard), with when they were last seen and whether they were Open to Work or Hiring at the time. The list updates with every new day of screenshots.
 - **Trust signals**: matched-cohort rates (the same people compared across scans), scan quality, and classifier confidence. These help you tell a real change from a change in who happened to be in your screenshots.
 
 > This measures a **visible public signal** in a **non-random sample** (your screenshots). It is not an unemployment rate. Removing the frame does not mean someone found a job. People who share Open to Work only with recruiters cannot be detected.
