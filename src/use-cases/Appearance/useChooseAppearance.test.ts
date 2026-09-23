@@ -121,27 +121,27 @@ describe('choosing the appearance', () => {
   it('shows the swatch of the chosen color theme', () => {
     const { result } = chooseAppearanceWith(inMemoryStorage())
 
-    act(() => result.current.chooseTheme('rose'))
+    act(() => result.current.chooseTheme('green'))
 
-    expect(result.current.themeSwatch).toBe('oklch(0.6 0.2 5)')
+    expect(result.current.themeSwatch).toBe('oklch(0.62 0.17 130)')
   })
 
   it('offers six color themes', () => {
     const { result } = chooseAppearanceWith(inMemoryStorage())
 
-    expect(result.current.themeOptions.map((option) => option.label)).toEqual(['Neutral', 'Ocean', 'Rose'])
+    expect(result.current.themeOptions.map((option) => option.label)).toEqual(['Neutral', 'Ocean', 'Green'])
   })
 
   it('restores the chosen mode and theme on the next visit', () => {
     const storage = inMemoryStorage()
     const firstVisit = chooseAppearanceWith(storage)
     act(() => firstVisit.result.current.chooseMode('light'))
-    act(() => firstVisit.result.current.chooseTheme('rose'))
+    act(() => firstVisit.result.current.chooseTheme('green'))
     firstVisit.unmount()
 
     const { result } = chooseAppearanceWith(storage)
 
-    expect([result.current.mode, result.current.theme]).toEqual(['light', 'rose'])
+    expect([result.current.mode, result.current.theme]).toEqual(['light', 'green'])
   })
 
   it('still switches the appearance when storage is blocked', () => {
@@ -149,10 +149,10 @@ describe('choosing the appearance', () => {
 
     act(() => {
       result.current.chooseMode('light')
-      result.current.chooseTheme('rose')
+      result.current.chooseTheme('green')
     })
 
-    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([false, 'rose'])
+    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([false, 'green'])
   })
 
   it('shows light when the device cannot report its preference and System is chosen', () => {

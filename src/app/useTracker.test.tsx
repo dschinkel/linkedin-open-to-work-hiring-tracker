@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import type { Audience, NetworkSize } from '@contracts/api'
 import type { TrackerMode } from '@/shared-repositories/trackerEnvironment'
-import { useTracker } from './useTracker'
+import { forgetCachedTrackers, useTracker } from './useTracker'
 
 function atAddress(path: string) {
   return function Browser({ children }: { children: ReactNode }) {
@@ -24,6 +24,7 @@ function liveApiWithListSizes(sizes: Record<Audience, NetworkSize>) {
 }
 
 afterEach(() => {
+  forgetCachedTrackers()
   vi.unstubAllGlobals()
 })
 
@@ -82,14 +83,14 @@ describe('followers and contacts toggle', () => {
     await waitFor(() => expect(result.current.audienceLinks.map((link) => link.detail)).toEqual(['1,204', '387']))
   })
 
-  it('leaves out the size of a list that has never been scanned', async () => {
+  it('shows 0 for a list that has never been scanned', async () => {
     vi.stubGlobal(
       'fetch',
       liveApiWithListSizes({ followers: { peopleCount: 1_204, latestScanDate: '2026-09-22' }, contacts: { peopleCount: 0, latestScanDate: null } }),
     )
     const { result } = renderTracker('live', 'followers', '/followers')
 
-    await waitFor(() => expect(result.current.audienceLinks.map((link) => link.detail)).toEqual(['1,204', undefined]))
+    await waitFor(() => expect(result.current.audienceLinks.map((link) => link.detail)).toEqual(['1,204', '0']))
   })
 })
 

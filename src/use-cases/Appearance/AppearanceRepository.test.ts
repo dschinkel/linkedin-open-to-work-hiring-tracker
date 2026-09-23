@@ -56,7 +56,7 @@ describe('remembered appearance', () => {
   it('keeps going when a choice cannot be remembered', () => {
     const repository = appearanceRepositoryFor(() => blockedStorage)
 
-    expect(() => repository.saveTheme('rose')).not.toThrow()
+    expect(() => repository.saveTheme('green')).not.toThrow()
   })
 
   it('falls back to the defaults when storage cannot even be opened', () => {

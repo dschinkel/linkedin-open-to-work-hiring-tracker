@@ -46,7 +46,7 @@ const subtitle = 'Your followers and contacts open to work or hiring, tracked ov
 /** One tracker per mode and audience, each with its own query cache so their data never mixes. */
 export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
   const location = useLocation()
-  const [queryClient] = useState(() => queryClientFor(mode))
+  const [queryClient] = useState(() => trackerClientFor(mode, audience))
   const [transport] = useState<Transport>(() => (mode === 'demo' ? demoTransport : httpTransport))
   const [environment] = useState(() => trackerEnvironmentFor(mode, audience, transport))
   const [apisByAudience] = useState(() => apisFor(mode, transport))
@@ -84,6 +84,21 @@ const sizeClients = new Map<TrackerMode, QueryClient>()
 function sizeClientFor(mode: TrackerMode): QueryClient {
   if (!sizeClients.has(mode)) sizeClients.set(mode, queryClientFor(mode))
   return sizeClients.get(mode)!
+}
+
+/** Starts every cache over, as a fresh page load would. */
+export function forgetCachedTrackers(): void {
+  sizeClients.clear()
+  trackerClients.clear()
+}
+
+/** Each audience keeps its own cache for the whole visit, so switching back shows its pages at once. */
+const trackerClients = new Map<string, QueryClient>()
+
+function trackerClientFor(mode: TrackerMode, audience: Audience): QueryClient {
+  const key = `${mode}-${audience}`
+  if (!trackerClients.has(key)) trackerClients.set(key, queryClientFor(mode))
+  return trackerClients.get(key)!
 }
 
 function queryClientFor(mode: TrackerMode): QueryClient {

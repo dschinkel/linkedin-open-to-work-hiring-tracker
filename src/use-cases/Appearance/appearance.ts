@@ -2,7 +2,7 @@
 export type AppearanceMode = 'light' | 'dark' | 'system'
 
 /** The accent palette the tracker is painted in. Signal colors (Open to Work, Hiring, Removed) never change. */
-export type ColorTheme = 'neutral' | 'ocean' | 'rose'
+export type ColorTheme = 'neutral' | 'ocean' | 'green'
 
 export interface ColorThemeOption {
   value: ColorTheme
@@ -16,11 +16,11 @@ export const defaultColorTheme: ColorTheme = 'ocean'
 
 const appearanceModes: readonly AppearanceMode[] = ['light', 'dark', 'system']
 
-/** Green and violet palettes are left out on purpose: they would blur into the Open to Work and Hiring signal colors. */
+/** Green leans yellow-green and violet is left out, so neither blurs into the Open to Work and Hiring signal colors. */
 export const colorThemeOptions: ColorThemeOption[] = [
   { value: 'neutral', label: 'Neutral', swatch: 'oklch(0.45 0 0)' },
   { value: 'ocean', label: 'Ocean', swatch: 'oklch(0.55 0.16 250)' },
-  { value: 'rose', label: 'Rose', swatch: 'oklch(0.6 0.2 5)' },
+  { value: 'green', label: 'Green', swatch: 'oklch(0.62 0.17 130)' },
 ]
 
 export function isAppearanceMode(value: unknown): value is AppearanceMode {

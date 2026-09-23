@@ -15,6 +15,7 @@ export interface DepartedPeopleView extends SortedRows {
   errorMessage: string
   title: string
   explanation: string
+  caveat: string
   resultSummary: string
   search: string
   searchByName: (search: string) => void
@@ -45,7 +46,8 @@ export function useFindDepartedPeople(injectedRepository?: DepartureRepository):
   return {
     ...loadStatusOf(query),
     title: departureTitles[audience],
-    explanation: `Seen in earlier scans but missing from the last ${threshold} scans in a row. This is only reliable when every scan covers your whole list; someone may just have been scrolled past. Anyone who shows up again drops off this list, and it updates with every new day of screenshots.`,
+    explanation: `Seen in earlier scans but missing from the last ${threshold} scans in a row.`,
+    caveat: 'This is only reliable when every scan covers your whole list; someone may just have been scrolled past. Anyone who shows up again drops off this list, and it updates with every new day of screenshots.',
     resultSummary: formatPeople(people.length),
     search,
     searchByName,

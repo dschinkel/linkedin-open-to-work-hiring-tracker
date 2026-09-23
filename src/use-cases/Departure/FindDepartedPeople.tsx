@@ -13,6 +13,7 @@ export function FindDepartedPeople() {
       <div>
         <h2 className="text-2xl font-semibold">{departed.title}</h2>
         <p className="max-w-3xl text-sm text-muted-foreground">{departed.explanation}</p>
+        <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{departed.caveat}</p>
       </div>
       <SectionCard title={departed.resultSummary}>
         <div className="mb-4 max-w-xs">
