@@ -38,7 +38,13 @@ GoFullPage file names include the date (for example `screencapture-linkedin-com-
 
 ### Safest: scroll and take screenshots yourself
 
-Scroll manually and take screenshots as you go (macOS: `Cmd+Shift+4`). Overlapping screenshots are fine, because people are de-duplicated. macOS names such as `Screenshot 2026-09-22 at 9.01.12 AM.png` are dated automatically.
+Scroll manually and take screenshots as you go. On macOS:
+
+- `Shift+Cmd+3`: capture the whole screen
+- `Shift+Cmd+4`: drag to capture just the connections list
+- `Shift+Cmd+5`: open the screenshot toolbar (screen, window, or selection, plus where to save)
+
+Overlapping screenshots are fine, because people are de-duplicated. macOS names such as `Screenshot 2026-09-22 at 9.01.12 AM.png` are dated automatically.
 
 ### Screenshot rules
 
