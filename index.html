@@ -9,9 +9,9 @@
       // Paint the saved appearance before first render (no flash). Keys and defaults mirror src/use-cases/Appearance.
       ;(function () {
         var modes = ['light', 'dark', 'system']
-        var themes = ['yellow', 'neutral', 'ocean', 'teal', 'sunset', 'rose']
+        var themes = ['neutral', 'ocean', 'rose']
         var mode = 'dark'
-        var theme = 'yellow'
+        var theme = 'ocean'
         try {
           var storedMode = localStorage.getItem('tracker.appearanceMode')
           var storedTheme = localStorage.getItem('tracker.colorTheme')

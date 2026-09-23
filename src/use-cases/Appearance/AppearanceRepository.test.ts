@@ -21,10 +21,10 @@ const blockedStorage: AppearanceStorage = {
 }
 
 describe('remembered appearance', () => {
-  it('starts in dark mode with the yellow theme when nothing was chosen before', () => {
+  it('starts in dark mode with the ocean theme when nothing was chosen before', () => {
     const repository = appearanceRepositoryFor(inMemoryStorage)
 
-    expect([repository.loadMode(), repository.loadTheme()]).toEqual(['dark', 'yellow'])
+    expect([repository.loadMode(), repository.loadTheme()]).toEqual(['dark', 'ocean'])
   })
 
   it('remembers the chosen mode and theme for the next visit', () => {
@@ -44,13 +44,13 @@ describe('remembered appearance', () => {
 
     const repository = appearanceRepositoryFor(() => storage)
 
-    expect([repository.loadMode(), repository.loadTheme()]).toEqual(['dark', 'yellow'])
+    expect([repository.loadMode(), repository.loadTheme()]).toEqual(['dark', 'ocean'])
   })
 
   it('falls back to the defaults when storage is blocked', () => {
     const repository = appearanceRepositoryFor(() => blockedStorage)
 
-    expect([repository.loadMode(), repository.loadTheme()]).toEqual(['dark', 'yellow'])
+    expect([repository.loadMode(), repository.loadTheme()]).toEqual(['dark', 'ocean'])
   })
 
   it('keeps going when a choice cannot be remembered', () => {
@@ -64,6 +64,6 @@ describe('remembered appearance', () => {
       throw new Error('no storage in this browser')
     })
 
-    expect(repository.loadTheme()).toBe('yellow')
+    expect(repository.loadTheme()).toBe('ocean')
   })
 })

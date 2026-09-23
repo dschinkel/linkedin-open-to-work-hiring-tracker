@@ -60,10 +60,10 @@ afterEach(() => {
 })
 
 describe('choosing the appearance', () => {
-  it('shows dark mode with the yellow theme on a first visit', () => {
+  it('shows dark mode with the ocean theme on a first visit', () => {
     chooseAppearanceWith(inMemoryStorage())
 
-    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([true, 'yellow'])
+    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([true, 'ocean'])
   })
 
   it('switches the page to dark when Dark is chosen', () => {
@@ -129,19 +129,19 @@ describe('choosing the appearance', () => {
   it('offers six color themes', () => {
     const { result } = chooseAppearanceWith(inMemoryStorage())
 
-    expect(result.current.themeOptions.map((option) => option.label)).toEqual(['Yellow', 'Neutral', 'Ocean', 'Teal', 'Sunset', 'Rose'])
+    expect(result.current.themeOptions.map((option) => option.label)).toEqual(['Neutral', 'Ocean', 'Rose'])
   })
 
   it('restores the chosen mode and theme on the next visit', () => {
     const storage = inMemoryStorage()
     const firstVisit = chooseAppearanceWith(storage)
     act(() => firstVisit.result.current.chooseMode('light'))
-    act(() => firstVisit.result.current.chooseTheme('teal'))
+    act(() => firstVisit.result.current.chooseTheme('rose'))
     firstVisit.unmount()
 
     const { result } = chooseAppearanceWith(storage)
 
-    expect([result.current.mode, result.current.theme]).toEqual(['light', 'teal'])
+    expect([result.current.mode, result.current.theme]).toEqual(['light', 'rose'])
   })
 
   it('still switches the appearance when storage is blocked', () => {
@@ -149,10 +149,10 @@ describe('choosing the appearance', () => {
 
     act(() => {
       result.current.chooseMode('light')
-      result.current.chooseTheme('sunset')
+      result.current.chooseTheme('rose')
     })
 
-    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([false, 'sunset'])
+    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([false, 'rose'])
   })
 
   it('shows light when the device cannot report its preference and System is chosen', () => {
