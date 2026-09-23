@@ -65,7 +65,7 @@ export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
     audienceLinks: audienceLinksFrom(location.pathname, environment, sizeByAudience),
     subtitle: subtitles[audience],
     demoSampleDescription: `${demoNetworks[audience].peopleCount} fictional ${audience} and 180 days of made-up scans ending Sep 22, 2026.`,
-    logoSrc: `${import.meta.env.BASE_URL}logo-animated.svg`,
+    logoSrc: `${import.meta.env.BASE_URL}logo.svg`,
     showDemoBanner: environment.isDemo,
     showDemoInvite: !environment.isDemo,
     showExitDemo: environment.isDemo && !isStaticDemoBuild,
