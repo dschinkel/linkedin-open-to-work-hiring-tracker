@@ -201,46 +201,6 @@ It updates with every new day of screenshots, and anyone seen again drops off. I
 | Moving averages | Average of the scans you actually took; missing days are skipped |
 | Observed duration | Days between the frame appearing and disappearing |
 
----
-
-## Architecture
-
-Built with React 19, Vite, TypeScript, shadcn/ui (Base UI), Tailwind CSS v4, TanStack Query, Recharts, and Zod.
-
-The frontend follows **hexagonal architecture** with **humble views**:
-
-```
-use case component (humble view)  →  hook (state, decisions, shaping)  →  repository (HTTP + contract)
-```
-
-- **Views** only render what their hook returns and report user events. They contain no fetching, formatting, or business decisions.
-- **Hooks** (`use<UseCase>.ts`) own loading/error state, filters, sorting, and turning domain data into view rows. They receive their repository as an injectable dependency.
-- **Repositories** are the only code that knows endpoints. Every response is validated against the Zod contract in `contracts/api.ts`.
-- **Analytics formulas** live server-side in pure, unit-tested functions (`mock-api/domain/`), never in React.
-
-```
-contracts/api.ts              Zod schemas: the API contract shared by server and client
-mock-api/
-  domain/                     pure analytics: rates, transitions, matched cohort, moving
-                              averages, durations, company extraction, identity hashing,
-                              scan dates, hiring list, scan quality (+ tests)
-  seed/                       deterministic sample network
-  routes.ts, trackerApi.ts    /api/* routes with Zod-validated input
-  sqliteStore.ts              the local database: creates and upgrades tables, reads and writes data
-  trackerStore.ts             the storage port (SQLite for your data, memory for the demo and tests)
-  demoTrackerApi.ts           the static demo network (runs in the browser)
-  mockApiPlugin.ts            serves /api/* inside `pnpm dev` until the Koa backend exists
-src/
-  app/                        live and demo trackers, each with its own data source and cache
-  demo/                       in-browser demo transport, banner, Demo button
-  components/                 generic UI atoms (StatGrid, DataTable, charts, pickers)
-  components/ui/              shadcn/ui primitives
-  shared-formatting/          %, pp, dates, time windows
-  shared-repositories/        fetch + contract validation
-  use-cases/
-    Dashboard/  Trend/  Hiring/  OpenToWork/  Scan/  Settings/
-```
-
 ## Roadmap
 
 The full specification is in [`linkedin-open-to-work-hiring-tracker-spec.md`](./linkedin-open-to-work-hiring-tracker-spec.md). Next steps:
