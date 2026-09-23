@@ -49,7 +49,7 @@ It's up to you whether you gauge your **followers** or your **contacts** (your L
 
 **Keep each dashboard consistent.** Only ever drop contacts screenshots into Contacts and followers screenshots into Followers. Mixing them would make people appear and disappear between scans, which shows up as fake transitions, fake unfollowers, and a jumpy rate.
 
-> **Tip:** zoom out to about 75% (`Cmd+-`, or `Ctrl+-` on Windows/Linux) so more people fit per screenshot. Not smaller, or names get hard to read.
+> **Zoom matters:** keep the browser at **75–100% zoom** (`Cmd+0` resets to 100%). The #OPENTOWORK and #HIRING frames are thin bands around each photo; zoomed out further, photos are too small to read them, and those people are marked Uncertain instead of guessed. Fewer people per screenshot is fine: overlap is filtered out.
 
 ### Easiest: GoFullPage (Chrome or Brave) <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle">
 

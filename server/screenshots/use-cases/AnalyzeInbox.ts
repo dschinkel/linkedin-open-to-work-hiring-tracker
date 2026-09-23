@@ -122,6 +122,11 @@ function withinThreshold<Status extends string>(reading: Classification<Status>,
   return reading.confidence >= required ? reading : { ...reading, status: 'UNCERTAIN' as Status }
 }
 
+function describeWarning(uncertainCount: number, unreadable: number, peopleCount: number): string | null {
+  if (unreadable > peopleCount / 2) return 'Photos are too small to read #OPENTOWORK / #HIRING frames. Take screenshots at 75–100% browser zoom.'
+  return uncertainCount > 0 ? `${uncertainCount} uncertain avatar classification(s)` : null
+}
+
 /** New cards join what was already saved for the day; someone seen again keeps the clearest reading. */
 export function mergeIntoDay(audience: Audience, scanDate: string, readings: ScreenshotReading[], existing: AnalyzedDay | null): AnalyzedDay {
   const scanId = `${audience}-${scanDate}`
@@ -170,11 +175,12 @@ function mergePeople(earlier: Person[], latest: Person[]): Person[] {
 
 function toScreenshotResult({ fileName, cards }: ScreenshotReading): Screenshot {
   const uncertainCount = cards.filter((card) => card.openToWork.status === 'UNCERTAIN' || card.hiring.status === 'UNCERTAIN').length
+  const unreadable = cards.filter((card) => card.openToWork.confidence === 0 && card.hiring.confidence === 0).length
   return {
     fileName,
     peopleDetected: cards.length,
     uncertainCount,
     outcome: uncertainCount > 0 ? 'warning' : 'processed',
-    warning: uncertainCount > 0 ? `${uncertainCount} uncertain avatar classification(s)` : null,
+    warning: describeWarning(uncertainCount, unreadable, cards.length),
   }
 }

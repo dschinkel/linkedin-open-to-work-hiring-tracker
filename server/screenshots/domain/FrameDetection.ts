@@ -18,6 +18,17 @@ export interface FrameReadings {
   hiring: Classification<HiringStatus>
 }
 
+/**
+ * Below this radius (in screenshot pixels) the frame band is only a few pixels wide and its label is a blur,
+ * so a green or purple photo background looks the same as a frame. Such photos are Uncertain, never "no frame".
+ */
+export const smallestReadablePhotoRadius = 20
+
+const tooSmallToRead: FrameReadings = {
+  openToWork: { status: 'UNCERTAIN', confidence: 0, classificationMethod: 'pixels' },
+  hiring: { status: 'UNCERTAIN', confidence: 0, classificationMethod: 'pixels' },
+}
+
 /** A real frame is one unbroken coloured band along the avatar's edge, at least this long, carrying light lettering. */
 const frameArcDegrees = 120
 const noFrameArcDegrees = 40
@@ -73,6 +84,7 @@ function rowHasShape(pixels: Pixels, y: number, left: number, right: number, bac
  * purple in it (a shirt, a background) rarely forms an unbroken band with lettering, so it isn't counted.
  */
 export function readFrames(pixels: Pixels, avatar: AvatarCircle): FrameReadings {
+  if (avatar.radius < smallestReadablePhotoRadius) return tooSmallToRead
   return {
     openToWork: classify(frameBand(pixels, avatar, isFrameGreen), 'OPEN', 'NOT_OPEN'),
     hiring: classify(frameBand(pixels, avatar, isFramePurple), 'HIRING', 'NOT_HIRING'),
