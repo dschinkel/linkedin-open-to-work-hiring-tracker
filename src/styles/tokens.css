@@ -111,7 +111,7 @@
 
 @theme {
   /* One monospace family for everything: body, headings, figures. */
-  --font-sans: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-mono: var(--font-sans);
   --font-heading: var(--font-sans);
 
