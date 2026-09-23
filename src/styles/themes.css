@@ -124,17 +124,17 @@
 
 [data-theme='green'].dark,
 .dark [data-theme='green'] {
-  --scheme-page: #1a2e1d;
-  --scheme-panel: #121810;
-  --scheme-raised: #171e15;
-  --scheme-fill: #192117;
-  --scheme-hover: #21291e;
-  --scheme-rule: #2d362a;
-  --scheme-rule-strong: #3c4639;
-  --scheme-dim: #959f92;
-  --scheme-text: #d0d6ce;
-  --scheme-bright: #eef1ed;
-  --scheme-accent: #82cd29;
-  --scheme-accent-fill: #82cd29;
-  --scheme-on-accent: #0d120b;
+  --scheme-page: #16261a;
+  --scheme-panel: #1b2f1f;
+  --scheme-raised: #213825;
+  --scheme-fill: #26402a;
+  --scheme-hover: #2e4b31;
+  --scheme-rule: #3c5e3e;
+  --scheme-rule-strong: #4f7650;
+  --scheme-dim: #a8c3a4;
+  --scheme-text: #dcebd8;
+  --scheme-bright: #f3faf0;
+  --scheme-accent: #9be83a;
+  --scheme-accent-fill: #9be83a;
+  --scheme-on-accent: #10200f;
 }
