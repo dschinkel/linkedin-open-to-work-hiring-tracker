@@ -1,18 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Open-to-Work and Hiring tracker">
-  <defs>
-    <clipPath id="avatar">
-      <circle cx="30" cy="30" r="17" />
-    </clipPath>
-  </defs>
-  <rect width="64" height="64" rx="14" fill="#0f172a" />
-  <g clip-path="url(#avatar)">
-    <circle cx="30" cy="30" r="17" fill="#334155" />
-    <circle cx="30" cy="26" r="6.5" fill="#e2e8f0" />
-    <ellipse cx="30" cy="45" rx="12" ry="9" fill="#e2e8f0" />
+  <rect width="64" height="64" rx="14" fill="#0E0F13" />
+  <g transform="translate(6.4 6.4) scale(0.512)">
+    <rect x="20" y="27.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="11" y="36.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="20" y="36.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="29" y="36.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="2" y="45.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="20" y="45.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="38" y="45.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="20" y="54.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="20" y="63.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="71" y="27.5" width="8.4" height="8.4" rx="1.2" fill="#22C872" />
+    <rect x="71" y="36.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="53" y="45.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="71" y="45.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="89" y="45.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="62" y="54.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="71" y="54.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="80" y="54.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
+    <rect x="71" y="63.5" width="8.4" height="8.4" rx="1.2" fill="#9B6BFF" />
   </g>
-  <path d="M30 10 A20 20 0 0 0 30 50" fill="none" stroke="#22c55e" stroke-width="5" stroke-linecap="round" />
-  <path d="M30 10 A20 20 0 0 1 30 50" fill="none" stroke="#a855f7" stroke-width="5" stroke-linecap="round" />
-  <circle cx="49" cy="49" r="11" fill="#f8fafc" stroke="#0f172a" stroke-width="2.5" />
-  <polyline points="42.5,53 46.5,48.5 49.5,51 55,45" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
-  <polyline points="51.5,45 55,45 55,48.5" fill="none" stroke="#0f172a" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
 </svg>

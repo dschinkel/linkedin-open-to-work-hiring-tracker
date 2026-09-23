@@ -26,7 +26,7 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 The app never logs into LinkedIn, crawls profiles, or automates your browser. **You** take screenshots, and the app does the rest.
 
-### Easiest: GoFullPage (Chrome or Brave) $\color{red}{\textsf{use at your own risk}}$
+### Easiest: GoFullPage (Chrome or Brave) <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle">
 
 1. Install [GoFullPage – Full Page Screen Capture](https://chromewebstore.google.com/detail/gofullpage-full-page-scre/fdpohaocaechififmbbbbbknoalclacl) in Chrome or Brave.
 2. Open your connections list: <https://www.linkedin.com/mynetwork/invite-connect/connections/>
@@ -38,7 +38,7 @@ GoFullPage file names include the date (for example `screencapture-linkedin-com-
 
 > **Heads-up: GoFullPage carries some risk.** It captures the page by scrolling it automatically, and LinkedIn may treat automated scrolling or capturing as scraping by an application. That could get your account flagged or restricted. If you want to be sure you won't get dinged, scroll and take the screenshots yourself (see below).
 
-### $\color{green}{\textsf{Safest:}}$ scroll and take screenshots yourself
+### <img src="https://img.shields.io/badge/Safest-2ea043?style=flat-square" alt="Safest" align="absmiddle"> scroll and take screenshots yourself
 
 This is the safest option because nothing is automated: you scroll LinkedIn like any normal visitor and use your operating system's own screenshot tool. No browser extension or app touches the LinkedIn page, so there is nothing for LinkedIn to flag as scraping.
 
@@ -108,11 +108,16 @@ TRACKER_SAMPLE=single pnpm dev   # one scan: shows "trend data available after a
 
 ## Pages
 
-- **Dashboard**: the latest scan's Open-to-Work and Hiring cards, rate trend, entry vs removal, Who's Hiring preview, scan quality, and daily history.
-- **Trends**: zoomable, synced charts showing the rate with a 7-day moving average, 7/30/90-day averages, raw vs matched-cohort rate, entry vs removal, net flow, entry/removal rates, observed duration, and hiring-frame trends. Includes 7D / 30D / 90D / 6M / 1Y / All windows.
-- **Hiring**: a searchable, filterable table of everyone seen with #HIRING (current vs previous, company known vs unknown, sorting), plus counts per company. Greyed rows were not in the latest scan, so the frame is not claimed for today.
-- **Scans**: sortable daily history (Open to Work / Hiring / All columns). Click a row for scan detail, per-screenshot results, quality, and **Reprocess scan**.
-- **Settings**: inbox/archive folders, automatic processing, classifier thresholds, vision fallback, retention, and scan reminders.
+<img src="https://img.shields.io/badge/Dashboard-2ea043?style=flat-square" alt="Dashboard" align="absmiddle"> the latest scan's Open-to-Work and Hiring cards, rate trend, entry vs removal, Who's Hiring preview, scan quality, and daily history.
+
+<img src="https://img.shields.io/badge/Trends-2ea043?style=flat-square" alt="Trends" align="absmiddle"> zoomable, synced charts showing the rate with a 7-day moving average, 7/30/90-day averages, raw vs matched-cohort rate, entry vs removal, net flow, entry/removal rates, observed duration, and hiring-frame trends. Includes 7D / 30D / 90D / 6M / 1Y / All windows.
+
+<img src="https://img.shields.io/badge/Hiring-2ea043?style=flat-square" alt="Hiring" align="absmiddle"> a searchable, filterable table of everyone seen with #HIRING (current vs previous, company known vs unknown, sorting), plus counts per company. Greyed rows were not in the latest scan, so the frame is not claimed for today.
+
+<img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> sortable daily history (Open to Work / Hiring / All columns). Click a row for scan detail, per-screenshot results, quality, and <img src="https://img.shields.io/badge/Reprocess_scan-2ea043?style=flat-square" alt="Reprocess scan" align="absmiddle">.
+
+<img src="https://img.shields.io/badge/Settings-2ea043?style=flat-square" alt="Settings" align="absmiddle"> inbox/archive folders, automatic processing, classifier thresholds, vision fallback, retention, and scan reminders.
+
 
 ## How the metrics are defined
 
