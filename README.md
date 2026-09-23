@@ -2,13 +2,12 @@
   <img src="public/logo-animated.svg" alt="Open-to-Work & Hiring Tracker icon" width="160" />
 </p>
 
-#### Disclaimer (bitch to yourselves)
-
-<h4 align="center">This app is semi-vibe-coded, meaning it's using some of my rules but not all.  So kinda half backed. It is what it is, some good, some bad; don't expect super clean or superb test coverage 😆.  It's just to find out some quick stats.</h4>
-
 <h1 align="center">LinkedIn Open-to-Work & Hiring Tracker</h1>
 
 <p align="center"><em>Who in your network is looking for work, how many, and who's hiring, tracked over time.</em></p>
+
+### Disclaimer (ok?)
+<h4 align="center">This app is semi-vibe-coded, meaning it's using some of my rules but not all.  So kinda half backed. It is what it is, some good, some bad; don't expect super clean or superb test coverage 😆.  It's just to find out some quick stats.</h4>
 
 <p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
