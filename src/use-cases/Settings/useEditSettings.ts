@@ -38,7 +38,7 @@ const frequencyOptions: PickerOption<Settings['scanFrequency']>[] = [
 ]
 
 const afterAnalysisOptions: PickerOption<Settings['afterAnalysis']>[] = [
-  { value: 'delete', label: 'Delete screenshots once imported' },
+  { value: 'delete', label: 'Delete them' },
   { value: 'keep', label: 'Keep an archived copy' },
 ]
 

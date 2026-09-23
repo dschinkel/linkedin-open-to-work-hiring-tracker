@@ -12,7 +12,9 @@ export function SectionCard({ title, description, action, children }: SectionCar
   return (
     <Card>
       <CardHeader className="max-sm:grid-cols-1">
-        <CardTitle className="text-title font-bold text-primary">{title}</CardTitle>
+        <CardTitle className="text-title font-bold">
+          <span className="panel-tag bg-prompt-fill text-prompt-foreground">{title}</span>
+        </CardTitle>
         {description && <CardDescription>{description}</CardDescription>}
         {action && <CardAction className="max-sm:col-start-1 max-sm:row-span-1 max-sm:row-start-auto max-sm:justify-self-start">{action}</CardAction>}
       </CardHeader>

@@ -12,9 +12,9 @@ interface SwitchFieldProps {
 export function SwitchField({ id, label, description, checked, onChange }: SwitchFieldProps) {
   return (
     <div className="flex items-start justify-between gap-4">
-      <div className="grid gap-0.5">
-        <Label htmlFor={id}>{label}</Label>
-        <p className="text-xs text-muted-foreground">{description}</p>
+      <div className="grid gap-1">
+        <Label htmlFor={id} className="field-label">{label}</Label>
+        <p className="text-xs leading-relaxed text-muted-foreground">{description}</p>
       </div>
       <Switch id={id} checked={checked} onCheckedChange={onChange} />
     </div>

@@ -13,8 +13,8 @@ interface LabeledInputProps {
 
 export function LabeledInput({ id, label, value, onChange, placeholder, type = 'text', step }: LabeledInputProps) {
   return (
-    <div className="grid gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+    <div className="grid gap-2">
+      <Label htmlFor={id} className="field-label">{label}</Label>
       <Input id={id} type={type} step={step} value={value} placeholder={placeholder} onChange={(event) => onChange(event.target.value)} />
     </div>
   )

@@ -67,3 +67,8 @@
 [data-slot='skeleton'] {
   @apply rounded-none;
 }
+
+/* Form fields: a taller box sunk to the page color with a clear rule, so they stand out from the panel. */
+:is([data-slot='input'], [data-slot='select-trigger']) {
+  @apply h-10 rounded-none border-input bg-background px-3 dark:bg-background dark:hover:bg-background;
+}

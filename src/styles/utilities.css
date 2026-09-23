@@ -14,6 +14,16 @@
   @apply -mt-[calc(var(--card-spacing)+0.8em)] -ml-[0.5ch] w-fit bg-card px-[0.5ch];
 }
 
+/* A panel title as a solid tag in the panel's color, so it reads at a glance. Color comes from the call site. */
+@utility panel-tag {
+  @apply inline-block px-[1ch] py-0.5 leading-snug;
+}
+
+/* A form field's label: bold and in the theme color, so it stands apart from the value under it. */
+@utility field-label {
+  @apply text-label font-bold text-prompt;
+}
+
 /* Dotted leader between a label and its value: Screenshots ........ 54. Place it as a flex child between the two. */
 @utility dot-leader {
   @apply min-w-4 flex-1 -translate-y-[0.25em] border-b border-dotted border-muted-foreground/50;

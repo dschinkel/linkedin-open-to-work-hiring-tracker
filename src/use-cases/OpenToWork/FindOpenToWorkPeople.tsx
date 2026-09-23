@@ -12,9 +12,8 @@ export function FindOpenToWorkPeople() {
     <>
       <div>
         <h2 className="page-title">Open to Work</h2>
-        <p className="mt-1 max-w-3xl text-label text-muted-foreground">
-          People whose photo shows the public #OPENTOWORK frame. Greyed rows weren't in the latest scan, so the frame isn't confirmed for today.
-        </p>
+        <p className="mt-1 max-w-3xl text-label text-muted-foreground">People whose photo shows the public #OPENTOWORK frame.</p>
+        <p className="mt-1 max-w-3xl text-label text-muted-foreground">Greyed rows were not in the latest scan, so the frame is not confirmed today.</p>
       </div>
       <SectionCard title={open.resultSummary}>
         <div className="mb-4 max-w-xs">

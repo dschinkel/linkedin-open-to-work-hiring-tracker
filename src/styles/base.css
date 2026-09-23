@@ -5,8 +5,9 @@
   }
 
   html {
-    /* Ligatures off: code fonts turn -> and != into glyphs, and this UI shows data, so characters stay literal. */
-    @apply font-sans antialiased [font-variant-ligatures:none];
+    /* Ligatures off: code fonts turn -> and != into glyphs, and this UI shows data, so characters stay literal.
+     * Regular text sits a little heavier than 400 and without grayscale smoothing, which thins light-on-dark text. */
+    @apply font-sans font-[450] [font-variant-ligatures:none];
   }
 
   /* The page fades from the theme's glow at the top to its page color, like a terminal backdrop. */

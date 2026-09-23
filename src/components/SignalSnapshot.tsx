@@ -15,7 +15,7 @@ interface SignalSnapshotProps {
   tiles: StatTileView[]
 }
 
-const titleColor: Record<Signal, string> = { 'open-to-work': 'text-open-to-work', hiring: 'text-hiring' }
+const titleColor: Record<Signal, string> = { 'open-to-work': 'bg-open-to-work text-background', hiring: 'bg-hiring text-background' }
 const toneColor: Record<DeltaTone, string> = { up: 'text-open-to-work', down: 'text-removed', flat: 'text-primary' }
 
 /** The same tiles as a stat grid, laid out as a ring with key facts beside it and movement since the last scan below. */
@@ -26,7 +26,9 @@ export function SignalSnapshot({ signal, title, description, frameText, tiles }:
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className={cn('text-title font-bold', titleColor[signal])}>{title}</CardTitle>
+        <CardTitle className="text-title font-bold">
+          <span className={cn('panel-tag', titleColor[signal])}>{title}</span>
+        </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-x-6 gap-y-4 sm:grid-cols-[auto_1fr] sm:items-center">

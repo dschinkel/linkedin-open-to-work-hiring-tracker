@@ -14,9 +14,8 @@ export function FindHiringPeople() {
     <>
       <div>
         <h2 className="page-title">Who's hiring</h2>
-        <p className="mt-1 max-w-3xl text-label text-muted-foreground">
-          People in your screenshots showing the public #HIRING frame. Greyed rows were not in the latest scan, so the frame is not confirmed today.
-        </p>
+        <p className="mt-1 max-w-3xl text-label text-muted-foreground">People in your screenshots showing the public #HIRING frame.</p>
+        <p className="mt-1 max-w-3xl text-label text-muted-foreground">Greyed rows were not in the latest scan, so the frame is not confirmed today.</p>
       </div>
       <div className="grid gap-6">
         <SectionCard title="Hiring people" description={hiring.resultSummary}>

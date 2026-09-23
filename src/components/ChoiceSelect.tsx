@@ -12,8 +12,8 @@ interface ChoiceSelectProps<Value extends string> {
 
 export function ChoiceSelect<Value extends string>({ id, label, value, options, onChange }: ChoiceSelectProps<Value>) {
   return (
-    <div className="grid gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
+    <div className="grid gap-2">
+      <Label htmlFor={id} className="field-label">{label}</Label>
       <Select items={options} value={value} onValueChange={(next) => next && onChange(next as Value)}>
         <SelectTrigger id={id} className="w-full">
           <SelectValue />
