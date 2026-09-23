@@ -9,6 +9,8 @@ import type {
   Scan,
   Screenshot,
 } from '../domain/observation.ts'
+import { type DetectedCard, deduplicateCards, type UniquePerson } from '../domain/deduplication.ts'
+import { normalizeIdentity } from '../domain/identityText.ts'
 import { addDays } from '../domain/scanDate.ts'
 import { companies, firstNames, lastNames, titles, vagueHeadlines } from './sampleVocabulary.ts'
 
@@ -36,6 +38,8 @@ interface SampleState {
 }
 
 const cardsPerScreenshot = 14
+/** Cards repeated at the top of the next screenshot, as happens when scrolling. */
+const overlappingCards = 2
 const sampledShare = 0.9
 const skippedDayShare = 0.12
 /** Chance per day that someone unfollows or disconnects, so the sample has people who left. */
@@ -119,19 +123,43 @@ function isScanDay(dayOffset: number, random: Random): boolean {
 function recordScan(state: SampleState, scanDate: string): void {
   const scanId = `scan-${scanDate}`
   const seen = state.people.filter((person) => !state.frames.get(person.id)?.hasLeft && state.random() < sampledShare)
-  const observations = seen.map((person) => observe(scanId, person.id, state))
-  state.observations.push(...observations)
-  state.scans.push(sampleScan(scanId, scanDate, observations, state.random))
+  const personIdByIdentity = new Map(seen.map((person) => [normalizeIdentity(person), person.id]))
+  const screenshots = overlappingScreenshots(seen).map((people, shot) => ({ fileName: macScreenshotName(scanDate, shot), people }))
+  const cards = screenshots.flatMap(({ fileName, people }) => people.map((person) => detectCard(person, fileName, state)))
+  const deduplicated = deduplicateCards(cards, normalizeIdentity)
+  state.observations.push(...deduplicated.people.map((person) => toObservation(scanId, person, personIdByIdentity)))
+  state.scans.push({
+    id: scanId,
+    scanDate,
+    screenshots: screenshots.map(({ fileName }) => toScreenshot(fileName, cards)),
+    cardsDetected: deduplicated.cardsDetected,
+    duplicateCount: deduplicated.duplicateCount,
+  })
 }
 
-function observe(scanId: string, personId: string, state: SampleState): Observation {
-  const frames = state.frames.get(personId) as TrueFrames
+/** Like a person scrolling: each screenshot repeats the last few cards of the one before. */
+function overlappingScreenshots(people: Person[]): Person[][] {
+  const step = cardsPerScreenshot - overlappingCards
+  const shots: Person[][] = []
+  for (let start = 0; start < people.length; start += step) shots.push(people.slice(start, start + cardsPerScreenshot))
+  return shots
+}
+
+/** Every card is read independently, so the same person can be read differently in two screenshots. */
+function detectCard(person: Person, screenshotFileName: string, state: SampleState): DetectedCard {
+  const frames = state.frames.get(person.id) as TrueFrames
   return {
-    scanId,
-    personId,
+    screenshotFileName,
+    displayName: person.displayName,
+    headline: person.headline,
+    companyName: person.companyName,
     openToWork: classify<OpenToWorkStatus>(frames.isOpen ? 'OPEN' : 'NOT_OPEN', state.random),
     hiring: classify<HiringStatus>(frames.isHiring ? 'HIRING' : 'NOT_HIRING', state.random),
   }
+}
+
+function toObservation(scanId: string, person: UniquePerson, personIdByIdentity: Map<string, string>): Observation {
+  return { scanId, personId: personIdByIdentity.get(person.identity) as string, openToWork: person.openToWork, hiring: person.hiring }
 }
 
 function classify<Status extends string>(trueStatus: Status, random: Random): Classification<Status | 'UNCERTAIN'> {
@@ -141,25 +169,12 @@ function classify<Status extends string>(trueStatus: Status, random: Random): Cl
   return { status: trueStatus, confidence: 0.9 + random() * 0.095, classificationMethod: 'opencv' }
 }
 
-function sampleScan(scanId: string, scanDate: string, observations: Observation[], random: Random): Scan {
-  const screenshots = sampleScreenshots(scanDate, observations)
-  const duplicateCount = screenshots.length * 2 + Math.floor(random() * 6)
-  return { id: scanId, scanDate, screenshots, cardsDetected: observations.length + duplicateCount, duplicateCount }
-}
-
-function sampleScreenshots(scanDate: string, observations: Observation[]): Screenshot[] {
-  const count = Math.ceil(observations.length / cardsPerScreenshot)
-  return Array.from({ length: count }, (_, shot) => {
-    const cards = observations.slice(shot * cardsPerScreenshot, (shot + 1) * cardsPerScreenshot)
-    return toScreenshot(macScreenshotName(scanDate, shot), cards)
-  })
-}
-
-function toScreenshot(fileName: string, cards: Observation[]): Screenshot {
-  const uncertainCount = cards.filter((card) => card.openToWork.status === 'UNCERTAIN' || card.hiring.status === 'UNCERTAIN').length
+function toScreenshot(fileName: string, cards: DetectedCard[]): Screenshot {
+  const shotCards = cards.filter((card) => card.screenshotFileName === fileName)
+  const uncertainCount = shotCards.filter((card) => card.openToWork.status === 'UNCERTAIN' || card.hiring.status === 'UNCERTAIN').length
   return {
     fileName,
-    peopleDetected: cards.length,
+    peopleDetected: shotCards.length,
     uncertainCount,
     outcome: uncertainCount > 0 ? 'warning' : 'processed',
     warning: uncertainCount > 0 ? `${uncertainCount} uncertain avatar classification(s)` : null,

@@ -239,3 +239,10 @@ export const departedPeopleSchema = z.object({
   scansMissedThreshold: z.number(),
 })
 export type DepartedPeople = z.infer<typeof departedPeopleSchema>
+
+export const networkSizeSchema = z.object({
+  /** Unique people seen in the recent scans: the current size of your followers or contacts list. */
+  peopleCount: z.number(),
+  latestScanDate: z.string().nullable(),
+})
+export type NetworkSize = z.infer<typeof networkSizeSchema>

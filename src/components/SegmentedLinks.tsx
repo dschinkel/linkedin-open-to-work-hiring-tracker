@@ -5,9 +5,11 @@ export interface SegmentLink {
   label: string
   to: string
   isActive: boolean
+  /** Optional figure shown after the label, e.g. a count. */
+  detail?: string
 }
 
-/** A pill-shaped toggle whose options are links, e.g. [Followers | Contacts]. */
+/** A pill-shaped toggle whose options are links, e.g. [Followers 742 | Contacts 468]. */
 export function SegmentedLinks({ label, links }: { label: string; links: SegmentLink[] }) {
   return (
     <nav aria-label={label} className="inline-flex rounded-lg border bg-muted p-0.5">
@@ -22,6 +24,7 @@ export function SegmentedLinks({ label, links }: { label: string; links: Segment
           )}
         >
           {link.label}
+          {link.detail && <span className="ml-1 tabular-nums opacity-70"> {link.detail}</span>}
         </Link>
       ))}
     </nav>

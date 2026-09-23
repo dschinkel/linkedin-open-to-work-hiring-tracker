@@ -4,6 +4,7 @@ import type {
   CompanyHiring,
   Dashboard,
   DepartedPeople,
+  NetworkSize,
   HiringPeopleQuery,
   HiringPerson,
   ProcessingResult,
@@ -17,6 +18,7 @@ import type {
 } from '../contracts/api.ts'
 import { listDepartedPeople } from './domain/departedPeople.ts'
 import { observedDurations } from './domain/durations.ts'
+import { networkSize } from './domain/networkSize.ts'
 import { aggregateHiringCompanies, filterHiringPeople, listHiringPeople } from './domain/hiringPeople.ts'
 import { movingAverageAt, movingAverageTable } from './domain/movingAverages.ts'
 import type { Network } from './domain/observation.ts'
@@ -37,6 +39,7 @@ export interface TrackerApi {
   hiringPeople: (query: HiringPeopleQuery) => { people: HiringPerson[] }
   hiringCompanies: () => CompanyHiring
   departedPeople: () => DepartedPeople
+  networkSize: () => NetworkSize
   settings: () => Settings
   saveSettings: (settings: Settings) => Settings
   reprocessScan: (scanId: string) => ProcessingResult | null
@@ -66,6 +69,7 @@ export function createTrackerApi(network: Network, initialSettings: Settings, op
     hiringCompanies: () => aggregateHiringCompanies(hiringPeople),
     // Recomputed on every request, so each new day's scan updates the list (and anyone seen again drops off it).
     departedPeople: () => listDepartedPeople(index),
+    networkSize: () => networkSize(index),
     settings: () => settings,
     saveSettings: (next) => (settings = next),
     addScreenshots: (request) => addThenAnalyze(request, options),

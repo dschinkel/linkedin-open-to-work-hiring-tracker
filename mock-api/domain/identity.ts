@@ -1,20 +1,9 @@
 import { createHash } from 'node:crypto'
+import { normalizeIdentity, type VisibleIdentity } from './identityText.ts'
 
-export interface VisibleIdentity {
-  displayName: string
-  headline: string | null
-  companyName: string | null
-}
+export { normalizeIdentity, type VisibleIdentity }
 
 /** Deterministic pseudonymous key for a visible person. No face recognition, only visible text. */
 export function personHash(identity: VisibleIdentity): string {
   return createHash('sha256').update(normalizeIdentity(identity)).digest('hex')
-}
-
-export function normalizeIdentity(identity: VisibleIdentity): string {
-  return [identity.displayName, identity.headline, identity.companyName].map(normalizeField).join('|')
-}
-
-function normalizeField(field: string | null): string {
-  return (field ?? '').toLowerCase().replace(/\s+/g, ' ').trim()
 }

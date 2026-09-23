@@ -35,6 +35,7 @@ const routes: Route[] = [
   { method: 'GET', pattern: /^\/api\/analytics\/trends$/, respond: (api, request) => ok(api.trends(windowQuery.parse(request.query).window)) },
   { method: 'GET', pattern: /^\/api\/hiring\/people$/, respond: (api, request) => ok(api.hiringPeople(hiringPeopleQuerySchema.parse(request.query))) },
   { method: 'GET', pattern: /^\/api\/hiring\/companies$/, respond: (api) => ok(api.hiringCompanies()) },
+  { method: 'GET', pattern: /^\/api\/network-size$/, respond: (api) => ok(api.networkSize()) },
   { method: 'GET', pattern: /^\/api\/departed$/, respond: (api) => ok(api.departedPeople()) },
   { method: 'GET', pattern: /^\/api\/settings$/, respond: (api) => ok(api.settings()) },
   { method: 'PUT', pattern: /^\/api\/settings$/, respond: (api, request) => ok(api.saveSettings(settingsSchema.parse(request.body))) },

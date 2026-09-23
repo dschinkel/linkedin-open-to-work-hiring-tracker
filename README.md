@@ -19,6 +19,7 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 - **Open to Work**: how many people display the frame, the rate, whether it is rising or falling, who newly added it, who removed it, net flow, entry and removal rates, and how long people stay Open to Work.
 - **Hiring**: who displays the #HIRING frame, their visible title and company, hiring-frame trends, and which companies are represented.
 - **Who left**: people who **unfollowed you** (Followers dashboard) or who you **lost as contacts** (Contacts dashboard), with when they were last seen and whether they were Open to Work or Hiring at the time. The list updates with every new day of screenshots.
+- **How many followers and contacts you have**: shown at the top next to the Followers / Contacts toggle and kept up to date. It counts everyone seen in your recent scans once, so a list captured over several screenshots, several uploads, or a few days still adds up correctly.
 - **Trust signals**: matched-cohort rates (the same people compared across scans), scan quality, and classifier confidence. These help you tell a real change from a change in who happened to be in your screenshots.
 
 > This measures a **visible public signal** in a **non-random sample** (your screenshots). It is not an unemployment rate. Removing the frame does not mean someone found a job. People who share Open to Work only with recruiters cannot be detected.
@@ -69,7 +70,9 @@ Overlapping screenshots are fine, because people are de-duplicated. macOS names 
 ### Screenshot rules
 
 1. Drag screenshots onto the drop box on the Dashboard, or copy them into that dashboard's inbox folder. There's no button to press: screenshots are analyzed as soon as they land, and the dashboard updates by itself. Only PNG, JPG, and WebP files are accepted, and a file already in the inbox is skipped.
-2. Screenshots from the **same date** are grouped into **one scan**.
+2. Screenshots from the **same date** are grouped into **one scan**, even across several uploads.
+
+   **Overlapping screenshots are fine; duplicates are filtered out.** When you scroll and screenshot, the same person often shows up at the bottom of one screenshot and the top of the next. The app is smart enough to catch that: every card from the day is matched by the person's visible name, headline, and company (ignoring case and spacing, never face recognition), so each person counts once. If two screenshots of the same person read their frame differently, the clearer reading wins, and if both are confident but disagree, that person is marked Uncertain instead of guessed. The number of duplicates removed is shown on each scan.
 3. Take a scan regularly (daily or weekly) so trends and transitions have history to compare.
 4. Make sure avatars, names, and headlines are visible. The frame is detected from the avatar, and names/headlines are used to match the same person across days (no face recognition).
 5. Screenshots contain real people's names. `LinkedinScreenShots/` and `data/` are **git-ignored**, so never force-add them.
