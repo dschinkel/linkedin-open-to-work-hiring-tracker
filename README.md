@@ -40,6 +40,8 @@ GoFullPage file names include the date (for example `screencapture-linkedin-com-
 
 ### Safest: scroll and take screenshots yourself
 
+This is the safest option because nothing is automated: you scroll LinkedIn like any normal visitor and use your operating system's own screenshot tool. No browser extension or app touches the LinkedIn page, so there is nothing for LinkedIn to flag as scraping.
+
 Scroll manually and take screenshots as you go. On macOS:
 
 - `Shift+Cmd+3`: capture the whole screen
