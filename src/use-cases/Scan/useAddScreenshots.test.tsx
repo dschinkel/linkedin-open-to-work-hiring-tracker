@@ -208,4 +208,21 @@ describe('adding screenshots', () => {
 
     await waitFor(() => expect(result.current).toMatchObject({ isDraggingOver: false, resultMessage: expect.stringContaining('2 screenshots added') }))
   })
+
+  it('shows a running total of people found while the batch uploads', async () => {
+    const { repository } = inboxAnswering(async ([file]) => {
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      return savedAs(file.fileName)
+    })
+    const progress: string[] = []
+    const { result } = renderHook(() => {
+      const view = useAddScreenshots(repository)
+      progress.push(view.progressMessage)
+      return view
+    }, { wrapper: insideTracker() })
+
+    act(() => result.current.handleFilesChosen(chosen([screenshot('page-1.png'), screenshot('page-2.png'), screenshot('page-3.png')])))
+
+    await waitFor(() => expect(progress).toContain('Adding 3 of 3: page-3.png · 40 people found so far'))
+  })
 })

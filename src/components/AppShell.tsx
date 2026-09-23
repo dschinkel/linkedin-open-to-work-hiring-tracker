@@ -19,22 +19,25 @@ interface AppShellProps {
   children: ReactNode
 }
 
-/** On phones the header stacks: title, then the toggle, then the page links, which wrap rather than scroll. */
+/** Two rows: title with the header controls, then the Followers / Contacts toggle beside the page links. */
 export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, headerAction, children }: AppShellProps) {
   return (
     <div className="min-h-svh bg-background text-foreground">
       <header className="border-b">
-        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
-            <img src={logoSrc} alt="" className="h-10 w-auto sm:h-14" />
-            <div className="min-w-0">
-              <h1 className="text-xl font-bold tracking-tight sm:text-3xl">{title}</h1>
-              <p className="text-sm text-muted-foreground sm:text-base">{subtitle}</p>
+        <div className="mx-auto max-w-7xl space-y-3 px-4 py-3">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex min-w-0 items-center gap-3">
+              <img src={logoSrc} alt="" className="h-10 w-auto sm:h-14" />
+              <div className="min-w-0">
+                <h1 className="text-xl font-bold tracking-tight sm:text-3xl">{title}</h1>
+                <p className="text-sm text-muted-foreground sm:text-base">{subtitle}</p>
+              </div>
             </div>
-            {toggle}
+            <div className="flex items-center gap-3">{headerAction}</div>
           </div>
-          <div className="flex min-w-0 items-center gap-3">
-            <nav className="flex min-w-0 flex-1 flex-wrap gap-1">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            {toggle}
+            <nav className="flex flex-wrap gap-1">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}
@@ -46,7 +49,6 @@ export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, h
                 </NavLink>
               ))}
             </nav>
-            {headerAction}
           </div>
         </div>
       </header>

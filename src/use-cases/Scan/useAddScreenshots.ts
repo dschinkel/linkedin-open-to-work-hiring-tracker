@@ -76,7 +76,7 @@ export function useAddScreenshots(injectedRepository?: ScanRepository): AddScree
 async function uploadOneByOne(files: File[], repository: ScanRepository, reportProgress: (message: string) => void): Promise<UploadTotals> {
   const totals: UploadTotals = { saved: [], rejected: [], importedCount: 0, failedCount: 0, peopleInScan: 0 }
   for (const [position, file] of files.entries()) {
-    reportProgress(`Adding ${position + 1} of ${files.length}: ${file.name}`)
+    reportProgress(`Adding ${position + 1} of ${files.length}: ${file.name}${peopleSoFar(totals)}`)
     await uploadOne(file, repository, totals)
   }
   return totals
@@ -96,6 +96,12 @@ async function uploadOne(file: File, repository: ScanRepository, totals: UploadT
 }
 
 /** One line for the whole batch, e.g. "23 screenshots added. 21 read, 2 couldn't be read. 480 people in this scan." */
+/** Live running total while a batch uploads, e.g. " · 142 people found so far". */
+function peopleSoFar(totals: UploadTotals): string {
+  if (totals.importedCount === 0) return ''
+  return ` · ${plural(totals.peopleInScan, 'person', 'people')} found so far`
+}
+
 function summarize(totals: UploadTotals): string {
   const added = `${plural(totals.saved.length, 'screenshot')} added${totals.rejected.length > 0 ? `, ${totals.rejected.length} skipped` : ''}.`
   const read = totals.importedCount + totals.failedCount > 0 ? ` ${totals.importedCount} read${totals.failedCount > 0 ? `, ${totals.failedCount} couldn't be read` : ''}.` : ''
