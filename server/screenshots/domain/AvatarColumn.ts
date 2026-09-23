@@ -40,7 +40,7 @@ export function sitsOnThePage(pixels: Pixels, spot: AvatarCircle): boolean {
   const background = backgroundColours(pixels.data, pixels.width * pixels.height)
   const ring = ringAround(spot, pixels)
   const onBackground = ring.filter((offset) => background.some((colour) => distance(colourAt(pixels.data, offset), colour) <= 45))
-  return ring.length > 0 && onBackground.length / ring.length >= 0.75
+  return ring.length > 0 && onBackground.length / ring.length >= 0.5
 }
 
 function ringAround({ centreX, centreY, radius }: AvatarCircle, { width, height }: Pixels): number[] {
