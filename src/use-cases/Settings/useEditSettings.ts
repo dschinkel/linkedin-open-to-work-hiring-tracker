@@ -3,8 +3,9 @@ import { useState } from 'react'
 import { settingsSchema, type Settings } from '@contracts/api'
 import type { LoadStatus } from '@/components/AsyncContent'
 import type { PickerOption } from '@/components/OptionPicker'
+import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
-import { type SettingsRepository, settingsRepository } from './SettingsRepository'
+import { type SettingsRepository, settingsRepositoryFor } from './SettingsRepository'
 
 type Threshold = 'open' | 'notOpen' | 'hiring' | 'notHiring'
 
@@ -53,7 +54,9 @@ const placeholderSettings: Settings = {
 }
 
 /** Edits a local draft of settings and saves it only when it passes the settings contract. */
-export function useEditSettings(repository: SettingsRepository = settingsRepository): SettingsView {
+export function useEditSettings(injectedRepository?: SettingsRepository): SettingsView {
+  const { api } = useTrackerEnvironment()
+  const repository = injectedRepository ?? settingsRepositoryFor(api)
   const queryClient = useQueryClient()
   const query = useQuery({ queryKey: ['settings'], queryFn: repository.load })
   const [draft, setDraft] = useState<Settings | null>(null)

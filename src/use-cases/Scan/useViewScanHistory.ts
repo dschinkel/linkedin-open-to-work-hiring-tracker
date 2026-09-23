@@ -13,8 +13,9 @@ import {
   formatSignedCount,
 } from '@/shared-formatting/formatMetric'
 import { timeWindowOptions } from '@/shared-formatting/timeWindowOptions'
+import { useAppPath, useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
-import { type ScanRepository, scanRepository } from './ScanRepository'
+import { type ScanRepository, scanRepositoryFor } from './ScanRepository'
 
 export type ColumnSet = 'openToWork' | 'hiring' | 'all'
 
@@ -79,8 +80,11 @@ const columnsBySet: Record<ColumnSet, HistoryColumn[]> = {
 }
 
 /** Daily History: one row per scan, newest first by default, sortable and clickable. */
-export function useViewScanHistory(repository: ScanRepository = scanRepository): ScanHistoryView {
+export function useViewScanHistory(injectedRepository?: ScanRepository): ScanHistoryView {
+  const { api } = useTrackerEnvironment()
+  const repository = injectedRepository ?? scanRepositoryFor(api)
   const navigate = useNavigate()
+  const appPath = useAppPath()
   const [timeWindow, chooseTimeWindow] = useState<TimeWindow>('30d')
   const [columnSet, chooseColumnSet] = useState<ColumnSet>('openToWork')
   const [sort, setSort] = useState<{ key: string; direction: SortDirection }>({ key: 'date', direction: 'desc' })
@@ -106,7 +110,7 @@ export function useViewScanHistory(repository: ScanRepository = scanRepository):
     sortKey: sort.key,
     sortDirection: sort.direction,
     sortBy,
-    openScan: (scanId) => navigate(`/scans/${scanId}`),
+    openScan: (scanId) => navigate(appPath(`/scans/${scanId}`)),
   }
 }
 

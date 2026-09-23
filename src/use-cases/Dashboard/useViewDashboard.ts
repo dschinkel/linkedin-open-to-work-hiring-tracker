@@ -3,11 +3,12 @@ import type { Dashboard } from '@contracts/api'
 import type { LoadStatus } from '@/components/AsyncContent'
 import type { StatTileView } from '@/components/StatTile'
 import { formatCount, formatLongDate } from '@/shared-formatting/formatMetric'
+import { useAppPath, useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { describeHiringPerson, describeHiringTiles, type HiringPersonRow } from '../Hiring/describeHiring'
 import { describeOpenToWorkTiles } from '../OpenToWork/describeOpenToWork'
 import { describeScanQuality, type QualitySection } from '../Scan/describeScanQuality'
-import { type DashboardRepository, dashboardRepository } from './DashboardRepository'
+import { type DashboardRepository, dashboardRepositoryFor } from './DashboardRepository'
 
 export interface DashboardView {
   status: LoadStatus
@@ -22,15 +23,27 @@ export interface DashboardView {
   whoIsHiringPeople: HiringPersonRow[]
   showNoHiringPeople: boolean
   qualitySections: QualitySection[]
+  hiringHref: string
+  demoHref: string
+  showDemoInvite: boolean
 }
 
 /** Latest snapshot at a glance: Open-to-Work stock and flow, Hiring, and how trustworthy the scan is. */
-export function useViewDashboard(repository: DashboardRepository = dashboardRepository): DashboardView {
+export function useViewDashboard(injectedRepository?: DashboardRepository): DashboardView {
+  const { api, isDemo } = useTrackerEnvironment()
+  const appPath = useAppPath()
+  const repository = injectedRepository ?? dashboardRepositoryFor(api)
   const query = useQuery({ queryKey: ['dashboard'], queryFn: repository.latest })
-  return { ...loadStatusOf(query), ...describeDashboard(query.data) }
+  return {
+    ...loadStatusOf(query),
+    ...describeDashboard(query.data),
+    hiringHref: appPath('/hiring'),
+    demoHref: '/demo',
+    showDemoInvite: !isDemo,
+  }
 }
 
-type DashboardFields = Omit<DashboardView, 'status' | 'errorMessage'>
+type DashboardFields = Omit<DashboardView, 'status' | 'errorMessage' | 'hiringHref' | 'demoHref' | 'showDemoInvite'>
 
 const noDashboard: DashboardFields = {
   hasScans: false,

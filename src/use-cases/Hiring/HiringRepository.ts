@@ -5,14 +5,16 @@ import {
   type HiringPeopleQuery,
   type HiringPerson,
 } from '@contracts/api'
-import { getJson, queryString } from '@/shared-repositories/apiClient'
+import { type ApiClient, queryString } from '@/shared-repositories/apiClient'
 
 export interface HiringRepository {
   people: (query: HiringPeopleQuery) => Promise<HiringPerson[]>
   companies: () => Promise<CompanyHiring>
 }
 
-export const hiringRepository: HiringRepository = {
-  people: async (query) => (await getJson(`/api/hiring/people?${queryString(query)}`, hiringPeopleSchema)).people,
-  companies: () => getJson('/api/hiring/companies', companyHiringSchema),
+export function hiringRepositoryFor(api: ApiClient): HiringRepository {
+  return {
+    people: async (query) => (await api.getJson(`/api/hiring/people?${queryString(query)}`, hiringPeopleSchema)).people,
+    companies: () => api.getJson('/api/hiring/companies', companyHiringSchema),
+  }
 }

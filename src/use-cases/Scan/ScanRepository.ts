@@ -7,7 +7,7 @@ import {
   type ScanSummary,
   type TimeWindow,
 } from '@contracts/api'
-import { getJson, queryString, sendJson } from '@/shared-repositories/apiClient'
+import { type ApiClient, queryString } from '@/shared-repositories/apiClient'
 
 export interface ScanRepository {
   history: (window: TimeWindow) => Promise<ScanSummary[]>
@@ -16,9 +16,11 @@ export interface ScanRepository {
   reprocess: (scanId: string) => Promise<ProcessingResult>
 }
 
-export const scanRepository: ScanRepository = {
-  history: async (window) => (await getJson(`/api/scans?${queryString({ window })}`, scanHistorySchema)).scans,
-  detail: (scanId) => getJson(`/api/scans/${encodeURIComponent(scanId)}`, scanDetailSchema),
-  analyzeNewScreenshots: () => sendJson('POST', '/api/scans', processingResultSchema),
-  reprocess: (scanId) => sendJson('POST', `/api/scans/${encodeURIComponent(scanId)}/reprocess`, processingResultSchema),
+export function scanRepositoryFor(api: ApiClient): ScanRepository {
+  return {
+    history: async (window) => (await api.getJson(`/api/scans?${queryString({ window })}`, scanHistorySchema)).scans,
+    detail: (scanId) => api.getJson(`/api/scans/${encodeURIComponent(scanId)}`, scanDetailSchema),
+    analyzeNewScreenshots: () => api.sendJson('POST', '/api/scans', processingResultSchema),
+    reprocess: (scanId) => api.sendJson('POST', `/api/scans/${encodeURIComponent(scanId)}/reprocess`, processingResultSchema),
+  }
 }

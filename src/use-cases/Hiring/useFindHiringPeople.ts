@@ -6,9 +6,10 @@ import type { DataColumn, DataRow } from '@/components/DataTable'
 import type { DefinitionRow } from '@/components/DefinitionList'
 import type { PickerOption } from '@/components/OptionPicker'
 import { formatCount } from '@/shared-formatting/formatMetric'
+import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { describeHiringPerson, type HiringPersonRow } from './describeHiring'
-import { type HiringRepository, hiringRepository } from './HiringRepository'
+import { type HiringRepository, hiringRepositoryFor } from './HiringRepository'
 
 export interface HiringPeopleView {
   status: LoadStatus
@@ -62,7 +63,9 @@ const columns: DataColumn[] = [
 const initialFilters: HiringPeopleQuery = { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' }
 
 /** Who's Hiring: searchable, filterable list of people seen with the public #HIRING frame. */
-export function useFindHiringPeople(repository: HiringRepository = hiringRepository): HiringPeopleView {
+export function useFindHiringPeople(injectedRepository?: HiringRepository): HiringPeopleView {
+  const { api } = useTrackerEnvironment()
+  const repository = injectedRepository ?? hiringRepositoryFor(api)
   const [filters, setFilters] = useState<HiringPeopleQuery>(initialFilters)
   const people = useQuery({ queryKey: ['hiring-people', filters], queryFn: () => repository.people(filters), placeholderData: keepPreviousData })
   const companies = useQuery({ queryKey: ['hiring-companies'], queryFn: repository.companies })

@@ -37,8 +37,12 @@ export interface TrackerApi {
   reprocessScan: (scanId: string) => ProcessingResult | null
 }
 
+export interface TrackerApiOptions {
+  analyzeMessage: string
+}
+
 /** Serves the Koa API contract from an in-memory network, computed once. */
-export function createTrackerApi(network: Network, initialSettings: Settings): TrackerApi {
+export function createTrackerApi(network: Network, initialSettings: Settings, options: TrackerApiOptions): TrackerApi {
   const index = indexNetwork(network)
   const timeline = buildTimeline(index)
   const hiringPeople = listHiringPeople(index)
@@ -53,7 +57,7 @@ export function createTrackerApi(network: Network, initialSettings: Settings): T
     hiringCompanies: () => aggregateHiringCompanies(hiringPeople),
     settings: () => settings,
     saveSettings: (next) => (settings = next),
-    analyzeNewScreenshots: () => ({ message: `No new screenshots found in ${settings.inboxDirectory}.` }),
+    analyzeNewScreenshots: () => ({ message: options.analyzeMessage }),
     reprocessScan: (scanId) => (timeline.some((summary) => summary.id === scanId) ? { message: 'Scan reprocessed. Results unchanged.' } : null),
   }
 }

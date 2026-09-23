@@ -8,10 +8,10 @@ export function HiringTrendCharts({ points }: { points: TrendPoint[] }) {
   return (
     <>
       <SectionCard title="Hiring-frame rate" description="Visible #HIRING frames in the sampled network, not job openings">
-        <LineTrendChart data={points} xKey="scanDate" series={hiringRateSeries} formatX={formatDateTick} formatY={formatRateTick} />
+        <LineTrendChart data={points} xKey="scanDate" zoomGroup="trends" series={hiringRateSeries} formatX={formatDateTick} formatY={formatRateTick} />
       </SectionCard>
       <SectionCard title="Hiring-frame changes" description="Newly hiring vs removed hiring frames">
-        <BarComparisonChart data={points} xKey="scanDate" series={hiringStatusChangeSeries} formatX={formatDateTick} />
+        <BarComparisonChart data={points} xKey="scanDate" zoomGroup="trends" series={hiringStatusChangeSeries} formatX={formatDateTick} />
       </SectionCard>
     </>
   )

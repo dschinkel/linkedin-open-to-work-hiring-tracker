@@ -11,15 +11,17 @@ import {
   formatRatio,
   formatSignedCount,
 } from '@/shared-formatting/formatMetric'
+import { useAppPath, useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { describeScanQuality, type QualitySection } from './describeScanQuality'
-import { type ScanRepository, scanRepository } from './ScanRepository'
+import { type ScanRepository, scanRepositoryFor } from './ScanRepository'
 import type { ScreenshotRow } from './ScreenshotResults'
 
 export interface ScanView {
   status: LoadStatus
   errorMessage: string
   title: string
+  allScansHref: string
   scanRows: DefinitionRow[]
   openToWorkRows: DefinitionRow[]
   hiringRows: DefinitionRow[]
@@ -31,9 +33,12 @@ export interface ScanView {
   reprocessMessage: string
 }
 
-export function useViewScan(repository: ScanRepository = scanRepository): ScanView {
+export function useViewScan(injectedRepository?: ScanRepository): ScanView {
+  const { api } = useTrackerEnvironment()
+  const repository = injectedRepository ?? scanRepositoryFor(api)
   const { scanId = '' } = useParams()
   const queryClient = useQueryClient()
+  const appPath = useAppPath()
   const query = useQuery({ queryKey: ['scan', scanId], queryFn: () => repository.detail(scanId) })
   const reprocessing = useMutation({
     mutationFn: () => repository.reprocess(scanId),
@@ -43,6 +48,7 @@ export function useViewScan(repository: ScanRepository = scanRepository): ScanVi
   return {
     ...loadStatusOf(query),
     ...describeDetail(query.data),
+    allScansHref: appPath('/scans'),
     reprocess: () => reprocessing.mutate(),
     isReprocessing: reprocessing.isPending,
     reprocessMessage: reprocessing.data?.message ?? reprocessing.error?.message ?? '',

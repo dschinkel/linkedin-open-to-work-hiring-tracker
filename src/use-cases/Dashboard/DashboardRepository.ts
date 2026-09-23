@@ -1,10 +1,12 @@
 import { dashboardSchema, type Dashboard } from '@contracts/api'
-import { getJson } from '@/shared-repositories/apiClient'
+import { type ApiClient } from '@/shared-repositories/apiClient'
 
 export interface DashboardRepository {
   latest: () => Promise<Dashboard>
 }
 
-export const dashboardRepository: DashboardRepository = {
-  latest: () => getJson('/api/dashboard', dashboardSchema),
+export function dashboardRepositoryFor(api: ApiClient): DashboardRepository {
+  return {
+    latest: () => api.getJson('/api/dashboard', dashboardSchema),
+  }
 }

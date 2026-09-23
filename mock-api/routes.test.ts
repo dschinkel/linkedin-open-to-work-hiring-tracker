@@ -1,18 +1,11 @@
 import { routeRequest } from './routes.ts'
+import { defaultSettings } from './defaultSettings.ts'
 import { createTrackerApi } from './trackerApi.ts'
 
 const emptyApi = createTrackerApi(
   { people: [], scans: [], observations: [] },
-  {
-    inboxDirectory: 'LinkedinScreenShots/',
-    archiveDirectory: 'data/screenshots/',
-    automaticProcessing: true,
-    openToWorkThresholds: { open: 0.9, notOpen: 0.1 },
-    hiringThresholds: { hiring: 0.9, notHiring: 0.1 },
-    visionFallback: false,
-    scanFrequency: 'daily',
-    retention: 'forever',
-  },
+  defaultSettings,
+  { analyzeMessage: 'Nothing to analyze.' },
 )
 
 describe('tracker API', () => {

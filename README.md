@@ -8,6 +8,8 @@
 
 <p align="center"><em>Who in your network is looking for work, how many, and who's hiring, tracked over time.</em></p>
 
+<p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
+
 Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**. The goal is a clearer picture of how your close network of contacts is doing, not a single snapshot.
 
 The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avatars in LinkedIn screenshots that you take. It then shows:
@@ -71,23 +73,29 @@ pnpm dev
 
 Open <http://localhost:5173>.
 
-### Sample data
+### Demo
 
-The screenshot-analysis backend (Koa + OpenCV/OCR + SQLite) is **not built yet**. Until it is, `pnpm dev` serves the API from a dev-only mock (`mock-api/`) filled with a deterministic 180-day sample network, so you can explore every screen. Screenshots dropped into `LinkedinScreenShots/` are **not analyzed yet**.
+The screenshot-analysis backend (Koa + OpenCV/OCR + SQLite) is **not built yet**, so screenshots dropped into `LinkedinScreenShots/` are **not analyzed yet**, and the app at `/` shows "No scans yet".
 
-Choose a sample scenario:
+To see what the app does, open the demo:
+
+- **Online:** <https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo>
+- **Locally:** <http://localhost:5173/demo>, or click **Demo** in the app header
+
+The demo runs entirely in your browser on a fixed sample network (500 fictional people, 180 days of made-up scans ending Sep 22, 2026). It never talks to a server or LinkedIn. Every chart can be zoomed like a stock chart: drag the handles under a chart, and the other charts on the page follow.
+
+To fill the local app at `/` with sample data instead of the empty state:
 
 ```bash
-TRACKER_SAMPLE=full pnpm dev     # default: ~6 months of history
+TRACKER_SAMPLE=full pnpm dev     # ~6 months of sample history ending today
 TRACKER_SAMPLE=single pnpm dev   # one scan: shows "trend data available after additional scans"
-TRACKER_SAMPLE=empty pnpm dev    # no scans: shows the first-run empty state
 ```
 
 ### Scripts
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | Dev server with the mock API |
+| `pnpm dev` | Dev server (app at `/`, demo at `/demo`) |
 | `pnpm test` | Unit tests (Vitest) |
 | `pnpm typecheck` | TypeScript project check |
 | `pnpm lint` | oxlint |
@@ -98,7 +106,7 @@ TRACKER_SAMPLE=empty pnpm dev    # no scans: shows the first-run empty state
 ## Pages
 
 - **Dashboard**: the latest scan's Open-to-Work and Hiring cards, rate trend, entry vs removal, Who's Hiring preview, scan quality, and daily history.
-- **Trends**: rate with a 7-day moving average, 7/30/90-day averages, raw vs matched-cohort rate, entry vs removal, net flow, entry/removal rates, observed duration, and hiring-frame trends. Includes 7D / 30D / 90D / 6M / 1Y / All windows.
+- **Trends**: zoomable, synced charts showing the rate with a 7-day moving average, 7/30/90-day averages, raw vs matched-cohort rate, entry vs removal, net flow, entry/removal rates, observed duration, and hiring-frame trends. Includes 7D / 30D / 90D / 6M / 1Y / All windows.
 - **Hiring**: a searchable, filterable table of everyone seen with #HIRING (current vs previous, company known vs unknown, sorting), plus counts per company. Greyed rows were not in the latest scan, so the frame is not claimed for today.
 - **Scans**: sortable daily history (Open to Work / Hiring / All columns). Click a row for scan detail, per-screenshot results, quality, and **Reprocess scan**.
 - **Settings**: inbox/archive folders, automatic processing, classifier thresholds, vision fallback, retention, and scan reminders.
@@ -143,8 +151,11 @@ mock-api/
                               scan dates, hiring list, scan quality (+ tests)
   seed/                       deterministic sample network
   routes.ts, trackerApi.ts    /api/* routes with Zod-validated input
-  mockApiPlugin.ts            serves the API inside `pnpm dev`
+  demoTrackerApi.ts           the static demo network (runs in the browser)
+  mockApiPlugin.ts            serves /api/* inside `pnpm dev` until the Koa backend exists
 src/
+  app/                        live and demo trackers, each with its own data source and cache
+  demo/                       in-browser demo transport, banner, Demo button
   components/                 generic UI atoms (StatGrid, DataTable, charts, pickers)
   components/ui/              shadcn/ui primitives
   shared-formatting/          %, pp, dates, time windows

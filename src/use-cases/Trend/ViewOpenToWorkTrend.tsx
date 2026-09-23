@@ -20,10 +20,10 @@ export function ViewOpenToWorkTrend() {
             description="Public Open-to-Work rate in sampled network"
             action={<OptionPicker label="Time window" value={trend.timeWindow} options={trend.windowOptions} onChange={trend.chooseTimeWindow} />}
           >
-            <LineTrendChart data={trend.points} xKey="scanDate" series={openRateSeries} formatX={formatDateTick} formatY={formatRateTick} />
+            <LineTrendChart data={trend.points} xKey="scanDate" zoomGroup="dashboard-trend" series={openRateSeries} formatX={formatDateTick} formatY={formatRateTick} />
           </SectionCard>
-          <SectionCard title="Entry vs removal" description="People changing Open-to-Work status: why the rate moved">
-            <BarComparisonChart data={trend.points} xKey="scanDate" series={openStatusChangeSeries} formatX={formatDateTick} />
+          <SectionCard title="Entry vs removal" description="People changing Open-to-Work status: why the rate moved. Drag the handles below a chart to zoom.">
+            <BarComparisonChart data={trend.points} xKey="scanDate" zoomGroup="dashboard-trend" series={openStatusChangeSeries} formatX={formatDateTick} />
           </SectionCard>
         </div>
       )}

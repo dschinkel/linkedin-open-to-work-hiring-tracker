@@ -7,9 +7,10 @@ import type { PickerOption } from '@/components/OptionPicker'
 import type { StatTileView } from '@/components/StatTile'
 import { formatCount, formatPercent, formatPercentagePoints, formatRatio } from '@/shared-formatting/formatMetric'
 import { timeWindowOptions } from '@/shared-formatting/timeWindowOptions'
+import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import type { DurationBucketRow } from './DurationDistribution'
-import { type TrendRepository, trendRepository } from './TrendRepository'
+import { type TrendRepository, trendRepositoryFor } from './TrendRepository'
 
 export interface TrendsView {
   status: LoadStatus
@@ -38,7 +39,9 @@ const movingAverageColumns: DataColumn[] = [
 ]
 
 /** Deeper longitudinal analysis: rates, averages, flows, matched cohorts, observed durations. */
-export function useViewTrends(repository: TrendRepository = trendRepository): TrendsView {
+export function useViewTrends(injectedRepository?: TrendRepository): TrendsView {
+  const { api } = useTrackerEnvironment()
+  const repository = injectedRepository ?? trendRepositoryFor(api)
   const [timeWindow, chooseTimeWindow] = useState<TimeWindow>('90d')
   const query = useQuery({ queryKey: ['trends', timeWindow], queryFn: () => repository.trends(timeWindow) })
   const points = query.data?.points ?? []

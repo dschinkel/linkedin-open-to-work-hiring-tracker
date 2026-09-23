@@ -1,5 +1,4 @@
 import { extractCompany } from '../domain/company.ts'
-import { personHash } from '../domain/identity.ts'
 import type {
   Classification,
   HiringStatus,
@@ -72,7 +71,7 @@ function samplePerson(position: number, random: Random): Person {
   const company = withOccasionalOcrNoise(extractCompany(headline, explicitCompany), random)
   return {
     id: `person-${String(position + 1).padStart(4, '0')}`,
-    personHash: personHash({ displayName, headline, companyName: company.companyName }),
+    personHash: `sample-hash-${position + 1}`, // sample people need no real SHA-256; keeps the seed browser-safe
     displayName,
     headline,
     ...company,

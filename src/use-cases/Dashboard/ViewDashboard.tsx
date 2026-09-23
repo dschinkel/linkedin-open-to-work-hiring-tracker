@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom'
 import { AsyncContent } from '@/components/AsyncContent'
 import { EmptyState } from '@/components/EmptyState'
 import { SectionCard } from '@/components/SectionCard'
+import { buttonVariants } from '@/components/ui/button'
 import { HiringSnapshot } from '../Hiring/HiringSnapshot'
 import { WhoIsHiringPreview } from '../Hiring/WhoIsHiringPreview'
 import { OpenToWorkSnapshot } from '../OpenToWork/OpenToWorkSnapshot'
@@ -23,7 +25,17 @@ export function ViewDashboard() {
         <AnalyzeScreenshots />
       </div>
       {dashboard.showFirstRunInvite && (
-        <EmptyState title="No scans yet" description="Drop screenshots into LinkedinScreenShots/ to create your first scan." />
+        <EmptyState
+          title="No scans yet"
+          description="Drop screenshots into LinkedinScreenShots/ to create your first scan."
+          action={
+            dashboard.showDemoInvite && (
+              <Link to={dashboard.demoHref} className={buttonVariants({ variant: 'outline' })}>
+                Try the demo with sample data
+              </Link>
+            )
+          }
+        />
       )}
       {dashboard.hasScans && (
         <>
@@ -37,6 +49,7 @@ export function ViewDashboard() {
               headline={dashboard.whoIsHiringHeadline}
               people={dashboard.whoIsHiringPeople}
               showNoHiringPeople={dashboard.showNoHiringPeople}
+              hiringHref={dashboard.hiringHref}
             />
             <SectionCard title="Latest scan quality" description="Check here before trusting an unusual move in the charts.">
               <ScanQualityPanel sections={dashboard.qualitySections} />

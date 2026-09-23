@@ -5,6 +5,8 @@ import { defineConfig } from 'vite'
 import { mockApiPlugin } from './mock-api/mockApiPlugin.ts'
 
 export default defineConfig({
+  // GitHub Pages serves the static demo from /<repo>/; local dev stays at /.
+  base: process.env.PAGES_BASE ?? '/',
   plugins: [react(), tailwindcss(), mockApiPlugin()],
   resolve: {
     alias: {

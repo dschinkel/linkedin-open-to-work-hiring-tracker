@@ -15,7 +15,7 @@ export function ViewScan() {
     <AsyncContent status={scan.status} errorMessage={scan.errorMessage}>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link to="/scans" className="text-sm text-muted-foreground hover:underline">
+          <Link to={scan.allScansHref} className="text-sm text-muted-foreground hover:underline">
             ← All scans
           </Link>
           <h2 className="text-2xl font-semibold">{scan.title}</h2>

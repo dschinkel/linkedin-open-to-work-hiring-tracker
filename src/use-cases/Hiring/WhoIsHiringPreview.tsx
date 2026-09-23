@@ -9,15 +9,16 @@ interface WhoIsHiringPreviewProps {
   headline: string
   people: HiringPersonRow[]
   showNoHiringPeople: boolean
+  hiringHref: string
 }
 
-export function WhoIsHiringPreview({ headline, people, showNoHiringPeople }: WhoIsHiringPreviewProps) {
+export function WhoIsHiringPreview({ headline, people, showNoHiringPeople, hiringHref }: WhoIsHiringPreviewProps) {
   return (
     <SectionCard
       title="Who's hiring"
       description={headline}
       action={
-        <Link to="/hiring" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+        <Link to={hiringHref} className={buttonVariants({ variant: 'outline', size: 'sm' })}>
           View all hiring
         </Link>
       }

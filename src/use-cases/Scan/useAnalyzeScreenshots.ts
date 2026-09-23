@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { type ScanRepository, scanRepository } from './ScanRepository'
+import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
+import { type ScanRepository, scanRepositoryFor } from './ScanRepository'
 
 export interface AnalyzeScreenshotsView {
   analyze: () => void
@@ -8,7 +9,9 @@ export interface AnalyzeScreenshotsView {
 }
 
 /** Manual trigger so the folder watcher is not the only way to ingest screenshots. */
-export function useAnalyzeScreenshots(repository: ScanRepository = scanRepository): AnalyzeScreenshotsView {
+export function useAnalyzeScreenshots(injectedRepository?: ScanRepository): AnalyzeScreenshotsView {
+  const { api } = useTrackerEnvironment()
+  const repository = injectedRepository ?? scanRepositoryFor(api)
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: repository.analyzeNewScreenshots,

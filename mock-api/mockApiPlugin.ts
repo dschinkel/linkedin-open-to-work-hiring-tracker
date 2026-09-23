@@ -1,33 +1,25 @@
 import type { IncomingMessage, ServerResponse } from 'node:http'
 import type { Plugin } from 'vite'
-import type { Settings } from '../contracts/api.ts'
 import type { Network } from './domain/observation.ts'
+import { defaultSettings } from './defaultSettings.ts'
 import { type ApiRequest, routeRequest } from './routes.ts'
 import { generateSampleNetwork } from './seed/generateSampleNetwork.ts'
 import { createTrackerApi } from './trackerApi.ts'
 
 type SampleScenario = 'empty' | 'single' | 'full'
 
-const defaultSettings: Settings = {
-  inboxDirectory: 'LinkedinScreenShots/',
-  archiveDirectory: 'data/screenshots/',
-  automaticProcessing: true,
-  openToWorkThresholds: { open: 0.9, notOpen: 0.1 },
-  hiringThresholds: { hiring: 0.9, notHiring: 0.1 },
-  visionFallback: false,
-  scanFrequency: 'daily',
-  retention: 'forever',
-}
+const notBuiltYet = 'Screenshot analysis is not built yet. Try the demo to see sample results.'
 
 /**
- * Dev-only stand-in for the Koa backend: answers /api/* with sample data so the UI runs with `pnpm dev`.
- * Pick a scenario with TRACKER_SAMPLE=empty|single|full (default full).
+ * Dev-only stand-in for the Koa backend at /api/*. It has no scans by default, because screenshot
+ * analysis does not exist yet. TRACKER_SAMPLE=single|full fills it with sample data instead.
+ * (The public demo at /demo does not use this; it runs the same API inside the browser.)
  */
 export function mockApiPlugin(): Plugin {
   return {
     name: 'tracker-mock-api',
     configureServer(server) {
-      const api = createTrackerApi(sampleNetwork(scenarioFromEnvironment()), defaultSettings)
+      const api = createTrackerApi(sampleNetwork(scenarioFromEnvironment()), defaultSettings, { analyzeMessage: notBuiltYet })
       server.middlewares.use('/api', (request, response) => {
         void answer(request, response, (apiRequest) => routeRequest(api, apiRequest))
       })
@@ -37,7 +29,7 @@ export function mockApiPlugin(): Plugin {
 
 function scenarioFromEnvironment(): SampleScenario {
   const scenario = process.env.TRACKER_SAMPLE
-  return scenario === 'empty' || scenario === 'single' ? scenario : 'full'
+  return scenario === 'single' || scenario === 'full' ? scenario : 'empty'
 }
 
 function sampleNetwork(scenario: SampleScenario): Network {
