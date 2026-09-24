@@ -19,6 +19,7 @@ function scanRepository(detail: ScanDetail, reprocess: () => Promise<ProcessingR
       return reprocess()
     },
     addScreenshots: async () => ({}) as AddScreenshotsResult,
+    people: async () => ({ scanId: '', scanDate: '', people: [] }),
   }
   return { repository, scansAskedFor, scansReprocessed }
 }

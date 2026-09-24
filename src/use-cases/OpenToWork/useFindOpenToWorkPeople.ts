@@ -3,6 +3,8 @@ import { useState } from 'react'
 import type { OpenToWorkPerson } from '@contracts/api'
 import type { LoadStatus } from '@/components/AsyncContent'
 import type { DataColumn, DataRow } from '@/components/DataTable'
+import { exportTableOf, type ListExporter, localToday } from '@/shared-exports/listExport'
+import { type ExportListView, useExportList } from '@/shared-exports/useExportList'
 import { formatPeople, formatShortDate, formatTimeShowingFrame } from '@/shared-formatting/formatMetric'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
@@ -17,6 +19,8 @@ export interface OpenToWorkPeopleView extends SortedRows {
   searchByNameOrTitle: (search: string) => void
   hasPeople: boolean
   showNobodyOpen: boolean
+  /** Saves the list as shown: current search and sort, same columns. */
+  exporting: ExportListView
 }
 
 const columns: DataColumn[] = [
@@ -29,13 +33,14 @@ const columns: DataColumn[] = [
 ]
 
 /** Everyone currently showing #OPENTOWORK, searchable by name or title. */
-export function useFindOpenToWorkPeople(injectedRepository?: OpenToWorkRepository): OpenToWorkPeopleView {
+export function useFindOpenToWorkPeople(injectedRepository?: OpenToWorkRepository, exporter?: ListExporter): OpenToWorkPeopleView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? openToWorkRepositoryFor(api)
   const [search, searchByNameOrTitle] = useState('')
   const query = useQuery({ queryKey: ['open-to-work-people'], queryFn: repository.people })
   const people = (query.data ?? []).filter((person) => matches(person, search))
   const table = useSortedRows(columns, people.map(toRow), { key: 'lastSeen', direction: 'desc' })
+  const exporting = useExportList(() => ({ list: { slug: 'open-to-work', title: 'Open to Work' }, date: localToday(), ...exportTableOf(table.columns, table.rows) }), exporter)
 
   return {
     ...loadStatusOf(query),
@@ -45,6 +50,7 @@ export function useFindOpenToWorkPeople(injectedRepository?: OpenToWorkRepositor
     hasPeople: people.length > 0,
     showNobodyOpen: people.length === 0,
     ...table,
+    exporting,
   }
 }
 

@@ -1,4 +1,6 @@
 allowBuilds:
+  # jspdf pulls it in optionally; its install script only prints a funding message.
+  core-js: false
   # Its install script only prints a donation message; the library works without it.
   tesseract.js: false
 minimumReleaseAgeExclude:

@@ -105,6 +105,23 @@ describe('SQLite database', () => {
     expect(followersStore(database).readDay('2026-09-22')).toEqual(janesDay)
   })
 
+  it('reads back one scan with only the people seen in it', () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    const bob: Person = { ...jane, id: 'person-bob', personHash: 'hash-bob', displayName: 'Bob Lee' }
+    const nextScan: Scan = { ...scan, id: 'followers-2026-09-23', scanDate: '2026-09-23', screenshots: [] }
+    followersStore(database).saveAnalyzedDay(janesDay)
+    followersStore(database).saveAnalyzedDay({ scan: nextScan, people: [bob], observations: [{ ...janeIsOpen, scanId: nextScan.id, personId: bob.id }] })
+
+    expect(followersStore(database).readScan(scan.id)).toEqual(janesDay)
+  })
+
+  it("does not read another audience's scan", () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    followersStore(database).saveAnalyzedDay(janesDay)
+
+    expect(sqliteTrackerStore(database, 'contacts', defaultSettingsFor('contacts')).readScan(scan.id)).toBeNull()
+  })
+
   it('keeps a screenshot that could not be read, marked failed, and no longer waiting', () => {
     const database = openTrackerDatabase(freshDatabaseFile())
     followersStore(database).recordWaitingScreenshot('blurry.png')

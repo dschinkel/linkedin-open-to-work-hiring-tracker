@@ -5,6 +5,8 @@ import type { LoadStatus } from '@/components/AsyncContent'
 import type { DataColumn, DataRow } from '@/components/DataTable'
 import type { DefinitionRow } from '@/components/DefinitionList'
 import type { PickerOption } from '@/components/OptionPicker'
+import { exportTableOf, type ListExporter, localToday } from '@/shared-exports/listExport'
+import { type ExportListView, useExportList } from '@/shared-exports/useExportList'
 import { formatPeople } from '@/shared-formatting/formatMetric'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
@@ -26,6 +28,8 @@ export interface HiringPeopleView extends SortedRows {
   hasPeople: boolean
   showNoMatches: boolean
   companyRows: DefinitionRow[]
+  /** Saves the list as shown: current filters and sort, same columns. */
+  exporting: ExportListView
 }
 
 const statusOptions: PickerOption<HiringStatusFilter>[] = [
@@ -53,13 +57,14 @@ const columns: DataColumn[] = [
 const initialFilters: HiringPeopleQuery = { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' }
 
 /** Who's Hiring: searchable, filterable list of people seen with the public #HIRING frame. */
-export function useFindHiringPeople(injectedRepository?: HiringRepository): HiringPeopleView {
+export function useFindHiringPeople(injectedRepository?: HiringRepository, exporter?: ListExporter): HiringPeopleView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? hiringRepositoryFor(api)
   const [filters, setFilters] = useState<HiringPeopleQuery>(initialFilters)
   const people = useQuery({ queryKey: ['hiring-people', filters], queryFn: () => repository.people(filters), placeholderData: keepPreviousData })
   const companies = useQuery({ queryKey: ['hiring-companies'], queryFn: repository.companies })
   const table = useSortedRows(columns, (people.data ?? []).map(toTableRow), { key: 'lastSeen', direction: 'desc' })
+  const exporting = useExportList(() => ({ list: { slug: 'hiring', title: 'Hiring' }, date: localToday(), ...exportTableOf(table.columns, table.rows) }), exporter)
 
   function updateFilter<Key extends keyof HiringPeopleQuery>(key: Key) {
     return (value: HiringPeopleQuery[Key]) => setFilters((current) => ({ ...current, [key]: value }))
@@ -79,6 +84,7 @@ export function useFindHiringPeople(injectedRepository?: HiringRepository): Hiri
     showNoMatches: table.rows.length === 0,
     ...table,
     companyRows: describeCompanies(companies.data),
+    exporting,
   }
 }
 

@@ -2,6 +2,7 @@ import { AsyncContent } from '@/components/AsyncContent'
 import { ChoiceSelect } from '@/components/ChoiceSelect'
 import { DataTable } from '@/components/DataTable'
 import { EmptyState } from '@/components/EmptyState'
+import { ExportMenu } from '@/components/ExportMenu'
 import { SectionCard } from '@/components/SectionCard'
 import { LabeledInput } from '@/components/LabeledInput'
 import { CompanyHiringList } from './CompanyHiringList'
@@ -24,6 +25,9 @@ export function FindHiringPeople() {
             <LabeledInput id="hiring-company" label="Company" placeholder="Filter by company" value={hiring.filters.company} onChange={hiring.filterByCompany} />
             <ChoiceSelect id="hiring-status" label="Status" value={hiring.filters.status} options={hiring.statusOptions} onChange={hiring.filterByStatus} />
             <ChoiceSelect id="hiring-company-known" label="Company visibility" value={hiring.filters.companyKnown} options={hiring.companyKnownOptions} onChange={hiring.filterByCompanyKnown} />
+          </div>
+          <div className="mb-4 flex justify-end">
+            <ExportMenu exporting={hiring.exporting} />
           </div>
           <AsyncContent status={hiring.status} errorMessage={hiring.errorMessage}>
             {hiring.hasPeople && <DataTable columns={hiring.columns} rows={hiring.rows} sortKey={hiring.sortKey} sortDirection={hiring.sortDirection} onSort={hiring.sortBy} />}

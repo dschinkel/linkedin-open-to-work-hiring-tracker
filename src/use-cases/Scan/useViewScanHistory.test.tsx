@@ -19,6 +19,7 @@ function historyRepository(scans: ScanSummary[]) {
     },
     detail: async () => ({}) as ScanDetail,
     reprocess: async () => ({}) as ProcessingResult,
+    people: async () => ({ scanId: '', scanDate: '', people: [] }),
     addScreenshots: async () => ({}) as AddScreenshotsResult,
   }
   return { repository, windowsAskedFor }

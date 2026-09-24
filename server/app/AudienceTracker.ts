@@ -12,6 +12,7 @@ import { findDepartedPeople } from '../tracker/use-cases/FindDepartedPeople.ts'
 import { findOpenToWorkPeople } from '../tracker/use-cases/FindOpenToWorkPeople.ts'
 import { findHiringPeople } from '../tracker/use-cases/FindHiringPeople.ts'
 import { listHiringCompanies } from '../tracker/use-cases/ListHiringCompanies.ts'
+import { listScanPeople } from '../tracker/use-cases/ListScanPeople.ts'
 import { listScans } from '../tracker/use-cases/ListScans.ts'
 import { measureNetworkSize } from '../tracker/use-cases/MeasureNetworkSize.ts'
 import { viewDashboard } from '../tracker/use-cases/ViewDashboard.ts'
@@ -33,6 +34,7 @@ export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData,
     ...viewDashboard(ports),
     ...listScans(ports),
     ...viewScan(ports),
+    ...listScanPeople(ports),
     ...viewTrends(ports),
     ...viewTitleTrends(ports),
     ...findHiringPeople(ports),

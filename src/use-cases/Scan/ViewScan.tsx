@@ -2,14 +2,17 @@ import { RefreshCw } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { AsyncContent } from '@/components/AsyncContent'
 import { DefinitionList } from '@/components/DefinitionList'
+import { ExportMenu } from '@/components/ExportMenu'
 import { SectionCard } from '@/components/SectionCard'
 import { Button } from '@/components/ui/button'
+import { useExportScanPeople } from './useExportScanPeople'
 import { ScanQualityPanel } from './ScanQualityPanel'
 import { ScreenshotResults } from './ScreenshotResults'
 import { useViewScan } from './useViewScan'
 
 export function ViewScan() {
   const scan = useViewScan()
+  const exporting = useExportScanPeople()
 
   return (
     <AsyncContent status={scan.status} errorMessage={scan.errorMessage}>
@@ -26,6 +29,7 @@ export function ViewScan() {
             <RefreshCw />
             Reprocess scan
           </Button>
+          <ExportMenu exporting={exporting} />
         </div>
       </div>
       <div className="grid gap-6 lg:grid-cols-3">

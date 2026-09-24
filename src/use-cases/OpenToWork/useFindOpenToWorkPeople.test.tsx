@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { OpenToWorkPerson } from '@contracts/api'
-import { insideTracker } from '@/test-support/trackerFixtures'
+import { localToday } from '@/shared-exports/listExport'
+import { insideTracker, recordingExporter } from '@/test-support/trackerFixtures'
 import type { OpenToWorkRepository } from './OpenToWorkRepository'
 import { useFindOpenToWorkPeople } from './useFindOpenToWorkPeople'
 
@@ -24,9 +25,9 @@ function openPerson(overrides: Partial<OpenToWorkPerson> = {}): OpenToWorkPerson
 const danaLee = openPerson()
 const samOrtiz = openPerson({ personId: 'person-sam-ortiz', displayName: 'Sam Ortiz', headline: 'Product Designer', companyName: 'Contoso', firstSeenOpen: '2026-09-15', lastSeenOpen: '2026-09-18', openSince: '2026-09-15', daysOpen: 4, scansSeenOpen: 1, wasObservedInLatestScan: false })
 
-async function readyOpenList(people: OpenToWorkPerson[]) {
+async function readyOpenList(people: OpenToWorkPerson[], exporter = recordingExporter().exporter) {
   const repository: OpenToWorkRepository = { people: async () => people }
-  const rendered = renderHook(() => useFindOpenToWorkPeople(repository), { wrapper: insideTracker() })
+  const rendered = renderHook(() => useFindOpenToWorkPeople(repository, exporter), { wrapper: insideTracker() })
   await waitFor(() => expect(rendered.result.current.status).toBe('ready'))
   return rendered
 }
@@ -95,5 +96,39 @@ describe('people open to work', () => {
     const { result } = await readyOpenList([])
 
     expect(result.current).toMatchObject({ hasPeople: false, showNobodyOpen: true })
+  })
+
+  it('exports the list as shown: only people matching the search, with the same columns', async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await readyOpenList([danaLee, samOrtiz], exporter)
+    act(() => result.current.searchByNameOrTitle('designer'))
+
+    act(() => result.current.exporting.exportAs('xlsx'))
+
+    await waitFor(() =>
+      expect([saved[0].columns, saved[0].rows]).toEqual([
+        ['Person', 'Title / headline', 'Company', 'Open since', 'Time open', 'Last seen open'],
+        [['Sam Ortiz', 'Product Designer', 'Contoso', 'Sep 15', '4 days · 1 scan', 'Sep 18']],
+      ]),
+    )
+  })
+
+  it('exports people in the order they are sorted', async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await readyOpenList([danaLee, samOrtiz], exporter)
+    act(() => result.current.sortBy('timeOpen'))
+
+    act(() => result.current.exporting.exportAs('pdf'))
+
+    await waitFor(() => expect(saved[0].rows.map((row) => row[0])).toEqual(['Sam Ortiz', 'Dana Lee']))
+  })
+
+  it("names the file after the audience, the Open to Work list, and today's date", async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await readyOpenList([danaLee], exporter)
+
+    act(() => result.current.exporting.exportAs('xlsx'))
+
+    await waitFor(() => expect(saved[0].fileName).toBe(`followers-open-to-work-${localToday()}.xlsx`))
   })
 })

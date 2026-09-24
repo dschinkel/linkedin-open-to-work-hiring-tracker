@@ -31,6 +31,8 @@ export interface TrackerStore {
   waitingScreenshotCount: () => number
   /** Everything already saved for a day, so later uploads that day are merged in rather than replacing it. */
   readDay: (scanDate: string) => AnalyzedDay | null
+  /** One saved scan with everyone observed in it. Null when this audience has no such scan. */
+  readScan: (scanId: string) => AnalyzedDay | null
   /** Saves (or replaces) one analyzed day in a single step; its screenshots stop being "waiting". */
   saveAnalyzedDay: (day: AnalyzedDay) => void
   /** A screenshot that could not be read stays listed, marked failed with the reason. */

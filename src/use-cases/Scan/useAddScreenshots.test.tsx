@@ -52,6 +52,7 @@ function inboxAnswering(answer: (upload: Upload) => Promise<AddScreenshotsResult
     history: async () => [],
     detail: async () => ({}) as ScanDetail,
     reprocess: async () => ({}) as ProcessingResult,
+    people: async () => ({ scanId: '', scanDate: '', people: [] }),
     addScreenshots: async (files) => {
       uploads.push(files)
       return answer(files)

@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { CompanyHiring, HiringPeopleQuery, HiringPerson } from '@contracts/api'
-import { hiringPerson, insideTracker } from '@/test-support/trackerFixtures'
+import { localToday } from '@/shared-exports/listExport'
+import { hiringPerson, insideTracker, recordingExporter } from '@/test-support/trackerFixtures'
 import type { HiringRepository } from './HiringRepository'
 import { useFindHiringPeople } from './useFindHiringPeople'
 
@@ -139,5 +140,39 @@ describe("who's hiring", () => {
     const { result } = await readyHiringSearch([mikeBrown])
 
     await waitFor(() => expect(result.current.companyRows.slice(2).map((row) => row.value)).toEqual(['2 people', '1,024 people']))
+  })
+
+  it('exports the people shown, in the order they are sorted, with the same columns', async () => {
+    const { repository } = hiringRepositoryReturning([mikeBrown, priyaNair])
+    const { exporter, saved } = recordingExporter()
+    const { result } = renderHook(() => useFindHiringPeople(repository, exporter), { wrapper: insideTracker() })
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+    act(() => result.current.sortBy('name'))
+
+    act(() => result.current.exporting.exportAs('xlsx'))
+
+    await waitFor(() => expect([saved[0].columns, saved[0].rows.map((row) => row[0])]).toEqual([result.current.columns.map((column) => column.label), ['Mike Brown', 'Priya Nair']]))
+  })
+
+  it('exports how long each person has been hiring', async () => {
+    const { repository } = hiringRepositoryReturning([priyaNair])
+    const { exporter, saved } = recordingExporter()
+    const { result } = renderHook(() => useFindHiringPeople(repository, exporter), { wrapper: insideTracker() })
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    act(() => result.current.exporting.exportAs('pdf'))
+
+    await waitFor(() => expect(saved[0].rows[0].slice(3, 5)).toEqual(['Sep 8', '3 days · 2 scans']))
+  })
+
+  it("names a Connections file after Connections, the Hiring list, and today's date", async () => {
+    const { repository } = hiringRepositoryReturning([mikeBrown])
+    const { exporter, saved } = recordingExporter()
+    const { result } = renderHook(() => useFindHiringPeople(repository, exporter), { wrapper: insideTracker({ audience: 'contacts' }) })
+    await waitFor(() => expect(result.current.status).toBe('ready'))
+
+    act(() => result.current.exporting.exportAs('pdf'))
+
+    await waitFor(() => expect(saved[0].fileName).toBe(`connections-hiring-${localToday()}.pdf`))
   })
 })

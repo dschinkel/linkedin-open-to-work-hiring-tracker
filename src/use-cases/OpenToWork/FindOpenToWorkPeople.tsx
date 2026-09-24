@@ -1,6 +1,7 @@
 import { AsyncContent } from '@/components/AsyncContent'
 import { DataTable } from '@/components/DataTable'
 import { EmptyState } from '@/components/EmptyState'
+import { ExportMenu } from '@/components/ExportMenu'
 import { LabeledInput } from '@/components/LabeledInput'
 import { SectionCard } from '@/components/SectionCard'
 import { useFindOpenToWorkPeople } from './useFindOpenToWorkPeople'
@@ -16,8 +17,11 @@ export function FindOpenToWorkPeople() {
         <p className="mt-1 max-w-3xl text-label text-muted-foreground">Greyed rows were not in the latest scan, so the frame is not confirmed today.</p>
       </div>
       <SectionCard title={open.resultSummary}>
-        <div className="mb-4 max-w-xs">
-          <LabeledInput id="open-search" label="Search" placeholder="Name or title" value={open.search} onChange={open.searchByNameOrTitle} />
+        <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+          <div className="w-full max-w-xs">
+            <LabeledInput id="open-search" label="Search" placeholder="Name or title" value={open.search} onChange={open.searchByNameOrTitle} />
+          </div>
+          <ExportMenu exporting={open.exporting} />
         </div>
         <AsyncContent status={open.status} errorMessage={open.errorMessage}>
           {open.hasPeople && <DataTable columns={open.columns} rows={open.rows} sortKey={open.sortKey} sortDirection={open.sortDirection} onSort={open.sortBy} />}

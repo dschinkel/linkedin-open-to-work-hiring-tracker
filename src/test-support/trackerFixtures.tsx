@@ -15,6 +15,7 @@ import type {
   TrendPoint,
   Trends,
 } from '@contracts/api'
+import type { ListExport, ListExporter } from '@/shared-exports/listExport'
 import type { Transport } from '@/shared-repositories/apiClient'
 import { TrackerEnvironmentContext, type TrackerMode, trackerEnvironmentFor } from '@/shared-repositories/trackerEnvironment'
 
@@ -234,4 +235,15 @@ export function settings(overrides: Partial<Settings> = {}): Settings {
     afterAnalysis: 'delete',
     ...overrides,
   }
+}
+
+/** An exporter that keeps what it was asked to save instead of downloading a file. */
+export function recordingExporter() {
+  const saved: ListExport[] = []
+  const exporter: ListExporter = {
+    save: async (listExport) => {
+      saved.push(listExport)
+    },
+  }
+  return { exporter, saved }
 }

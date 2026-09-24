@@ -1,5 +1,5 @@
 import type { Settings } from '../../../../contracts/api.ts'
-import type { Network } from '../../../shared/domain/Observation.ts'
+import type { Network, Scan } from '../../../shared/domain/Observation.ts'
 import type { AnalyzedDay, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
 
 /** In-memory store: the demo's fixed sample data and test fixtures. Nothing is written to disk. */
@@ -22,8 +22,9 @@ export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Set
     version += 1
   }
 
-  const readDay = (scanDate: string): AnalyzedDay | null => {
-    const scan = network.scans.find((existing) => existing.scanDate === scanDate)
+  const readDay = (scanDate: string): AnalyzedDay | null => readSavedScan(network.scans.find((existing) => existing.scanDate === scanDate))
+
+  const readSavedScan = (scan: Scan | undefined): AnalyzedDay | null => {
     if (!scan) return null
     const observations = network.observations.filter((observation) => observation.scanId === scan.id)
     const personIds = new Set(observations.map((observation) => observation.personId))
@@ -47,6 +48,7 @@ export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Set
     waitingScreenshotCount: () => waiting.size,
     knowsScreenshot: (fileName) => seen.has(fileName) || network.scans.some((scan) => scan.screenshots.some((screenshot) => screenshot.fileName === fileName)),
     readDay,
+    readScan: (scanId) => readSavedScan(network.scans.find((existing) => existing.id === scanId)),
     saveAnalyzedDay,
     markScreenshotFailed: (fileName) => {
       waiting.delete(fileName)

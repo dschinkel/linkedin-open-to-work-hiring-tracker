@@ -105,6 +105,7 @@ export const sqliteTrackerStore = (database: DatabaseSync, audience: Audience, d
     knowsScreenshot: (fileName) => database.prepare('SELECT 1 FROM screenshots WHERE audience = ? AND file_name = ?').get(audience, fileName) !== undefined,
     waitingScreenshotCount: () => Number((database.prepare("SELECT COUNT(*) AS count FROM screenshots WHERE audience = ? AND outcome = 'waiting'").get(audience) as { count: number }).count),
     readDay: (scanDate) => readDay(database, audience, scanDate),
+    readScan: (scanId) => readScan(database, audience, scanId),
     saveAnalyzedDay: ({ scan, people, observations }) => saveAnalyzedScan(database, audience, scan, people, observations),
     markScreenshotFailed: (fileName, reason) => {
       database
@@ -126,6 +127,23 @@ function readDay(database: DatabaseSync, audience: Audience, scanDate: string): 
   const observations = network.observations.filter((observation) => observation.scanId === scan.id)
   const personIds = new Set(observations.map((observation) => observation.personId))
   return { scan, observations, people: network.people.filter((person) => personIds.has(person.id)) }
+}
+
+/** Reads just the one scan, its observations, and the people in them, rather than the whole network. */
+function readScan(database: DatabaseSync, audience: Audience, scanId: string): AnalyzedDay | null {
+  const scan = readScans(database, audience).find((existing) => existing.id === scanId)
+  if (!scan) return null
+  return {
+    scan,
+    observations: database
+      .prepare('SELECT * FROM observations WHERE scan_id = ?')
+      .all(scanId)
+      .map((row) => toObservation(row as unknown as ObservationRow)),
+    people: database
+      .prepare('SELECT people.* FROM people JOIN observations ON observations.person_id = people.id WHERE observations.scan_id = ? AND people.audience = ?')
+      .all(scanId, audience)
+      .map((row) => toPerson(row as unknown as PersonRow)),
+  }
 }
 
 /** Total rows changed through this connection; bumps the version when this app writes. */

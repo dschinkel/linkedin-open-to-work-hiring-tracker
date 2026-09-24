@@ -294,3 +294,22 @@ export const openToWorkPersonSchema = z.object({
 export type OpenToWorkPerson = z.infer<typeof openToWorkPersonSchema>
 
 export const openToWorkPeopleSchema = z.object({ people: z.array(openToWorkPersonSchema) })
+
+/** One person as seen in one scan: who they are and which frames they showed that day. */
+export const scanPersonSchema = z.object({
+  personId: z.string(),
+  displayName: z.string(),
+  headline: z.string().nullable(),
+  companyName: z.string().nullable(),
+  openToWork: z.enum(['OPEN', 'NOT_OPEN', 'UNCERTAIN']),
+  hiring: z.enum(['HIRING', 'NOT_HIRING', 'UNCERTAIN']),
+})
+export type ScanPerson = z.infer<typeof scanPersonSchema>
+
+/** Everyone saved for one scan, sorted by name. */
+export const scanPeopleSchema = z.object({
+  scanId: z.string(),
+  scanDate: z.string(),
+  people: z.array(scanPersonSchema),
+})
+export type ScanPeople = z.infer<typeof scanPeopleSchema>

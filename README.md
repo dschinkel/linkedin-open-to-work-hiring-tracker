@@ -178,7 +178,7 @@ Each page exists for **Followers** and **Connections**; the header toggle switch
 
 Only reliable when each scan covers your whole list, since a screenshot can't prove someone left.
 
-<img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> daily history; click a day for its screenshots and quality.
+<img src="https://img.shields.io/badge/Scans-2ea043?style=flat-square" alt="Scans" align="absmiddle"> daily history; click a day for its screenshots and quality. **Export** saves everyone in that scan (name, headline, company, Open to Work, Hiring) as a spreadsheet (.xlsx), PDF, or CSV, e.g. `followers-2026-09-22.xlsx`; the Scans page can export the latest scan. The Open to Work and Hiring pages export their list as shown (search, filters, sort), e.g. `connections-hiring-2026-09-23.pdf`.
 
 <img src="https://img.shields.io/badge/Settings-2ea043?style=flat-square" alt="Settings" align="absmiddle"> inbox and archive folders, what happens after import, thresholds, reminders, and **Clear all data** (asks you to confirm first).
 
