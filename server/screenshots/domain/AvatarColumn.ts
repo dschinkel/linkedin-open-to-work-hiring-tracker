@@ -21,7 +21,8 @@ export function findAvatarColumn(pixels: Pixels): AvatarCircle[] {
   const columns = groupIntoColumns(shapes.map((shape) => asRoundBlob(shape, pixels.height)).filter((blob) => blob !== null))
   const best = columns.sort((a, b) => medianSize(b) - medianSize(a) || b.length - a.length)[0] ?? []
   const cutPhoto = best.length > 0 ? photoCutByTheTop(shapes, best) : null
-  return [...(cutPhoto ? [cutPhoto] : []), ...best.filter((blob) => blob.top > 0)]
+  const blended = best.length > 0 ? photosBlendingIntoThePage(shapes, best, pixels.height) : []
+  return [...(cutPhoto ? [cutPhoto] : []), ...best.filter((blob) => blob.top > 0), ...blended]
     .sort((a, b) => a.top - b.top)
     .map((blob) => ({ centreX: blob.left + blob.size / 2, centreY: blob.top + blob.size / 2, radius: blob.size / 2 }))
 }
@@ -32,6 +33,30 @@ function photoCutByTheTop(shapes: Component[], column: Blob[]): Blob | null {
   const left = column[0].left
   const cut = shapes.find((shape) => shape.minY === 0 && Math.abs(shape.minX - left) <= size * 0.3 && Math.abs(shape.maxX - shape.minX + 1 - size) <= size * 0.25)
   return cut ? { left: cut.minX, top: cut.maxY + 1 - size, size } : null
+}
+
+/**
+ * A photo taken against a white wall or sky blends into the page where the background shows, so it is no longer a
+ * filled circle. It still spans a whole photo from top to bottom, starts at the column's left edge, and sits where no
+ * other photo is: such a shape in the column is a photo too.
+ */
+function photosBlendingIntoThePage(shapes: Component[], column: Blob[], imageHeight: number): Blob[] {
+  const size = medianSize(column)
+  const left = medianLeft(column)
+  const isFree = (top: number) => column.every((blob) => Math.abs(blob.top - top) >= size)
+  return shapes
+    .filter((shape) => shape.minY > 0 && shape.maxY < imageHeight - 1)
+    .filter((shape) => Math.abs(shape.maxY - shape.minY + 1 - size) <= size * 0.1 && shape.maxX - shape.minX + 1 <= size * 1.1 && shape.maxX - shape.minX + 1 >= size * 0.75)
+    .filter((shape) => Math.abs(shape.minX - left) <= size * 0.3 && shape.area / (size * size) >= blendedPhotoFill && isFree(shape.minY))
+    .map((shape) => ({ left, top: shape.minY, size }))
+}
+
+/** Even a photo mostly against a white background has a person in it: this much of its square at least. */
+const blendedPhotoFill = 0.4
+
+function medianLeft(column: Blob[]): number {
+  const lefts = column.map((blob) => blob.left).sort((a, b) => a - b)
+  return lefts[Math.floor(lefts.length / 2)]
 }
 
 /**

@@ -8,13 +8,14 @@ interface ChoiceSelectProps<Value extends string> {
   value: Value
   options: PickerOption<Value>[]
   onChange: (value: Value) => void
+  disabled?: boolean
 }
 
-export function ChoiceSelect<Value extends string>({ id, label, value, options, onChange }: ChoiceSelectProps<Value>) {
+export function ChoiceSelect<Value extends string>({ id, label, value, options, onChange, disabled }: ChoiceSelectProps<Value>) {
   return (
     <div className="grid gap-2">
       <Label htmlFor={id} className="field-label">{label}</Label>
-      <Select items={options} value={value} onValueChange={(next) => next && onChange(next as Value)}>
+      <Select items={options} value={value} disabled={disabled} onValueChange={(next) => next && onChange(next as Value)}>
         <SelectTrigger id={id} className="w-full">
           <SelectValue />
         </SelectTrigger>

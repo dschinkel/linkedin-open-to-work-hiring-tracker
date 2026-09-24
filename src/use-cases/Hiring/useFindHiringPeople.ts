@@ -36,6 +36,8 @@ export interface HiringPeopleView extends SortedRows {
   exporting: ExportListView
   /** Saved copies of this list, with the filters they were taken with; one can be shown in place of the current list. */
   snapshots: KeepSnapshotsView
+  /** E.g. "Saved with: Currently hiring · Company known · company “Acme”. Name and company search the saved people." */
+  snapshotDetail: string
 }
 
 const statusOptions: PickerOption<HiringStatusFilter>[] = [
@@ -99,7 +101,18 @@ export function useFindHiringPeople(injectedRepository?: HiringRepository, expor
     areSavedFiltersLocked: snapshots.isViewingSnapshot,
     exporting,
     snapshots,
+    snapshotDetail: viewed ? describeSavedFilters(viewed.filters) : '',
   }
+}
+
+function describeSavedFilters(filters: HiringPeopleQuery): string {
+  const choices = [
+    statusOptions.find((option) => option.value === filters.status)?.label,
+    companyKnownOptions.find((option) => option.value === filters.companyKnown)?.label,
+    filters.search && `name “${filters.search}”`,
+    filters.company && `company “${filters.company}”`,
+  ].filter(Boolean)
+  return `Saved with: ${choices.join(' · ')}. Name and company search the saved people.`
 }
 
 function hiringSnapshotIn(snapshot: Snapshot | null): HiringSnapshot | null {

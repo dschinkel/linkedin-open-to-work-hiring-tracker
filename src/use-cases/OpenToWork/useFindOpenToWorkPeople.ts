@@ -25,6 +25,7 @@ export interface OpenToWorkPeopleView extends SortedRows {
   exporting: ExportListView
   /** Saved copies of this list; one can be shown in place of the current list. */
   snapshots: KeepSnapshotsView
+  snapshotDetail: string
 }
 
 const columns: DataColumn[] = [
@@ -61,6 +62,7 @@ export function useFindOpenToWorkPeople(injectedRepository?: OpenToWorkRepositor
     ...table,
     exporting,
     snapshots,
+    snapshotDetail: 'The list exactly as it was saved. Search and sort work; greyed rows were missing from the latest scan at the time.',
   }
 }
 
