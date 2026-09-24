@@ -57,7 +57,7 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 
 **Keep each dashboard consistent.** Only ever drop connections screenshots into Connections and followers screenshots into Followers. Mixing them would make people appear and disappear between scans, which shows up as fake transitions, fake unfollowers, and a jumpy rate.
 
-> **Zoom matters:** set the browser to **67% zoom** (`Cmd+0`, then `Cmd+-` four times). That fits about 24 people per screenshot on a laptop screen and keeps each photo big enough to read the #OPENTOWORK / #HIRING frame. Anything from 67% to 100% works; below 50% frames can't be read, and those people are marked Uncertain.
+> **Zoom matters:** Anything from 67% to 100% works;** below 50% frames can't be read, and those people are marked Uncertain.
 >
 > | Zoom | People per screenshot (laptop) | Screenshots for ~1,450 people |
 > |---|---|---|
