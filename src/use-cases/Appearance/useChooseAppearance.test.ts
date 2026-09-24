@@ -59,10 +59,10 @@ afterEach(() => {
 })
 
 describe('choosing the appearance', () => {
-  it('shows dark mode with the ocean theme on a first visit', () => {
+  it('shows dark mode with the neutral theme on a first visit', () => {
     chooseAppearanceWith(inMemoryStorage())
 
-    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([true, 'ocean'])
+    expect([page.classList.contains('dark'), page.dataset.theme]).toEqual([true, 'neutral'])
   })
 
   it('switches the page to dark when Dark is chosen', () => {
@@ -145,6 +145,32 @@ describe('choosing the appearance', () => {
     const { result } = chooseAppearanceWith(inMemoryStorage())
 
     act(() => result.current.chooseMode('system'))
+
+    expect(page.classList.contains('dark')).toBe(false)
+  })
+
+  it('shows a theme while it is only being pointed at, without saving it', () => {
+    const storage = inMemoryStorage()
+    const { result } = chooseAppearanceWith(storage)
+
+    act(() => result.current.previewTheme('brown'))
+
+    expect([page.dataset.theme, result.current.theme, storage.getItem('tracker.colorTheme')]).toEqual(['brown', 'neutral', null])
+  })
+
+  it('goes back to the chosen theme when the pointer leaves', () => {
+    const { result } = chooseAppearanceWith(inMemoryStorage())
+    act(() => result.current.previewTheme('brown'))
+
+    act(() => result.current.previewTheme(null))
+
+    expect(page.dataset.theme).toBe('neutral')
+  })
+
+  it('shows light mode while Light is pointed at', () => {
+    const { result } = chooseAppearanceWith(inMemoryStorage())
+
+    act(() => result.current.previewMode('light'))
 
     expect(page.classList.contains('dark')).toBe(false)
   })

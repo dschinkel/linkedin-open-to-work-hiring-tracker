@@ -12,14 +12,19 @@ export interface ChooseAppearance {
   themeOptions: ColorThemeOption[]
   chooseMode: (mode: AppearanceMode) => void
   chooseTheme: (theme: ColorTheme) => void
+  previewMode: (mode: AppearanceMode | null) => void
+  previewTheme: (theme: ColorTheme | null) => void
 }
 
 export function useChooseAppearance(repository: AppearanceRepository = appearanceRepository): ChooseAppearance {
   const [mode, setMode] = useState(repository.loadMode)
   const [theme, setTheme] = useState(repository.loadTheme)
-  const isDark = showsDark(mode, useDevicePrefersDark())
+  const [modeOnTrial, previewMode] = useState<AppearanceMode | null>(null)
+  const [themeOnTrial, previewTheme] = useState<ColorTheme | null>(null)
+  const isDark = showsDark(modeOnTrial ?? mode, useDevicePrefersDark())
+  const shownTheme = themeOnTrial ?? theme
 
-  useEffect(() => showAppearance(isDark, theme), [isDark, theme])
+  useEffect(() => showAppearance(isDark, shownTheme), [isDark, shownTheme])
 
   return {
     mode,
@@ -28,12 +33,16 @@ export function useChooseAppearance(repository: AppearanceRepository = appearanc
     themeOptions: colorThemeOptions,
     chooseMode: (next) => {
       setMode(next)
+      previewMode(null)
       repository.saveMode(next)
     },
     chooseTheme: (next) => {
       setTheme(next)
+      previewTheme(null)
       repository.saveTheme(next)
     },
+    previewMode,
+    previewTheme,
   }
 }
 

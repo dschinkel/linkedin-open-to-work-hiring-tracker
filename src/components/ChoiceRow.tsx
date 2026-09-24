@@ -15,12 +15,13 @@ interface ChoiceRowProps<Value extends string, Option extends Choice<Value>> {
   value: Value
   options: Option[]
   onChange: (value: Value) => void
+  onPreview?: (value: Value | null) => void
   renderMark: (option: Option) => React.ReactNode
 }
 
-export function ChoiceRow<Value extends string, Option extends Choice<Value>>({ label, value, options, onChange, renderMark }: ChoiceRowProps<Value, Option>) {
+export function ChoiceRow<Value extends string, Option extends Choice<Value>>({ label, value, options, onChange, onPreview, renderMark }: ChoiceRowProps<Value, Option>) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex items-center gap-0.5">
+    <div role="radiogroup" aria-label={label} className="flex items-center gap-0.5" onMouseLeave={() => onPreview?.(null)}>
       {options.map((option) => (
         <button
           key={option.value}
@@ -30,6 +31,9 @@ export function ChoiceRow<Value extends string, Option extends Choice<Value>>({ 
           aria-label={option.label}
           title={option.label}
           onClick={() => onChange(option.value)}
+          onMouseEnter={() => onPreview?.(option.value)}
+          onFocus={() => onPreview?.(option.value)}
+          onBlur={() => onPreview?.(null)}
           className={cn(
             'grid size-7 cursor-pointer place-items-center border transition-colors',
             option.value === value ? 'border-prompt bg-accent ring-2 ring-prompt/40' : 'border-transparent text-muted-foreground hover:border-input hover:text-foreground',

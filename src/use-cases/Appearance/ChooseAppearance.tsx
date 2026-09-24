@@ -11,6 +11,7 @@ export function ChooseAppearance() {
         value={appearance.mode}
         options={appearance.modeOptions}
         onChange={appearance.chooseMode}
+        onPreview={appearance.previewMode}
         renderMark={(option) => <IconMark icon={option.icon} />}
       />
       <ChoiceRow
@@ -18,6 +19,7 @@ export function ChooseAppearance() {
         value={appearance.theme}
         options={appearance.themeOptions}
         onChange={appearance.chooseTheme}
+        onPreview={appearance.previewTheme}
         renderMark={(option) => <SwatchMark color={option.swatch} />}
       />
     </div>

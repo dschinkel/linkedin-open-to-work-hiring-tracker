@@ -9,7 +9,7 @@ export interface ColorThemeOption {
 }
 
 export const defaultAppearanceMode: AppearanceMode = 'dark'
-export const defaultColorTheme: ColorTheme = 'ocean'
+export const defaultColorTheme: ColorTheme = 'neutral'
 
 const appearanceModes: readonly AppearanceMode[] = ['light', 'dark', 'system']
 
