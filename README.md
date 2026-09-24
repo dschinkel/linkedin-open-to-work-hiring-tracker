@@ -25,7 +25,7 @@ pnpm dev
 
 Open <http://localhost:5173>.
 
-Next, grab a [screenshot](#taking-screenshots-required) of your followers or connections and upload them to the app.
+Next, grab a [screenshot](#taking-screenshots-required) of your followers or connections and upload them to the app.  The rest is magic.
 
 ### Demo
 
