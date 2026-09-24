@@ -6,6 +6,7 @@ import type { DataColumn, DataRow } from '@/components/DataTable'
 import { exportTableOf, type ListExporter, localToday } from '@/shared-exports/listExport'
 import { type ExportListView, useExportList } from '@/shared-exports/useExportList'
 import { formatPeople, formatShortDate, formatTimeShowingFrame } from '@/shared-formatting/formatMetric'
+import { seenInCell, withSeenInColumn } from '@/shared-formatting/seenIn'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { type SortedRows, sortRows, useSortedRows } from '@/shared-state/useSortedRows'
@@ -39,14 +40,15 @@ const initialSort = { key: 'lastSeen', direction: 'desc' } as const
 const openToWorkList = { slug: 'open-to-work', title: 'Open to Work' }
 
 export function useFindOpenToWorkPeople(injectedRepository?: OpenToWorkRepository, exporter?: ListExporter, snapshotRepository?: SnapshotRepository): OpenToWorkPeopleView {
-  const { api } = useTrackerEnvironment()
+  const { api, audience } = useTrackerEnvironment()
   const repository = injectedRepository ?? openToWorkRepositoryFor(api)
+  const shownColumns = withSeenInColumn(columns, audience)
   const [search, searchByNameOrTitle] = useState('')
   const query = useQuery({ queryKey: ['open-to-work-people'], queryFn: repository.people })
-  const snapshots = useKeepSnapshots({ kind: 'open-to-work', list: openToWorkList, tableOf: tableOfSnapshot }, snapshotRepository, exporter)
+  const snapshots = useKeepSnapshots({ kind: 'open-to-work', list: openToWorkList, tableOf: (snapshot) => tableOfSnapshot(snapshot, shownColumns) }, snapshotRepository, exporter)
   const listed = snapshots.isViewingSnapshot ? openToWorkPeopleIn(snapshots.viewedSnapshot) : (query.data ?? [])
   const people = listed.filter((person) => matches(person, search))
-  const table = useSortedRows(columns, people.map(toRow), initialSort)
+  const table = useSortedRows(shownColumns, people.map(toRow), initialSort)
   const exporting = useExportList(() => ({ ...(snapshots.viewedExportName ?? { list: openToWorkList, date: localToday() }), ...exportTableOf(table.columns, table.rows) }), exporter)
 
   return {
@@ -67,8 +69,8 @@ function openToWorkPeopleIn(snapshot: Snapshot | null): OpenToWorkPerson[] {
   return snapshot?.kind === 'open-to-work' ? snapshot.people : []
 }
 
-function tableOfSnapshot(snapshot: Snapshot) {
-  return exportTableOf(columns, sortRows(openToWorkPeopleIn(snapshot).map(toRow), initialSort))
+function tableOfSnapshot(snapshot: Snapshot, shownColumns: DataColumn[]) {
+  return exportTableOf(shownColumns, sortRows(openToWorkPeopleIn(snapshot).map(toRow), initialSort))
 }
 
 function matches(person: OpenToWorkPerson, search: string): boolean {
@@ -84,6 +86,7 @@ function toRow(person: OpenToWorkPerson): DataRow {
       name: { text: person.displayName },
       headline: { text: person.headline ?? '' },
       company: { text: person.companyName ?? 'Company not visible' },
+      in: seenInCell(person.seenIn),
       openSince: { text: formatShortDate(person.openSince), sortValue: person.openSince },
       timeOpen: { text: formatTimeShowingFrame(person.daysOpen, person.scansSeenOpen), sortValue: person.daysOpen },
       lastSeen: { text: formatShortDate(person.lastSeenOpen), sortValue: person.lastSeenOpen },

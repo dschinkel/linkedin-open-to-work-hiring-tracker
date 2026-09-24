@@ -1,7 +1,7 @@
 import { type QueryClient, useQueries } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
-import { type Audience, audiences, type NetworkSize, networkSizeSchema } from '@contracts/api'
+import { type AudienceChoice, audienceChoices, type NetworkSize, networkSizeSchema } from '@contracts/api'
 import type { NavItem } from '@/components/AppShell'
 import type { SegmentLink } from '@/components/SegmentedLinks'
 import { demoNetworks } from '../../server/sample/DemoNetworks.ts'
@@ -18,6 +18,8 @@ export interface TrackerView {
   environment: TrackerEnvironment
   navItems: NavItem[]
   audienceLinks: SegmentLink[]
+  showsEveryPage: boolean
+  listsHome: string
   subtitle: string
   demoSampleDescription: string
   logoSrc: string
@@ -37,32 +39,37 @@ const pages = [
   { path: '/settings', label: 'Settings' },
 ]
 
-const audienceToggle: Array<{ audience: Audience; label: string }> = [
+const listPages = ['/open-to-work', '/hiring']
+
+const audienceToggle: Array<{ audience: AudienceChoice; label: string }> = [
+  { audience: 'all', label: 'All' },
   { audience: 'followers', label: 'Followers' },
   { audience: 'contacts', label: 'Connections' },
 ]
 
 const subtitle = 'Your followers and connections open to work or hiring, tracked over time'
 
-export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
+export function useTracker(mode: TrackerMode, audience: AudienceChoice): TrackerView {
   const location = useLocation()
   const [transport] = useState<Transport>(() => (mode === 'demo' ? demoTransport : httpTransport))
   const queryClient = useMemo(() => trackerClientFor(mode, audience), [mode, audience])
   const environment = useMemo(() => trackerEnvironmentFor(mode, audience, transport), [mode, audience, transport])
   const [apisByAudience] = useState(() => apisFor(mode, transport))
   const sizes = useQueries(
-    { queries: audiences.map((each) => ({ queryKey: ['network-size', mode, each], queryFn: () => apisByAudience[each].getJson('/network-size', networkSizeSchema) })) },
+    { queries: audienceChoices.map((each) => ({ queryKey: ['network-size', mode, each], queryFn: () => apisByAudience[each].getJson('/network-size', networkSizeSchema) })) },
     sizeClientFor(mode),
   )
-  const sizeByAudience = Object.fromEntries(audiences.map((each, position) => [each, sizes[position].data])) as Record<Audience, NetworkSize | undefined>
+  const sizeByAudience = Object.fromEntries(audienceChoices.map((each, position) => [each, sizes[position].data])) as Record<AudienceChoice, NetworkSize | undefined>
 
   return {
     queryClient,
     environment,
     navItems: navItemsUnder(environment.routeBase, audience),
     audienceLinks: audienceLinksFrom(location.pathname, environment, sizeByAudience),
+    showsEveryPage: audience !== 'all',
+    listsHome: `${environment.routeBase}${listPages[0]}`,
     subtitle,
-    demoSampleDescription: `${demoNetworks[audience].peopleCount} fictional ${audience} and 180 days of made-up scans ending Sep 22, 2026.`,
+    demoSampleDescription: `${describeDemoSample(audience)} and 180 days of made-up scans ending Sep 22, 2026.`,
     logoSrc: `${import.meta.env.BASE_URL}logo-animated.svg`,
     showDemoBanner: environment.isDemo,
     showDemoInvite: !environment.isDemo,
@@ -72,8 +79,13 @@ export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
   }
 }
 
-function apisFor(mode: TrackerMode, transport: Transport): Record<Audience, ApiClient> {
-  return { contacts: trackerEnvironmentFor(mode, 'contacts', transport).api, followers: trackerEnvironmentFor(mode, 'followers', transport).api }
+function apisFor(mode: TrackerMode, transport: Transport): Record<AudienceChoice, ApiClient> {
+  return Object.fromEntries(audienceChoices.map((each) => [each, trackerEnvironmentFor(mode, each, transport).api])) as Record<AudienceChoice, ApiClient>
+}
+
+function describeDemoSample(audience: AudienceChoice): string {
+  if (audience !== 'all') return `${demoNetworks[audience].peopleCount} fictional ${audience}`
+  return `${demoNetworks.followers.peopleCount} fictional followers and ${demoNetworks.contacts.peopleCount} fictional contacts`
 }
 
 function describeSize(size: NetworkSize | undefined): string | undefined {
@@ -81,20 +93,26 @@ function describeSize(size: NetworkSize | undefined): string | undefined {
   return formatCount(size.latestScanDate === null ? 0 : size.peopleCount)
 }
 
-function navItemsUnder(routeBase: string, audience: Audience): NavItem[] {
+function navItemsUnder(routeBase: string, audience: AudienceChoice): NavItem[] {
   const departurePage = { path: '/departed', label: departureTitles[audience] }
   const afterHiring = pages.findIndex((page) => page.path === '/hiring') + 1
   const withDeparture = [...pages.slice(0, afterHiring), departurePage, ...pages.slice(afterHiring)]
-  return withDeparture.map((page) => ({ to: `${routeBase}${page.path}`, label: page.label, isExact: page.path === '' }))
+  const shown = audience === 'all' ? withDeparture.filter((page) => listPages.includes(page.path)) : withDeparture
+  return shown.map((page) => ({ to: `${routeBase}${page.path}`, label: page.label, isExact: page.path === '' }))
 }
 
-function audienceLinksFrom(pathname: string, environment: TrackerEnvironment, sizes: Record<Audience, NetworkSize | undefined>): SegmentLink[] {
+function audienceLinksFrom(pathname: string, environment: TrackerEnvironment, sizes: Record<AudienceChoice, NetworkSize | undefined>): SegmentLink[] {
   const pageWithinTracker = pathname.slice(environment.routeBase.length)
   const modeBase = environment.isDemo ? '/demo' : ''
   return audienceToggle.map((option) => ({
     label: option.label,
-    to: `${modeBase}/${option.audience}${pageWithinTracker}`,
+    to: `${modeBase}/${option.audience}${pageFor(option.audience, pageWithinTracker)}`,
     isActive: option.audience === environment.audience,
     detail: describeSize(sizes[option.audience]),
   }))
+}
+
+function pageFor(audience: AudienceChoice, page: string): string {
+  if (audience !== 'all') return page
+  return listPages.find((listPage) => page === listPage || page.startsWith(`${listPage}/`)) ?? listPages[0]
 }

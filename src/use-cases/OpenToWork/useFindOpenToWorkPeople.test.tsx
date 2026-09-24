@@ -184,3 +184,37 @@ describe('open to work snapshot on show', () => {
     await waitFor(() => expect([saved[0].columns, saved[0].rows[1]]).toEqual([result.current.columns.map((column) => column.label), ['Sam Ortiz', 'Product Designer', 'Contoso', 'Sep 15', '4 days · 1 scan', 'Sep 18']]))
   })
 })
+
+describe('open to work across all audiences together', () => {
+  async function readyAllOpenList(people: OpenToWorkPerson[], exporter = recordingExporter().exporter) {
+    const repository: OpenToWorkRepository = { people: async () => people }
+    const rendered = renderHook(() => useFindOpenToWorkPeople(repository, exporter, fakeSnapshotRepository().repository), { wrapper: insideTracker({ audience: 'all' }) })
+    await waitFor(() => expect(rendered.result.current.status).toBe('ready'))
+    return rendered
+  }
+
+  it('shows whether each person is a follower, a connection, or both', async () => {
+    const { result } = await readyAllOpenList([{ ...danaLee, seenIn: 'both' }, { ...samOrtiz, seenIn: 'followers' }])
+    expect(result.current.rows.map((row) => row.cells.in.text)).toEqual(['Both', 'Follower'])
+  })
+
+  it('sorts by where people were found when that column is clicked', async () => {
+    const { result } = await readyAllOpenList([{ ...danaLee, seenIn: 'followers' }, { ...samOrtiz, seenIn: 'contacts' }])
+    act(() => result.current.sortBy('in'))
+    expect(names(result.current.rows)).toEqual(['Sam Ortiz', 'Dana Lee'])
+  })
+
+  it("names the file after all audiences, the Open to Work list, and today's date", async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await readyAllOpenList([{ ...danaLee, seenIn: 'both' }], exporter)
+
+    act(() => result.current.exporting.exportAs('xlsx'))
+
+    await waitFor(() => expect([saved[0].fileName, saved[0].columns.includes('In')]).toEqual([`all-open-to-work-${localToday()}.xlsx`, true]))
+  })
+
+  it('leaves out where people were found when showing one audience', async () => {
+    const { result } = await readyOpenList([danaLee])
+    expect(result.current.columns.map((column) => column.key)).not.toContain('in')
+  })
+})

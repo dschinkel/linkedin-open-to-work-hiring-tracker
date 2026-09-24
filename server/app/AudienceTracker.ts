@@ -3,7 +3,8 @@ import type { Route } from './HttpRouting.ts'
 import type { ScreenshotUseCases } from '../screenshots/http/ScreenshotsHttp.ts'
 import { screenshotsHttp } from '../screenshots/http/ScreenshotsHttp.ts'
 import { screenshotRoutes } from '../screenshots/http/routes.ts'
-import { trackerAnalytics } from '../tracker/domain/TrackerAnalytics.ts'
+import { listOpenToWorkPeople } from '../tracker/domain/OpenToWorkPeople.ts'
+import { type Analytics, trackerAnalytics } from '../tracker/domain/TrackerAnalytics.ts'
 import { trackerHttp, type TrackerUseCases } from '../tracker/http/TrackerHttp.ts'
 import { trackerRoutes } from '../tracker/http/routes.ts'
 import type { TrackerStore } from '../tracker/outbound/persistence/TrackerStore.ts'
@@ -26,12 +27,13 @@ export interface AudienceTrackerParts {
   screenshots: ScreenshotUseCases
   clearAllData: () => Promise<ProcessingResult>
   clearAudienceData: () => Promise<ProcessingResult>
+  analytics?: () => Analytics
   today?: () => string
   now?: () => Date
 }
 
-export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData, clearAudienceData, today = localToday, now = () => new Date() }: AudienceTrackerParts): Route[] => {
-  const ports = { analytics: trackerAnalytics(trackerStore), trackerStore, today }
+export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData, clearAudienceData, analytics = trackerAnalytics(trackerStore), today = localToday, now = () => new Date() }: AudienceTrackerParts): Route[] => {
+  const ports = { analytics, trackerStore, today }
   const useCases: TrackerUseCases = {
     ...viewDashboard(ports),
     ...listScans(ports),
@@ -47,12 +49,18 @@ export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData,
     ...editSettings(ports),
     clearAllData,
     clearAudienceData,
-    ...keepSnapshots({ ...ports, now, newSnapshotId: () => crypto.randomUUID() }),
+    ...keepSnapshots({
+      snapshotStore: trackerStore,
+      openToWorkPeople: () => listOpenToWorkPeople(analytics().index),
+      hiringPeople: () => analytics().hiringPeople,
+      now,
+      newSnapshotId: () => crypto.randomUUID(),
+    }),
   }
   return [...trackerRoutes(trackerHttp(useCases)), ...screenshotRoutes(screenshotsHttp(screenshots))]
 }
 
-function localToday(): string {
+export function localToday(): string {
   const now = new Date()
   return [now.getFullYear(), now.getMonth() + 1, now.getDate()].map((part) => String(part).padStart(2, '0')).join('-')
 }

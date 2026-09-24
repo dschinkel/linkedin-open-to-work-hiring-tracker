@@ -1,7 +1,22 @@
 import type { Settings, Snapshot } from '../../../../contracts/api.ts'
 import { summaryOf } from '../../domain/Snapshots.ts'
 import type { Network, Scan } from '../../../shared/domain/Observation.ts'
-import type { AnalyzedDay, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
+import type { AnalyzedDay, SnapshotStore, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
+
+export const memorySnapshotStore = (): SnapshotStore & { forgetSnapshots: () => void } => {
+  const snapshots = new Map<string, Snapshot>()
+  return {
+    saveSnapshot: (snapshot) => void snapshots.set(snapshot.id, snapshot),
+    listSnapshots: (kind) =>
+      [...snapshots.values()]
+        .filter((snapshot) => snapshot.kind === kind)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .map(summaryOf),
+    readSnapshot: (snapshotId) => snapshots.get(snapshotId) ?? null,
+    deleteSnapshot: (snapshotId) => snapshots.delete(snapshotId),
+    forgetSnapshots: () => snapshots.clear(),
+  }
+}
 
 export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Settings): TrackerStore => {
   let network = initialNetwork
@@ -9,7 +24,7 @@ export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Set
   let version = 0
   const waiting = new Map<string, WaitingScreenshot>()
   const seen = new Set<string>()
-  const snapshots = new Map<string, Snapshot>()
+  const { forgetSnapshots, ...snapshotStore } = memorySnapshotStore()
 
   const saveAnalyzedDay = ({ scan, people, observations }: AnalyzedDay): void => {
     const peopleIds = new Set(people.map((person) => person.id))
@@ -55,20 +70,13 @@ export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Set
       waiting.delete(fileName)
       version += 1
     },
-    saveSnapshot: (snapshot) => void snapshots.set(snapshot.id, snapshot),
-    listSnapshots: (kind) =>
-      [...snapshots.values()]
-        .filter((snapshot) => snapshot.kind === kind)
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
-        .map(summaryOf),
-    readSnapshot: (snapshotId) => snapshots.get(snapshotId) ?? null,
-    deleteSnapshot: (snapshotId) => snapshots.delete(snapshotId),
+    ...snapshotStore,
     eraseAudience: () => {
       network = { people: [], scans: [], observations: [] }
       settings = initialSettings
       waiting.clear()
       seen.clear()
-      snapshots.clear()
+      forgetSnapshots()
       version += 1
     },
   }

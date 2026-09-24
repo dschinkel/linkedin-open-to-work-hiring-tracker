@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query'
-import type { Audience } from '@contracts/api'
+import type { AudienceChoice } from '@contracts/api'
 import { formatCount, formatLongDate } from '@/shared-formatting/formatMetric'
 import { ApiError } from '@/shared-repositories/apiClient'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
@@ -29,7 +29,11 @@ const formats: ExportFormatOption[] = [
   { value: 'csv', label: 'CSV' },
 ]
 
-const audienceNames: Record<Audience, string> = { followers: 'Followers', contacts: 'Connections' }
+const audienceNames: Record<AudienceChoice, { file: string; title: string }> = {
+  all: { file: 'All', title: 'Followers and Connections' },
+  followers: { file: 'Followers', title: 'Followers' },
+  contacts: { file: 'Connections', title: 'Connections' },
+}
 
 export function useExportList(contentsToExport: () => ExportContents | Promise<ExportContents>, exporter: ListExporter = browserListExporter): ExportListView {
   const { audience } = useTrackerEnvironment()
@@ -37,8 +41,8 @@ export function useExportList(contentsToExport: () => ExportContents | Promise<E
     mutationFn: async (format: ExportFormat) => {
       const { list, date, columns, rows } = await contentsToExport()
       const audienceName = audienceNames[audience]
-      const fileName = `${[audienceName, list?.slug ?? '', date].filter(Boolean).join('-').toLowerCase()}.${format}`
-      const title = [[audienceName, list?.title].filter(Boolean).join(' '), formatLongDate(date), peopleCount(rows.length)].join(' · ')
+      const fileName = `${[audienceName.file, list?.slug ?? '', date].filter(Boolean).join('-').toLowerCase()}.${format}`
+      const title = [[audienceName.title, list?.title].filter(Boolean).join(' '), formatLongDate(date), peopleCount(rows.length)].join(' · ')
       await exporter.save({ format, fileName, title, columns, rows })
       return `Exported ${peopleCount(rows.length)} to ${fileName}.`
     },

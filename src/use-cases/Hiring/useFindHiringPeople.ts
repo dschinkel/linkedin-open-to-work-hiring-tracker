@@ -8,6 +8,7 @@ import type { PickerOption } from '@/components/OptionPicker'
 import { exportTableOf, type ListExporter, localToday } from '@/shared-exports/listExport'
 import { type ExportListView, useExportList } from '@/shared-exports/useExportList'
 import { formatPeople } from '@/shared-formatting/formatMetric'
+import { seenInCell, withSeenInColumn } from '@/shared-formatting/seenIn'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { type SortedRows, sortRows, useSortedRows } from '@/shared-state/useSortedRows'
@@ -64,15 +65,16 @@ const hiringList = { slug: 'hiring', title: 'Hiring' }
 const initialFilters: HiringPeopleQuery = { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' }
 
 export function useFindHiringPeople(injectedRepository?: HiringRepository, exporter?: ListExporter, snapshotRepository?: SnapshotRepository): HiringPeopleView {
-  const { api } = useTrackerEnvironment()
+  const { api, audience } = useTrackerEnvironment()
   const repository = injectedRepository ?? hiringRepositoryFor(api)
+  const shownColumns = withSeenInColumn(columns, audience)
   const [filters, setFilters] = useState<HiringPeopleQuery>(initialFilters)
   const people = useQuery({ queryKey: ['hiring-people', filters], queryFn: () => repository.people(filters), placeholderData: keepPreviousData })
   const companies = useQuery({ queryKey: ['hiring-companies'], queryFn: repository.companies })
-  const snapshots = useKeepSnapshots({ kind: 'hiring', list: hiringList, filters, tableOf: tableOfSnapshot }, snapshotRepository, exporter)
+  const snapshots = useKeepSnapshots({ kind: 'hiring', list: hiringList, filters, tableOf: (snapshot) => tableOfSnapshot(snapshot, shownColumns) }, snapshotRepository, exporter)
   const viewed = hiringSnapshotIn(snapshots.viewedSnapshot)
   const rows = viewed ? rowsOfSnapshot(viewed, viewed.people.filter((person) => matchesTextFilters(person, filters))) : (people.data ?? []).map((person) => toTableRow(person))
-  const table = useSortedRows(columns, rows, initialSort)
+  const table = useSortedRows(shownColumns, rows, initialSort)
   const exporting = useExportList(() => ({ ...(snapshots.viewedExportName ?? { list: hiringList, date: localToday() }), ...exportTableOf(table.columns, table.rows) }), exporter)
 
   function updateFilter<Key extends keyof HiringPeopleQuery>(key: Key) {
@@ -118,9 +120,9 @@ function rowsOfSnapshot(snapshot: HiringSnapshot, people: HiringPerson[] = snaps
   return people.map((person) => toTableRow(person, new Date(snapshot.createdAt)))
 }
 
-function tableOfSnapshot(snapshot: Snapshot) {
+function tableOfSnapshot(snapshot: Snapshot, shownColumns: DataColumn[]) {
   const hiring = hiringSnapshotIn(snapshot)
-  return exportTableOf(columns, sortRows(hiring ? rowsOfSnapshot(hiring) : [], initialSort))
+  return exportTableOf(shownColumns, sortRows(hiring ? rowsOfSnapshot(hiring) : [], initialSort))
 }
 
 function matchesTextFilters(person: HiringPerson, { search, company }: HiringPeopleQuery): boolean {
@@ -140,6 +142,7 @@ function toTableRow(person: HiringPerson, today?: Date): DataRow {
       name: { text: row.name },
       headline: { text: row.headline },
       company: { text: row.company, note: row.companyNeedsReview ? 'review' : undefined },
+      in: seenInCell(person.seenIn),
       since: { text: row.hiringSince, sortValue: person.hiringSince },
       days: { text: row.timeHiring, sortValue: person.daysHiring },
       lastSeen: { text: row.lastSeenHiring, sortValue: person.lastSeenHiring },

@@ -10,9 +10,11 @@ import { addScreenshots } from '../screenshots/use-cases/AddScreenshots.ts'
 import { analyzeInbox } from '../screenshots/use-cases/AnalyzeInbox.ts'
 import { reprocessScan } from '../screenshots/use-cases/ReprocessScan.ts'
 import { defaultSettingsFor } from '../tracker/domain/DefaultSettings.ts'
-import { defaultDatabasePath, eraseTrackerDatabase, openTrackerDatabase, sqliteTrackerStore } from '../tracker/outbound/persistence/SqliteTrackerStore.ts'
+import { trackerAnalytics } from '../tracker/domain/TrackerAnalytics.ts'
+import { defaultDatabasePath, eraseTrackerDatabase, openTrackerDatabase, sqliteSnapshotStore, sqliteTrackerStore } from '../tracker/outbound/persistence/SqliteTrackerStore.ts'
 import type { TrackerStore } from '../tracker/outbound/persistence/TrackerStore.ts'
 import type { RoutesByAudience } from './AudienceRouting.ts'
+import { allAudiencesTrackerRoutes } from './AllAudiencesTracker.ts'
 import { audienceTrackerRoutes } from './AudienceTracker.ts'
 
 export interface LiveTrackerSetup {
@@ -40,7 +42,15 @@ export const liveTrackers = ({ projectRoot, cardReader, log }: LiveTrackerSetup)
   const contacts = liveAudience('contacts', sqliteTrackerStore(database, 'contacts', defaultSettingsFor('contacts')), projectRoot, cardReader, clearEverything)
   inboxes.push(followers.inboxFolder, contacts.inboxFolder)
   return {
-    routesByAudience: { followers: followers.routes, contacts: contacts.routes },
+    routesByAudience: {
+      followers: followers.routes,
+      contacts: contacts.routes,
+      all: allAudiencesTrackerRoutes({
+        trackerStores: { followers: followers.trackerStore, contacts: contacts.trackerStore },
+        analytics: { followers: followers.analytics, contacts: contacts.analytics },
+        snapshotStore: sqliteSnapshotStore(database, 'all'),
+      }),
+    },
     watchInboxes: () => {
       const stops = [followers, contacts].map((audience) => audience.watch(log))
       return async () => void (await Promise.all(stops.map((stop) => stop())))
@@ -55,8 +65,10 @@ function liveAudience(audience: Audience, trackerStore: TrackerStore, projectRoo
     archiveDirectory: () => trackerStore.readSettings().archiveDirectory,
   })
   const { analyzeWaitingScreenshots } = analyzeInbox({ audience, trackerStore, inboxFolder, cardReader })
+  const analytics = trackerAnalytics(trackerStore)
   const routes = audienceTrackerRoutes({
     trackerStore,
+    analytics,
     screenshots: {
       ...addScreenshots({ inboxFolder, trackerStore, analyzeWaitingScreenshots }),
       ...reprocessScan({ audience, trackerStore, inboxFolder, cardReader }),
@@ -74,5 +86,5 @@ function liveAudience(audience: Audience, trackerStore: TrackerStore, projectRoo
       },
       onFileSkipped: (fileName, reason) => log(`Tracker (${audience}): skipped ${fileName}: ${reason}`),
     })
-  return { routes, watch, inboxFolder }
+  return { routes, watch, inboxFolder, trackerStore, analytics }
 }

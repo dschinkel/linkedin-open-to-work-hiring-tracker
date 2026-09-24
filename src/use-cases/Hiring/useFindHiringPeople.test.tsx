@@ -238,3 +238,40 @@ describe('hiring snapshot on show', () => {
     await waitFor(() => expect(snapshots.saves[0][1].filters).toMatchObject({ status: 'previous' }))
   })
 })
+
+describe('hiring across all audiences together', () => {
+  async function readyAllHiring(people: HiringPerson[], exporter = recordingExporter().exporter) {
+    const { repository } = hiringRepositoryReturning(people)
+    const rendered = renderHook(() => useFindHiringPeople(repository, exporter, fakeSnapshotRepository().repository), { wrapper: insideTracker({ audience: 'all' }) })
+    await waitFor(() => expect(rendered.result.current.status).toBe('ready'))
+    return rendered
+  }
+
+  it('shows whether each person is a follower, a connection, or both', async () => {
+    const { result } = await readyAllHiring([{ ...mikeBrown, seenIn: 'both' }, { ...priyaNair, seenIn: 'contacts' }])
+    expect(result.current.rows.map((row) => row.cells.in.text)).toEqual(['Both', 'Connection'])
+  })
+
+  it('exports where each person was found', async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await readyAllHiring([{ ...mikeBrown, seenIn: 'followers' }], exporter)
+
+    act(() => result.current.exporting.exportAs('csv'))
+
+    await waitFor(() => expect(saved[0].rows[0][saved[0].columns.indexOf('In')]).toBe('Follower'))
+  })
+
+  it("names the file after all audiences, the Hiring list, and today's date", async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await readyAllHiring([mikeBrown], exporter)
+
+    act(() => result.current.exporting.exportAs('xlsx'))
+
+    await waitFor(() => expect(saved[0].fileName).toBe(`all-hiring-${localToday()}.xlsx`))
+  })
+
+  it('leaves out where people were found when showing one audience', async () => {
+    const { result } = await readyHiringSearch([mikeBrown])
+    expect(result.current.columns.map((column) => column.label)).not.toContain('In')
+  })
+})

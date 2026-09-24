@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import path from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
-import { type Audience, type Settings, type Snapshot, type SnapshotKind, type SnapshotSummary, settingsSchema, snapshotSchema } from '../../../../contracts/api.ts'
+import { type Audience, type AudienceChoice, type Settings, type Snapshot, type SnapshotKind, type SnapshotSummary, settingsSchema, snapshotSchema } from '../../../../contracts/api.ts'
 import type {
   ClassificationMethod,
   CompanyExtractionMethod,
@@ -13,7 +13,7 @@ import type {
   Scan,
   Screenshot,
 } from '../../../shared/domain/Observation.ts'
-import type { AnalyzedDay, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
+import type { AnalyzedDay, SnapshotStore, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
 
 const migrations: string[] = [
   `CREATE TABLE people (
@@ -117,13 +117,17 @@ export const sqliteTrackerStore = (database: DatabaseSync, audience: Audience, d
         .prepare("UPDATE screenshots SET outcome = 'failed', warning = ? WHERE audience = ? AND file_name = ?")
         .run(reason, audience, fileName)
     },
-    saveSnapshot: (snapshot) => saveSnapshot(database, audience, snapshot),
-    listSnapshots: (kind) => listSnapshots(database, audience, kind),
-    readSnapshot: (snapshotId) => readSnapshot(database, audience, snapshotId),
-    deleteSnapshot: (snapshotId) => Number(database.prepare('DELETE FROM snapshots WHERE audience = ? AND id = ?').run(audience, snapshotId).changes) > 0,
+    ...sqliteSnapshotStore(database, audience),
     eraseAudience: () => eraseAudience(database, audience),
   }
 }
+
+export const sqliteSnapshotStore = (database: DatabaseSync, owner: AudienceChoice): SnapshotStore => ({
+  saveSnapshot: (snapshot) => saveSnapshot(database, owner, snapshot),
+  listSnapshots: (kind) => listSnapshots(database, owner, kind),
+  readSnapshot: (snapshotId) => readSnapshot(database, owner, snapshotId),
+  deleteSnapshot: (snapshotId) => Number(database.prepare('DELETE FROM snapshots WHERE audience = ? AND id = ?').run(owner, snapshotId).changes) > 0,
+})
 
 export function eraseTrackerDatabase(database: DatabaseSync): void {
   database.exec('BEGIN; DELETE FROM observations; DELETE FROM screenshots; DELETE FROM scans; DELETE FROM people; DELETE FROM settings; DELETE FROM snapshots; COMMIT;')
@@ -223,20 +227,20 @@ function saveAnalyzedScan(database: DatabaseSync, audience: Audience, scan: Scan
   }
 }
 
-function saveSnapshot(database: DatabaseSync, audience: Audience, snapshot: Snapshot): void {
+function saveSnapshot(database: DatabaseSync, audience: AudienceChoice, snapshot: Snapshot): void {
   database
     .prepare('INSERT INTO snapshots (id, audience, kind, name, created_at, people_count, filters_json, people_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
     .run(snapshot.id, audience, snapshot.kind, snapshot.name, snapshot.createdAt, snapshot.peopleCount, snapshot.kind === 'hiring' ? JSON.stringify(snapshot.filters) : null, JSON.stringify(snapshot.people))
 }
 
-function listSnapshots(database: DatabaseSync, audience: Audience, kind: SnapshotKind): SnapshotSummary[] {
+function listSnapshots(database: DatabaseSync, audience: AudienceChoice, kind: SnapshotKind): SnapshotSummary[] {
   return database
     .prepare('SELECT id, kind, name, created_at AS createdAt, people_count AS peopleCount FROM snapshots WHERE audience = ? AND kind = ? ORDER BY created_at DESC')
     .all(audience, kind)
     .map((row) => ({ ...(row as unknown as SnapshotSummary) }))
 }
 
-function readSnapshot(database: DatabaseSync, audience: Audience, snapshotId: string): Snapshot | null {
+function readSnapshot(database: DatabaseSync, audience: AudienceChoice, snapshotId: string): Snapshot | null {
   const row = database.prepare('SELECT * FROM snapshots WHERE audience = ? AND id = ?').get(audience, snapshotId) as unknown as SnapshotRow | undefined
   if (!row) return null
   return snapshotSchema.parse({

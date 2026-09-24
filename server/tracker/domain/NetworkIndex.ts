@@ -1,6 +1,7 @@
 import type { Network, Observation, Person, Scan } from '../../shared/domain/Observation.ts'
 
 export interface NetworkIndex {
+  people: Person[]
   scansInOrder: Scan[]
   observationsOf: (scanId: string) => Observation[]
   personOf: (personId: string) => Person
@@ -10,6 +11,7 @@ export function indexNetwork(network: Network): NetworkIndex {
   const observationsByScan = groupObservationsByScan(network.observations)
   const peopleById = new Map(network.people.map((person) => [person.id, person]))
   return {
+    people: network.people,
     scansInOrder: [...network.scans].sort((a, b) => a.scanDate.localeCompare(b.scanDate)),
     observationsOf: (scanId) => observationsByScan.get(scanId) ?? [],
     personOf: (personId) => peopleById.get(personId) as Person,

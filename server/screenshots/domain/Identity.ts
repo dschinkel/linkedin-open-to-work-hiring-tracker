@@ -1,18 +1,11 @@
 import { createHash } from 'node:crypto'
 import { normalizeIdentity, type VisibleIdentity } from '../../shared/domain/IdentityText.ts'
-import { type PhotoPrint, photosDiffer, photosMatch } from './PhotoPrint.ts'
-import { titleEvidence } from './SamePerson.ts'
+import { matchNamesakes, type SeenPerson } from './Namesakes.ts'
 
-export { normalizeIdentity, type VisibleIdentity }
+export { normalizeIdentity, type SeenPerson, type VisibleIdentity }
 
 export function personHash(identity: VisibleIdentity): string {
   return hashOf(normalizeIdentity(identity))
-}
-
-export interface SeenPerson {
-  displayName: string
-  headline: string | null
-  photoPrint?: PhotoPrint | null
 }
 
 export interface KnownPerson extends SeenPerson {
@@ -34,31 +27,9 @@ export function resolvePersonHashes(people: SeenPerson[], known: KnownPerson[]):
 }
 
 function resolveNamesakes(people: SeenPerson[], namesakes: KnownPerson[]): string[] {
-  if (people.length === 1 && namesakes.length === 1 && !clearlySomeoneElse(people[0], namesakes[0])) return [namesakes[0].personHash]
-  const claimed = new Map<number, string>()
-  for (const recognises of [samePhoto, sameTitleWithoutAPhoto]) {
-    people.forEach((person, index) => {
-      if (claimed.has(index)) return
-      const match = namesakes.find((namesake) => ![...claimed.values()].includes(namesake.personHash) && recognises(person, namesake))
-      if (match) claimed.set(index, match.personHash)
-    })
-  }
-  const taken = new Set([...namesakes.map((namesake) => namesake.personHash), ...claimed.values()])
-  return people.map((person, index) => claimed.get(index) ?? claimNextNumber(person, taken))
-}
-
-function clearlySomeoneElse(person: SeenPerson, namesake: KnownPerson): boolean {
-  const titles = titleEvidence(person.headline, namesake.headline)
-  if (!person.photoPrint || !namesake.photoPrint) return titles === 'different'
-  return photosDiffer(person.photoPrint, namesake.photoPrint) && titles !== 'same'
-}
-
-function samePhoto(person: SeenPerson, namesake: KnownPerson): boolean {
-  return Boolean(person.photoPrint && namesake.photoPrint) && photosMatch(person.photoPrint as PhotoPrint, namesake.photoPrint as PhotoPrint)
-}
-
-function sameTitleWithoutAPhoto(person: SeenPerson, namesake: KnownPerson): boolean {
-  return (!person.photoPrint || !namesake.photoPrint) && titleEvidence(person.headline, namesake.headline) !== 'different'
+  const claimed = matchNamesakes(people, namesakes)
+  const taken = new Set([...namesakes, ...claimed.values()].map((namesake) => namesake.personHash))
+  return people.map((person, index) => claimed.get(index)?.personHash ?? claimNextNumber(person, taken))
 }
 
 function claimNextNumber(person: SeenPerson, taken: Set<string>): string {

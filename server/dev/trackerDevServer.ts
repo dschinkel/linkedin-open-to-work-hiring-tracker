@@ -3,7 +3,7 @@ import type { Audience } from '../../contracts/api.ts'
 import { answerAudienceRequest, type RoutesByAudience } from '../app/AudienceRouting.ts'
 import { trackerKoaApp } from '../app/KoaApp.ts'
 import { liveTrackers } from '../app/LiveTrackers.ts'
-import { sampleTrackerRoutes } from '../sample/DemoTrackers.ts'
+import { sampleTrackers } from '../sample/DemoTrackers.ts'
 import { generateSampleNetwork } from '../sample/SampleNetwork.ts'
 import { screenshotCardReader } from '../screenshots/outbound/vision/ScreenshotCardReader.ts'
 
@@ -24,16 +24,16 @@ export function trackerDevServer(): Plugin {
 function routesFor(scenario: SampleScenario | null, projectRoot: string, log: (message: string) => void, onClose: (stop: () => Promise<void>) => void): RoutesByAudience {
   if (scenario !== null) {
     log(`Tracker: in-memory sample data (TRACKER_SAMPLE=${scenario}); your database is not used.`)
-    return { followers: sampleRoutes('followers', scenario), contacts: sampleRoutes('contacts', scenario) }
+    return sampleTrackers({ followers: sampleNetwork('followers', scenario), contacts: sampleNetwork('contacts', scenario) })
   }
   const trackers = liveTrackers({ projectRoot, cardReader: screenshotCardReader(), log })
   onClose(trackers.watchInboxes())
   return trackers.routesByAudience
 }
 
-function sampleRoutes(audience: Audience, scenario: SampleScenario) {
+function sampleNetwork(audience: Audience, scenario: SampleScenario) {
   const days = scenario === 'single' ? 1 : 180
-  return sampleTrackerRoutes(audience, generateSampleNetwork({ latestScanDate: todayIsoDate(), days, peopleCount: 500, seed: audience === 'followers' ? 7331 : 2026 }))
+  return generateSampleNetwork({ latestScanDate: todayIsoDate(), days, peopleCount: 500, seed: audience === 'followers' ? 7331 : 2026 })
 }
 
 function scenarioFromEnvironment(): SampleScenario | null {

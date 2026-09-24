@@ -31,6 +31,14 @@ describe('tracker address', () => {
     expect(routeAt('demo', '/demo/followers')).toEqual({ audience: 'followers', redirectTo: null })
   })
 
+  it('opens all audiences together', () => {
+    expect(routeAt('live', '/all/hiring')).toEqual({ audience: 'all', redirectTo: null })
+  })
+
+  it('opens all audiences together in the demo', () => {
+    expect(routeAt('demo', '/demo/all/open-to-work')).toEqual({ audience: 'all', redirectTo: null })
+  })
+
   it('sends an unknown audience to the followers tracker', () => {
     expect(routeAt('live', '/colleagues')).toEqual({ audience: null, redirectTo: '/followers' })
   })

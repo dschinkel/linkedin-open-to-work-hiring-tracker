@@ -1,18 +1,18 @@
 import { createContext, useContext } from 'react'
-import type { Audience } from '@contracts/api'
+import type { AudienceChoice } from '@contracts/api'
 import { type ApiClient, createApiClient, httpTransport, type Transport } from './apiClient'
 
 export type TrackerMode = 'live' | 'demo'
 
 export interface TrackerEnvironment {
   api: ApiClient
-  apiFor: (audience: Audience) => ApiClient
+  apiFor: (audience: AudienceChoice) => ApiClient
   routeBase: string
   isDemo: boolean
-  audience: Audience
+  audience: AudienceChoice
 }
 
-export function trackerEnvironmentFor(mode: TrackerMode, audience: Audience, transport: Transport): TrackerEnvironment {
+export function trackerEnvironmentFor(mode: TrackerMode, audience: AudienceChoice, transport: Transport): TrackerEnvironment {
   const modeBase = mode === 'demo' ? '/demo' : ''
   return {
     api: createApiClient(transport, `/api/${audience}`),

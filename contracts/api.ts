@@ -4,6 +4,13 @@ export const audienceSchema = z.enum(['contacts', 'followers'])
 export type Audience = z.infer<typeof audienceSchema>
 export const audiences: Audience[] = audienceSchema.options
 
+export const audienceChoiceSchema = z.enum(['all', 'followers', 'contacts'])
+export type AudienceChoice = z.infer<typeof audienceChoiceSchema>
+export const audienceChoices: AudienceChoice[] = audienceChoiceSchema.options
+
+export const seenInSchema = z.enum(['followers', 'contacts', 'both'])
+export type SeenIn = z.infer<typeof seenInSchema>
+
 export const timeWindowSchema = z.enum(['7d', '30d', '90d', '6m', '1y', 'all'])
 export type TimeWindow = z.infer<typeof timeWindowSchema>
 
@@ -97,6 +104,7 @@ export const hiringPersonSchema = z.object({
   scansSeenHiring: z.number(),
   isCurrentlyHiring: z.boolean(),
   wasObservedInLatestScan: z.boolean(),
+  seenIn: seenInSchema.optional(),
 })
 export type HiringPerson = z.infer<typeof hiringPersonSchema>
 
@@ -279,6 +287,7 @@ export const openToWorkPersonSchema = z.object({
   daysOpen: z.number(),
   scansSeenOpen: z.number(),
   wasObservedInLatestScan: z.boolean(),
+  seenIn: seenInSchema.optional(),
 })
 export type OpenToWorkPerson = z.infer<typeof openToWorkPersonSchema>
 

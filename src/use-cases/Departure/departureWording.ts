@@ -1,6 +1,7 @@
-import type { Audience } from '@contracts/api'
+import type { AudienceChoice } from '@contracts/api'
 
-export const departureTitles: Record<Audience, string> = {
+export const departureTitles: Record<AudienceChoice, string> = {
+  all: 'Unfollowers and past connections',
   followers: 'Unfollowers',
   contacts: 'Past connections',
 }

@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query'
-import type { Audience } from '@contracts/api'
+import type { AudienceChoice } from '@contracts/api'
 import type { TrackerMode } from './trackerEnvironment'
 
 const liveRefreshMilliseconds = 5_000
@@ -13,7 +13,7 @@ export function sizeClientFor(mode: TrackerMode): QueryClient {
   return sizeClients.get(mode)!
 }
 
-export function trackerClientFor(mode: TrackerMode, audience: Audience): QueryClient {
+export function trackerClientFor(mode: TrackerMode, audience: AudienceChoice): QueryClient {
   const key = `${mode}-${audience}`
   if (!trackerClients.has(key)) trackerClients.set(key, queryClientFor(mode))
   return trackerClients.get(key)!

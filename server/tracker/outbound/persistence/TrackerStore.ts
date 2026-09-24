@@ -12,7 +12,14 @@ export interface WaitingScreenshot {
   addedAt: string
 }
 
-export interface TrackerStore {
+export interface SnapshotStore {
+  saveSnapshot: (snapshot: Snapshot) => void
+  listSnapshots: (kind: SnapshotKind) => SnapshotSummary[]
+  readSnapshot: (snapshotId: string) => Snapshot | null
+  deleteSnapshot: (snapshotId: string) => boolean
+}
+
+export interface TrackerStore extends SnapshotStore {
   readNetwork: () => Network
   dataVersion: () => number
   readSettings: () => Settings
@@ -25,9 +32,5 @@ export interface TrackerStore {
   readScan: (scanId: string) => AnalyzedDay | null
   saveAnalyzedDay: (day: AnalyzedDay) => void
   markScreenshotFailed: (fileName: string, reason: string) => void
-  saveSnapshot: (snapshot: Snapshot) => void
-  listSnapshots: (kind: SnapshotKind) => SnapshotSummary[]
-  readSnapshot: (snapshotId: string) => Snapshot | null
-  deleteSnapshot: (snapshotId: string) => boolean
   eraseAudience: () => void
 }
