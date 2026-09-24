@@ -162,47 +162,39 @@
   --scheme-on-accent: #06181c;
 }
 
-[data-theme='yellow'] {
-  --scheme-page: #fbf6dc;
-  --scheme-page-glow: #f3e7a8;
-  --scheme-panel: #fffdf2;
+[data-theme='brown'] {
+  --scheme-page: #f3e9dd;
+  --scheme-page-glow: #e3cdb3;
+  --scheme-panel: #fcf7f1;
   --scheme-raised: #ffffff;
-  --scheme-fill: #f6eab3;
-  --scheme-hover: #f3e5a6;
-  --scheme-rule: #dcc970;
-  --scheme-rule-strong: #c4ae4d;
-  --scheme-dim: #5a501c;
-  --scheme-text: #2a2508;
-  --scheme-bright: #4a3d00;
-  --scheme-accent: #6e5800;
-  --scheme-accent-fill: #f5cf2a;
-  --scheme-on-accent: #2a2000;
+  --scheme-fill: #ead9c4;
+  --scheme-hover: #e6d2ba;
+  --scheme-rule: #c9a887;
+  --scheme-rule-strong: #b08a66;
+  --scheme-dim: #5e4430;
+  --scheme-text: #2a1a0e;
+  --scheme-bright: #4a2a10;
+  --scheme-accent: #7a4a1e;
+  --scheme-accent-fill: #8b5a2b;
+  --scheme-on-accent: #fdf6ee;
 }
 
-[data-theme='yellow'].dark,
-.dark [data-theme='yellow'] {
-  --scheme-page: #f2c200;
-  --scheme-page-glow: #ffd83a;
-  --scheme-panel: #f7cf2a;
-  --scheme-raised: #fad640;
-  --scheme-fill: #eab900;
-  --scheme-hover: #e2b100;
-  --scheme-rule: #b88f00;
-  --scheme-rule-strong: #8f6f00;
-  --scheme-dim: #4a3a00;
-  --scheme-text: #1f1800;
-  --scheme-bright: #120e00;
-  --scheme-accent: #1f1800;
-  --scheme-accent-fill: #1f1800;
-  --scheme-on-accent: #ffd83a;
-  --scheme-open-to-work: #0c4a22;
-  --scheme-open-to-work-soft: #e2d98f;
-  --scheme-hiring: #3f1480;
-  --scheme-hiring-soft: #e9d9a0;
-  --scheme-removed: #7a1408;
-  --scheme-warning: #4a3000;
-  --scheme-shadow: rgb(60 40 0 / 0.25);
-  color-scheme: light;
+[data-theme='brown'].dark,
+.dark [data-theme='brown'] {
+  --scheme-page: #2e2119;
+  --scheme-page-glow: #5a3d28;
+  --scheme-panel: #37281e;
+  --scheme-raised: #402f23;
+  --scheme-fill: #483528;
+  --scheme-hover: #533d2e;
+  --scheme-rule: #765741;
+  --scheme-rule-strong: #94704f;
+  --scheme-dim: #d8c2ad;
+  --scheme-text: #f1e4d6;
+  --scheme-bright: #fcf6ef;
+  --scheme-accent: #e0a878;
+  --scheme-accent-fill: #e0a878;
+  --scheme-on-accent: #231208;
 }
 
 [data-theme='orange'] {

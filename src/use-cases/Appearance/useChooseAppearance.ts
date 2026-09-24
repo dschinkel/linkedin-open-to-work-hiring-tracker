@@ -1,18 +1,15 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
-import type { IconOption } from '@/components/IconChoiceSelect'
-import { colorThemeOptions, showsDark, swatchOf, type AppearanceMode, type ColorTheme, type ColorThemeOption } from './appearance'
+import type { IconOption } from '@/components/ChoiceRow'
+import { colorThemeOptions, showsDark, type AppearanceMode, type ColorTheme, type ColorThemeOption } from './appearance'
 import { appearanceRepository, type AppearanceRepository } from './AppearanceRepository'
-import { appearanceModeOptions, modeOptionFor } from './appearanceModeOptions'
+import { appearanceModeOptions } from './appearanceModeOptions'
 import { devicePrefersDark, showAppearance, watchDeviceColorScheme } from './pageAppearance'
 
 export interface ChooseAppearance {
   mode: AppearanceMode
   modeOptions: IconOption<AppearanceMode>[]
-  modeIcon: IconOption<AppearanceMode>['icon']
-  modeLabel: string
   theme: ColorTheme
   themeOptions: ColorThemeOption[]
-  themeSwatch: string
   chooseMode: (mode: AppearanceMode) => void
   chooseTheme: (theme: ColorTheme) => void
 }
@@ -27,11 +24,8 @@ export function useChooseAppearance(repository: AppearanceRepository = appearanc
   return {
     mode,
     modeOptions: appearanceModeOptions,
-    modeIcon: modeOptionFor(mode).icon,
-    modeLabel: `Appearance: ${modeOptionFor(mode).label}`,
     theme,
     themeOptions: colorThemeOptions,
-    themeSwatch: swatchOf(theme),
     chooseMode: (next) => {
       setMode(next)
       repository.saveMode(next)

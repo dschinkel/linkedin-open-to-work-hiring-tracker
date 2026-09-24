@@ -1,6 +1,6 @@
 export type AppearanceMode = 'light' | 'dark' | 'system'
 
-export type ColorTheme = 'neutral' | 'ocean' | 'aqua' | 'green' | 'yellow' | 'orange' | 'red'
+export type ColorTheme = 'neutral' | 'ocean' | 'aqua' | 'green' | 'brown' | 'orange' | 'red'
 
 export interface ColorThemeOption {
   value: ColorTheme
@@ -18,7 +18,7 @@ export const colorThemeOptions: ColorThemeOption[] = [
   { value: 'ocean', label: 'Ocean', swatch: 'oklch(0.55 0.16 250)' },
   { value: 'aqua', label: 'Aqua', swatch: '#1fb8c0' },
   { value: 'green', label: 'Green', swatch: 'oklch(0.72 0.2 133)' },
-  { value: 'yellow', label: 'Yellow', swatch: '#f5cf2a' },
+  { value: 'brown', label: 'Brown', swatch: '#8b5a2b' },
   { value: 'orange', label: 'Orange', swatch: '#ff9a3d' },
   { value: 'red', label: 'Red', swatch: '#e53945' },
 ]
@@ -36,6 +36,3 @@ export function showsDark(mode: AppearanceMode, devicePrefersDark: boolean): boo
   return mode === 'dark'
 }
 
-export function swatchOf(theme: ColorTheme): string {
-  return colorThemeOptions.find((option) => option.value === theme)?.swatch ?? ''
-}

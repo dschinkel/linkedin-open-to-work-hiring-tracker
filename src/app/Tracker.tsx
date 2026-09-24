@@ -36,10 +36,14 @@ export function Tracker({ mode, audience }: { mode: TrackerMode; audience: Audie
           banner={tracker.showDemoBanner && <DemoBanner sampleDescription={tracker.demoSampleDescription} />}
           headerAction={
             <>
-              {tracker.showDemoInvite && <DemoInvite href={tracker.demoHref} />}
-              {tracker.showExitDemo && <ExitDemo href={tracker.exitDemoHref} />}
               <GitHubLink />
               <ChooseAppearance />
+            </>
+          }
+          navAction={
+            <>
+              {tracker.showDemoInvite && <DemoInvite href={tracker.demoHref} />}
+              {tracker.showExitDemo && <ExitDemo href={tracker.exitDemoHref} />}
             </>
           }
         >

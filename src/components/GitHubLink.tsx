@@ -11,7 +11,7 @@ export function GitHubLink() {
       rel="noreferrer"
       aria-label="Source code on GitHub"
       title="Source code on GitHub"
-      className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'h-10 w-8')}
+      className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'size-7')}
     >
       <GitHubMark />
     </a>
