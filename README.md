@@ -5,6 +5,8 @@
 <h1 align="center">LinkedIn Open-to-Work & Hiring Tracker</h1>
 
 <p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
+
+<p align="center"><img src="docs/dashboard.png" alt="The tracker dashboard: Open to Work and Hiring rates with their key figures" width="900"></p>
 <p align="center"><em>Who in your network is looking for work, how many, and who's hiring, tracked over time.</em></p>
 
 The goal is a clearer picture of how your close network of connections is doing, not a single snapshot.
