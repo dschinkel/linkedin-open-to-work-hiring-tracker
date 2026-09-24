@@ -154,7 +154,7 @@ function withoutSlivers(words: TextBox[]): TextBox[] {
 
 function couldBeAWord(word: TextBox): boolean {
   const trusted = word.confidence >= trustworthyConfidence && (/[A-Za-z]{2}/.test(word.text) || /^[A-Z]\.$/.test(word.text))
-  return trusted || /^[@©®“”"'‘’]?\p{L}{2,}([-'’]\p{L}+)*$/u.test(word.text)
+  return trusted || /^[@©®]?\p{L}{2,}([-'’]\p{L}+)*$/u.test(word.text)
 }
 
 export function groupIntoLines(words: TextBox[]): TextLine[] {

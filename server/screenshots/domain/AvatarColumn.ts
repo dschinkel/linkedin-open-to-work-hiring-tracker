@@ -7,16 +7,9 @@ interface Blob {
   size: number
 }
 
-/** Photos this small (in pixels, on the detection image) are icons or mutual-connection faces, not profile photos. */
 const smallestPhoto = 8
-/** A filled circle covers about 79% of its bounding square; letters like "o" are hollow and cover far less. */
 const circleFill = { least: 0.62, most: 0.95 }
 
-/**
- * Finds every person on a LinkedIn list by their profile photo: the photos are round, the same size, and
- * stacked in one column. Browser menus, bookmark icons, and letters don't form such a column. A photo cut by the
- * top of the image is no longer round; it is placed where its whole circle would be, reaching above the image.
- */
 export function findAvatarColumn(pixels: Pixels): AvatarCircle[] {
   const shapes = inkShapes(pixels)
   const columns = groupIntoColumns(shapes.map((shape) => asRoundBlob(shape, pixels.height)).filter((blob) => blob !== null))
@@ -28,7 +21,6 @@ export function findAvatarColumn(pixels: Pixels): AvatarCircle[] {
     .map((blob) => ({ centreX: blob.left + blob.size / 2, centreY: blob.top + blob.size / 2, radius: blob.size / 2 }))
 }
 
-/** The shape touching the top of the image in the photo column, as wide as a photo: the lower part of a cut photo. */
 function photoCutByTheTop(shapes: Component[], column: Blob[]): Blob | null {
   const size = medianSize(column)
   const left = column[0].left
@@ -36,12 +28,6 @@ function photoCutByTheTop(shapes: Component[], column: Blob[]): Blob | null {
   return cut ? { left: cut.minX, top: cut.maxY + 1 - size, size } : null
 }
 
-/**
- * A photo taken against a white wall or sky blends into the page where the background shows, so it is no longer a
- * filled circle. What is left (the person, down to their shoulders at the foot of the circle) still reaches the foot
- * of a photo, is most of a photo tall and more than half a photo wide, lies in the column, and sits where no other
- * photo is: such a shape is a photo too.
- */
 function photosBlendingIntoThePage(shapes: Component[], column: Blob[], imageHeight: number): Blob[] {
   const size = medianSize(column)
   const left = medianLeft(column)
@@ -50,13 +36,12 @@ function photosBlendingIntoThePage(shapes: Component[], column: Blob[], imageHei
   const height = (shape: Component) => shape.maxY - shape.minY + 1
   return shapes
     .filter((shape) => shape.minY > 0 && shape.maxY < imageHeight - 1 && shape.minX >= left - size * 0.3 && shape.maxX <= left + size * 1.3)
-    .filter((shape) => height(shape) >= size * 0.75 && height(shape) <= size * 1.05 && width(shape) >= size * 0.6 && width(shape) <= size * 1.05)
+    .filter((shape) => height(shape) >= size * 0.8 && height(shape) <= size * 1.05 && width(shape) >= size * 0.6 && width(shape) <= size * 1.05)
     .filter((shape) => shape.area / (size * size) >= blendedPhotoFill)
-    .map((shape) => ({ left, top: shape.maxY + 1 - size, size }))
+    .map((shape) => ({ left, top: (shape.minY + shape.maxY + 1 - size) / 2, size }))
     .filter((blob) => isFree(blob.top))
 }
 
-/** Even a photo mostly against a white background has a person in it: this much of its square at least. */
 const blendedPhotoFill = 0.3
 
 function medianLeft(column: Blob[]): number {
@@ -64,23 +49,12 @@ function medianLeft(column: Blob[]): number {
   return lefts[Math.floor(lefts.length / 2)]
 }
 
-/**
- * How far apart one person's row is from the next. The closest pair of photos is one row apart; a median would
- * stretch across rows whose photo wasn't found (light photos blend into the page) and merge several people.
- */
 export function rowSpacing(photos: AvatarCircle[]): number {
   const gaps = photos.slice(1).map((photo, index) => photo.centreY - photos[index].centreY)
   const rowGaps = gaps.filter((gap) => gap >= photos[0].radius * 2)
   return rowGaps.length > 0 ? Math.min(...rowGaps) : photos[0].radius * 3
 }
 
-/**
- * Whether a row was cut by the top of the image: its photo, or the spot where its photo should be, reaches well
- * past the top edge. A name starts level with the top of its photo, so such a row has usually lost its name and what
- * is left beside it is only a title. On some lists (Connections) names start a little below the top of their photos,
- * and a cut just above a name leaves it whole: text beside the cut photo starting just where this list's names start
- * (the given drop below the photo's top) is that name. A row cut by the bottom edge keeps its name.
- */
 export function hasLostItsName(photo: AvatarCircle, whereNamesStart?: { textBeside: NameBlock; nameDrop: number }): boolean {
   const { centreY, radius } = photo
   if (centreY - radius >= -radius * cutSliver) return false
@@ -89,13 +63,8 @@ export function hasLostItsName(photo: AvatarCircle, whereNamesStart?: { textBesi
   return Math.abs(textBeside.top - (centreY - radius + nameDrop)) > radius * 0.15
 }
 
-/** A photo (and the name level with it) cut by no more than this share of its radius still reads. */
 const cutSliver = 0.2
 
-/**
- * Whether a spot where a photo should be sits on the web page: the ring just outside it is the page's own
- * background. Text beside a spot in the browser's toolbars or bookmarks bar is not a person.
- */
 export function sitsOnThePage(pixels: Pixels, spot: AvatarCircle): boolean {
   const background = backgroundColours(pixels.data, pixels.width * pixels.height)
   const ring = ringAround(spot, pixels)
@@ -117,7 +86,6 @@ function colourAt(data: Pixels['data'], offset: number): number[] {
   return [data[offset], data[offset + 1], data[offset + 2]]
 }
 
-/** Every connected patch of ink at least as big as the smallest photo. */
 function inkShapes(pixels: Pixels): Component[] {
   const ink = inkMask(pixels)
   const seen = new Uint8Array(pixels.width * pixels.height)
@@ -161,7 +129,6 @@ function floodFill(ink: Uint8Array, seen: Uint8Array, start: number, width: numb
   return component
 }
 
-/** A photo's round shape. One slightly cut by the bottom of the image still reads as round; its width is its size. */
 function asRoundBlob({ minX, minY, maxX, maxY, area }: Component, imageHeight: number): Blob | null {
   const width = maxX - minX + 1
   const height = maxY - minY + 1
@@ -172,7 +139,6 @@ function asRoundBlob({ minX, minY, maxX, maxY, area }: Component, imageHeight: n
   return { left: minX, top: minY, size }
 }
 
-/** Photos share a left edge and a size; group blobs that do. */
 function groupIntoColumns(blobs: Blob[]): Blob[][] {
   const columns: Blob[][] = []
   for (const blob of [...blobs].sort((a, b) => a.left - b.left)) {
@@ -189,7 +155,6 @@ function medianSize(column: Blob[]): number {
   return sizes[Math.floor(sizes.length / 2)]
 }
 
-/** Anything that isn't one of the page's two main background colours (the card and the page behind it). */
 function inkMask({ data, width, height }: Pixels): Uint8Array {
   const [first, second] = backgroundColours(data, width * height)
   const ink = new Uint8Array(width * height)

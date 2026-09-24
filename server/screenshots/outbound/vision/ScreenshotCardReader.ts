@@ -51,7 +51,7 @@ export const screenshotCardReader = (cacheFolder = path.resolve('data/ocr')): Ca
     const rows = names.map((name) => ({ name, photo: photoFor(name, photos) }))
     const drop = nameDrop(rows.filter(({ photo }) => photos.includes(photo)))
     return rows
-      .filter(({ name, photo }) => !hasLostItsName(photo, { textBeside: name, nameDrop: drop }))
+      .filter(({ name, photo }) => !hasLostItsName(photo, startsAtAPageBreak(paper) ? { textBeside: name, nameDrop: drop } : undefined))
       .filter(({ photo }) => photos.includes(photo) || sitsOnThePage(pixels, photo))
       .map(({ name, photo }) => toCard(name, { photo, wasFound: photos.includes(photo) }, pixels, fileName))
   }
@@ -89,6 +89,10 @@ async function withoutPaperMargins(image: Buffer): Promise<{ pixels: Pixels; pap
 
 function endsAtAPageBreak({ below }: Paper): boolean {
   return below > 0
+}
+
+function startsAtAPageBreak({ above }: Paper): boolean {
+  return above > 0
 }
 
 async function decode(image: Buffer): Promise<Pixels> {

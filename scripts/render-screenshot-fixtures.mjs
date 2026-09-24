@@ -106,7 +106,7 @@ function connectionsPage(list, seamAfter) {
     .tools span:last-child { border: 1px solid #999; border-radius: 4px; padding: 2px 40px 2px 8px; }
     .row { display: flex; align-items: flex-start; gap: 12px; padding: 7px 20px 7px 16px; border-bottom: 1px solid #eee; }
     .avatar { width: 72px; height: 72px; flex: none; }
-    .text { flex: 1; min-width: 0; line-height: 1.2; }
+    .text { flex: 1; min-width: 0; line-height: 1.2; padding-top: 12px; }
     .name { font-size: 16px; font-weight: 600; color: #191919; }
     .headline { font-size: 14px; color: #333; margin-top: 3px; }
     .connected { font-size: 13px; color: #666; margin-top: 1px; }

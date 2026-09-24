@@ -107,6 +107,22 @@ describe('reading a LinkedIn connections capture', () => {
 
     expect(cards.slice(-6).map((card) => card.displayName)).toEqual(['Lorenzo Ellery', 'Mireille Fairbanks', 'Niall Galloway', 'Odette Abernathy', 'Pavel Blackwood', 'Quentin Castellano'])
   }, 120_000)
+
+  it('keeps a whole name a page break passes just above, through the top of its photo, since no other page shows it', async () => {
+    const pageBelow = await printedOnAPage(fixture('Connections full page.png'), { top: justAboveSorenBlackwoodsName, height: 5600 - justAboveSorenBlackwoodsName })
+
+    const cards = await reader.readCards(pageBelow, 'page 2.png')
+
+    expect(cards[0].displayName).toBe('Soren Blackwood')
+  }, 120_000)
+
+  it('leaves a row whose photo the top of a screenshot cuts through to the screenshot before it', async () => {
+    const screenshot = await sharp(fixture('Connections full page.png')).extract({ left: 0, top: justAboveSorenBlackwoodsName, width: 1800, height: 1400 }).png().toBuffer()
+
+    const cards = await reader.readCards(screenshot, 'second.png')
+
+    expect(cards[0].displayName).toBe('Tamsin Castellano')
+  }, 120_000)
 })
 
 function printedOnAPage(capture: Buffer, { top, height }: { top: number; height: number }): Promise<Buffer> {
@@ -120,3 +136,4 @@ const belowSorenDrummondsName = 2270
 const throughTheFootOfSorenDrummondsName = 2258
 const throughTamsinEllerysName = 2450
 const throughTamsinEllerysPhoto = 2485
+const justAboveSorenBlackwoodsName = 1173
