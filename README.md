@@ -73,8 +73,6 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 > | `Cmd+-` | `Ctrl+-` | Zoom out one step (100 → 90 → 80 → 75 → 67 → 50 → 33%) |
 > | `Cmd+=` (or `Cmd++`) | `Ctrl+=` (or `Ctrl++`) | Zoom in one step |
 >
-> From 100%, pressing `Cmd+-` **four times** lands on **67%**. The browser briefly shows the zoom level in the address bar. Safari has no 67% step; use 75% there.
->
 > **The threshold:** each profile photo must be at least **40 pixels wide in the screenshot image**. On a Retina Mac that's about **50% zoom**; at 33% photos are ~30px and frames can't be read (tested: 0 of 5 frames read, and some names misread). On a non-Retina screen photos are half as many pixels, so stay at **100%** there.
 >
 > Any number of screenshots can be dropped at once; they're read one by one. Let each screenshot overlap the previous by a row or two so nobody is skipped; duplicates are filtered out.
