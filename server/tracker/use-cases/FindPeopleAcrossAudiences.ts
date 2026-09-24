@@ -1,6 +1,7 @@
-import type { CompanyHiring, HiringPeopleQuery, HiringPerson, NetworkSize, OpenToWorkPerson } from '../../../contracts/api.ts'
+import type { AllDashboard, CompanyHiring, HiringPeopleQuery, HiringPerson, NetworkSize, OpenToWorkPerson } from '../../../contracts/api.ts'
 import { countPeopleAcrossAudiences, mergeHiringPeople, mergeOpenToWorkPeople, type PeopleAcrossAudiences, pairAcrossAudiences } from '../domain/AcrossAudiences.ts'
-import { aggregateHiringCompanies, filterHiringPeople } from '../domain/HiringPeople.ts'
+import { aggregateHiringCompanies, filterHiringPeople, whoIsHiringAmong } from '../domain/HiringPeople.ts'
+import { summarizeLatestScansAcrossAudiences } from '../domain/LatestScansAcrossAudiences.ts'
 import type { NetworkIndex } from '../domain/NetworkIndex.ts'
 import { recentPeopleIds } from '../domain/NetworkSize.ts'
 import { listOpenToWorkPeople } from '../domain/OpenToWorkPeople.ts'
@@ -30,6 +31,13 @@ export const findPeopleAcrossAudiences = ({ followers, contacts }: AcrossAudienc
     allHiringPeople,
     findHiringPeople: (query: HiringPeopleQuery): { people: HiringPerson[] } => ({ people: filterHiringPeople(allHiringPeople(), query) }),
     listHiringCompanies: (): CompanyHiring => aggregateHiringCompanies(allHiringPeople()),
+    viewDashboard: (): AllDashboard => {
+      const both = bothAudiences()
+      return {
+        ...summarizeLatestScansAcrossAudiences(both.pairs, both.followers.index, both.contacts.index),
+        whoIsHiring: whoIsHiringAmong(mergeHiringPeople(both.pairs, both.followers.hiringPeople, both.contacts.hiringPeople)),
+      }
+    },
     measureNetworkSize: (): NetworkSize => {
       const both = bothAudiences()
       return {

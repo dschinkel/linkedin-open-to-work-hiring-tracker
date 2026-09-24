@@ -122,6 +122,17 @@ export const dashboardSchema = z.object({
 })
 export type Dashboard = z.infer<typeof dashboardSchema>
 
+export const allDashboardSchema = z.object({
+  latestScanDates: z.object({ followers: z.string().nullable(), contacts: z.string().nullable() }),
+  peopleCount: z.number(),
+  peopleByAudience: z.object({ followers: z.number(), contacts: z.number(), both: z.number() }),
+  openToWork: openToWorkSummarySchema.pick({ open: true, notOpen: true, uncertain: true, rate: true }),
+  hiring: hiringSummarySchema.pick({ hiring: true, notHiring: true, uncertain: true, rate: true, companyCount: true }),
+  latestQuality: scanQualitySchema.nullable(),
+  whoIsHiring: dashboardSchema.shape.whoIsHiring,
+})
+export type AllDashboard = z.infer<typeof allDashboardSchema>
+
 export const scanHistorySchema = z.object({ scans: z.array(scanSummarySchema) })
 export type ScanHistory = z.infer<typeof scanHistorySchema>
 

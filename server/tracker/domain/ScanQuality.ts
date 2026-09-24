@@ -1,23 +1,26 @@
 import type { ConfidenceBreakdown, ScanQuality } from '../../../contracts/api.ts'
 import { isReliableCompany } from '../../shared/domain/Company.ts'
 import type { NetworkIndex } from './NetworkIndex.ts'
-import { hiringSignal, type Observation, openToWorkSignal, type Scan, type Signal } from '../../shared/domain/Observation.ts'
+import { hiringSignal, type Observation, openToWorkSignal, type Person, type Scan, type Signal } from '../../shared/domain/Observation.ts'
 import { percentage } from './Rates.ts'
 
 export const highConfidence = 0.9
 
 export function scanQuality(scan: Scan, index: NetworkIndex): ScanQuality {
-  const observations = index.observationsOf(scan.id)
+  return qualityOfScans([scan], index.observationsOf(scan.id), index.personOf)
+}
+
+export function qualityOfScans(scans: Scan[], observations: Observation[], personOf: (personId: string) => Person): ScanQuality {
   const openToWork = confidenceBreakdown(observations, openToWorkSignal)
   return {
-    screenshotCount: scan.screenshots.length,
-    cardsDetected: scan.cardsDetected,
+    screenshotCount: sumOf(scans.map((scan) => scan.screenshots.length)),
+    cardsDetected: sumOf(scans.map((scan) => scan.cardsDetected)),
     uniquePeople: observations.length,
-    duplicateCount: scan.duplicateCount,
+    duplicateCount: sumOf(scans.map((scan) => scan.duplicateCount)),
     openToWork,
     hiring: confidenceBreakdown(observations, hiringSignal),
     classificationCoverage: percentage(observations.length - openToWork.uncertain, observations.length),
-    companyExtraction: companyExtractionAmongHiring(observations, index),
+    companyExtraction: companyExtractionAmongHiring(observations, personOf),
   }
 }
 
@@ -31,10 +34,10 @@ function confidenceBreakdown(observations: Observation[], signal: Signal): Confi
   }
 }
 
-function companyExtractionAmongHiring(observations: Observation[], index: NetworkIndex): ScanQuality['companyExtraction'] {
+function companyExtractionAmongHiring(observations: Observation[], personOf: (personId: string) => Person): ScanQuality['companyExtraction'] {
   const hiringPeople = observations
     .filter((observation) => hiringSignal.read(observation) === 'POSITIVE')
-    .map((observation) => index.personOf(observation.personId))
+    .map((observation) => personOf(observation.personId))
   const withCompany = hiringPeople.filter((person) => person.companyName !== null)
   const identified = withCompany.filter(isReliableCompany).length
   return {
@@ -42,4 +45,8 @@ function companyExtractionAmongHiring(observations: Observation[], index: Networ
     lowConfidence: withCompany.length - identified,
     notVisible: hiringPeople.length - withCompany.length,
   }
+}
+
+function sumOf(counts: number[]): number {
+  return counts.reduce((total, count) => total + count, 0)
 }

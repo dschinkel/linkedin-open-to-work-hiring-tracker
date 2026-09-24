@@ -5,6 +5,7 @@ import { DemoBanner } from '@/demo/DemoBanner'
 import { DemoInvite } from '@/demo/DemoInvite'
 import { ExitDemo } from '@/demo/ExitDemo'
 import { TrackerEnvironmentContext } from '@/shared-repositories/trackerEnvironment'
+import { ViewAllDashboard } from '@/use-cases/Dashboard/ViewAllDashboard'
 import { ViewDashboard } from '@/use-cases/Dashboard/ViewDashboard'
 import { FindDepartedPeople } from '@/use-cases/Departure/FindDepartedPeople'
 import { FindHiringPeople } from '@/use-cases/Hiring/FindHiringPeople'
@@ -55,7 +56,10 @@ export function Tracker({ mode, audience }: { mode: TrackerMode; audience: Audie
                 <Route path="settings" element={<EditSettings />} />
               </>
             ) : (
-              <Route path="*" element={<Navigate to={tracker.listsHome} replace />} />
+              <>
+                <Route index element={<ViewAllDashboard />} />
+                <Route path="*" element={<Navigate to={tracker.allHome} replace />} />
+              </>
             )}
           </Routes>
         </AppShell>

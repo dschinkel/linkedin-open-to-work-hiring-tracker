@@ -9,6 +9,7 @@ import { describeHiringPerson, describeHiringTiles, type HiringPersonRow } from 
 import { describeOpenToWorkTiles } from '../OpenToWork/describeOpenToWork'
 import { describeScanQuality, type QualitySection } from '../Scan/describeScanQuality'
 import { type DashboardRepository, dashboardRepositoryFor } from './DashboardRepository'
+import { linkTile } from './linkTile'
 
 export interface DashboardView {
   status: LoadStatus
@@ -60,10 +61,6 @@ const noDashboard: DashboardFields = {
   showInboxNote: false,
   scanReminder: '',
   showScanReminder: false,
-}
-
-function linkTile(tiles: StatTileView[], label: string, href: string): StatTileView[] {
-  return tiles.map((tile) => (tile.label === label ? { ...tile, href } : tile))
 }
 
 function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {

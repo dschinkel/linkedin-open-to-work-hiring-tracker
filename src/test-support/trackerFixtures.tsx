@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import type {
+  AllDashboard,
   AudienceChoice,
   Dashboard,
   DepartedPerson,
@@ -156,6 +157,19 @@ export function dashboard(overrides: Partial<Dashboard> = {}): Dashboard {
     latestScan: scanSummary(),
     latestQuality: scanQuality(),
     whoIsHiring: { peopleCount: 46, companyCount: 31, preview: [hiringPerson()] },
+    ...overrides,
+  }
+}
+
+export function allDashboard(overrides: Partial<AllDashboard> = {}): AllDashboard {
+  return {
+    latestScanDates: { followers: '2026-09-22', contacts: '2026-09-21' },
+    peopleCount: 1_500,
+    peopleByAudience: { followers: 994, contacts: 592, both: 86 },
+    openToWork: { open: 140, notOpen: 1_352, uncertain: 8, rate: 9.3834 },
+    hiring: { hiring: 61, notHiring: 1_431, uncertain: 8, rate: 4.0885, companyCount: 44 },
+    latestQuality: scanQuality(),
+    whoIsHiring: { peopleCount: 61, companyCount: 44, preview: [hiringPerson({ seenIn: 'both' })] },
     ...overrides,
   }
 }

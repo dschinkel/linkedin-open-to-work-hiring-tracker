@@ -19,7 +19,7 @@ export interface TrackerView {
   navItems: NavItem[]
   audienceLinks: SegmentLink[]
   showsEveryPage: boolean
-  listsHome: string
+  allHome: string
   subtitle: string
   demoSampleDescription: string
   logoSrc: string
@@ -40,6 +40,8 @@ const pages = [
 ]
 
 const listPages = ['/open-to-work', '/hiring']
+
+const pagesUnderAll = ['', ...listPages]
 
 const audienceToggle: Array<{ audience: AudienceChoice; label: string }> = [
   { audience: 'all', label: 'All' },
@@ -67,7 +69,7 @@ export function useTracker(mode: TrackerMode, audience: AudienceChoice): Tracker
     navItems: navItemsUnder(environment.routeBase, audience),
     audienceLinks: audienceLinksFrom(location.pathname, environment, sizeByAudience),
     showsEveryPage: audience !== 'all',
-    listsHome: `${environment.routeBase}${listPages[0]}`,
+    allHome: environment.routeBase,
     subtitle,
     demoSampleDescription: `${describeDemoSample(audience)} and 180 days of made-up scans ending Sep 22, 2026.`,
     logoSrc: `${import.meta.env.BASE_URL}logo-animated.svg`,
@@ -97,7 +99,7 @@ function navItemsUnder(routeBase: string, audience: AudienceChoice): NavItem[] {
   const departurePage = { path: '/departed', label: departureTitles[audience] }
   const afterHiring = pages.findIndex((page) => page.path === '/hiring') + 1
   const withDeparture = [...pages.slice(0, afterHiring), departurePage, ...pages.slice(afterHiring)]
-  const shown = audience === 'all' ? withDeparture.filter((page) => listPages.includes(page.path)) : withDeparture
+  const shown = audience === 'all' ? withDeparture.filter((page) => pagesUnderAll.includes(page.path)) : withDeparture
   return shown.map((page) => ({ to: `${routeBase}${page.path}`, label: page.label, isExact: page.path === '' }))
 }
 
@@ -114,5 +116,5 @@ function audienceLinksFrom(pathname: string, environment: TrackerEnvironment, si
 
 function pageFor(audience: AudienceChoice, page: string): string {
   if (audience !== 'all') return page
-  return listPages.find((listPage) => page === listPage || page.startsWith(`${listPage}/`)) ?? listPages[0]
+  return listPages.find((listPage) => page === listPage || page.startsWith(`${listPage}/`)) ?? ''
 }

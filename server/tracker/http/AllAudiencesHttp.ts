@@ -1,9 +1,10 @@
 import { z } from 'zod'
-import type { CompanyHiring, HiringPeopleQuery, HiringPerson, NetworkSize, OpenToWorkPerson, SaveSnapshotRequest, Snapshot, SnapshotKind, SnapshotList, SnapshotSummary } from '../../../contracts/api.ts'
+import type { AllDashboard, CompanyHiring, HiringPeopleQuery, HiringPerson, NetworkSize, OpenToWorkPerson, SaveSnapshotRequest, Snapshot, SnapshotKind, SnapshotList, SnapshotSummary } from '../../../contracts/api.ts'
 import { hiringPeopleQuerySchema, saveSnapshotRequestSchema, snapshotKindSchema } from '../../../contracts/api.ts'
 import { type ApiRequest, type ApiResponse, ok, orNotFound, type Route } from '../../app/HttpRouting.ts'
 
 export interface AllAudiencesUseCases {
+  viewDashboard: () => AllDashboard
   findOpenToWorkPeople: () => { people: OpenToWorkPerson[] }
   findHiringPeople: (query: HiringPeopleQuery) => { people: HiringPerson[] }
   listHiringCompanies: () => CompanyHiring
@@ -17,6 +18,7 @@ export interface AllAudiencesUseCases {
 const kindQuery = z.object({ kind: snapshotKindSchema })
 
 export const allAudiencesRoutes = (useCases: AllAudiencesUseCases): Route[] => [
+  { method: 'GET', pattern: /^\/api\/dashboard$/, respond: () => ok(useCases.viewDashboard()) },
   { method: 'GET', pattern: /^\/api\/open-to-work\/people$/, respond: () => ok(useCases.findOpenToWorkPeople()) },
   { method: 'GET', pattern: /^\/api\/hiring\/people$/, respond: (request) => ok(useCases.findHiringPeople(hiringPeopleQuerySchema.parse(request.query))) },
   { method: 'GET', pattern: /^\/api\/hiring\/companies$/, respond: () => ok(useCases.listHiringCompanies()) },

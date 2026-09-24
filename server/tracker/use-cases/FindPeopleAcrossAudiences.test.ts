@@ -1,4 +1,4 @@
-import { companyHiringSchema, hiringPeopleSchema, networkSizeSchema, openToWorkPeopleSchema, snapshotListSchema, snapshotSchema, snapshotSummarySchema } from '../../../contracts/api.ts'
+import { allDashboardSchema, companyHiringSchema, hiringPeopleSchema, networkSizeSchema, openToWorkPeopleSchema, snapshotListSchema, snapshotSchema, snapshotSummarySchema } from '../../../contracts/api.ts'
 import { allAudiencesTrackerRoutes } from '../../app/AllAudiencesTracker.ts'
 import { answerRequest } from '../../app/HttpRouting.ts'
 import type { Network, Person, Scan } from '../../shared/domain/Observation.ts'
@@ -131,9 +131,35 @@ describe('snapshots of the merged lists', () => {
   })
 })
 
+describe('dashboard of both audiences together', () => {
+  it('counts the people of both latest scans once each', async () => {
+    const { call } = allAudiences()
+    const dashboard = allDashboardSchema.parse((await call('GET', '/api/dashboard')).body)
+    expect([dashboard.peopleCount, dashboard.peopleByAudience]).toEqual([3, { followers: 2, contacts: 2, both: 1 }])
+  })
+
+  it('rates open to work and hiring over those people', async () => {
+    const { call } = allAudiences()
+    const dashboard = allDashboardSchema.parse((await call('GET', '/api/dashboard')).body)
+    expect([dashboard.openToWork.open, dashboard.hiring.hiring, dashboard.hiring.companyCount]).toEqual([2, 2, 2])
+  })
+
+  it('dates the latest scan of each audience', async () => {
+    const { call } = allAudiences()
+    const dashboard = allDashboardSchema.parse((await call('GET', '/api/dashboard')).body)
+    expect(dashboard.latestScanDates).toEqual({ followers: '2026-09-22', contacts: '2026-09-21' })
+  })
+
+  it('previews the merged list of people hiring', async () => {
+    const { call } = allAudiences()
+    const { whoIsHiring } = allDashboardSchema.parse((await call('GET', '/api/dashboard')).body)
+    expect([whoIsHiring.peopleCount, whoIsHiring.companyCount, whoIsHiring.preview.map((person) => person.seenIn)]).toEqual([2, 2, ['followers', 'both']])
+  })
+})
+
 describe('pages that belong to one audience', () => {
   it('are not answered for both audiences together', async () => {
     const { call } = allAudiences()
-    expect((await call('GET', '/api/dashboard')).status).toBe(404)
+    expect((await call('GET', '/api/trends')).status).toBe(404)
   })
 })

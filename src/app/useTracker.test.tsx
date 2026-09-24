@@ -43,17 +43,18 @@ describe('tracker navigation', () => {
     expect(result.current.navItems.map((item) => item.to)).toEqual(['/contacts', '/contacts/trends', '/contacts/open-to-work', '/contacts/hiring', '/contacts/departed', '/contacts/scans', '/contacts/settings'])
   })
 
-  it('offers only the Open to Work and Hiring lists for all audiences together', () => {
+  it('offers the dashboard and the Open to Work and Hiring lists for all audiences together', () => {
     const { result } = renderTracker('live', 'all', '/all/hiring')
-    expect(result.current.navItems.map((item) => [item.label, item.to])).toEqual([
-      ['Open to Work', '/all/open-to-work'],
-      ['Hiring', '/all/hiring'],
+    expect(result.current.navItems.map((item) => [item.label, item.to, item.isExact])).toEqual([
+      ['Dashboard', '/all', true],
+      ['Open to Work', '/all/open-to-work', false],
+      ['Hiring', '/all/hiring', false],
     ])
   })
 
-  it('sends any other page of all audiences together to the Open to Work list', () => {
+  it('sends any other page of all audiences together to their dashboard', () => {
     const { result } = renderTracker('demo', 'all', '/demo/all/trends')
-    expect(result.current).toMatchObject({ showsEveryPage: false, listsHome: '/demo/all/open-to-work' })
+    expect(result.current).toMatchObject({ showsEveryPage: false, allHome: '/demo/all' })
   })
 
   it('shows every page for a single audience', () => {
@@ -97,9 +98,19 @@ describe('followers and contacts toggle', () => {
     expect(result.current.audienceLinks[0].to).toBe('/all/hiring')
   })
 
-  it('opens the Open to Work list when switching to all audiences from a page they do not have', () => {
+  it('opens the dashboard when switching to all audiences from a page they do not have', () => {
     const { result } = renderTracker('demo', 'followers', '/demo/followers/trends')
-    expect(result.current.audienceLinks[0].to).toBe('/demo/all/open-to-work')
+    expect(result.current.audienceLinks[0].to).toBe('/demo/all')
+  })
+
+  it('keeps the dashboard when switching to all audiences from the dashboard', () => {
+    const { result } = renderTracker('live', 'contacts', '/contacts')
+    expect(result.current.audienceLinks[0].to).toBe('/all')
+  })
+
+  it('keeps the dashboard when switching from all audiences to one', () => {
+    const { result } = renderTracker('demo', 'all', '/demo/all')
+    expect(result.current.audienceLinks.map((link) => link.to)).toEqual(['/demo/all', '/demo/followers', '/demo/contacts'])
   })
 
   it('keeps the list being viewed when switching from all audiences to one', () => {

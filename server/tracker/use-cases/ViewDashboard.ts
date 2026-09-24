@@ -1,10 +1,8 @@
 import type { Dashboard, Settings } from '../../../contracts/api.ts'
 import { daysBetween } from '../../shared/domain/ScanDate.ts'
-import { aggregateHiringCompanies, filterHiringPeople } from '../domain/HiringPeople.ts'
+import { whoIsHiringAmong } from '../domain/HiringPeople.ts'
 import { scanQuality } from '../domain/ScanQuality.ts'
 import type { Analytics, TrackerPorts } from '../domain/TrackerAnalytics.ts'
-
-const whoIsHiringPreviewSize = 6
 
 export const viewDashboard = ({ analytics, trackerStore, today }: TrackerPorts) => ({
   viewDashboard: (): Dashboard => ({
@@ -15,17 +13,12 @@ export const viewDashboard = ({ analytics, trackerStore, today }: TrackerPorts) 
 
 function dashboardOf({ index, timeline, hiringPeople }: Analytics, inboxWaitingCount: number): Omit<Dashboard, 'scanReminder'> {
   const latestScan = index.scansInOrder.at(-1)
-  const currentlyHiring = filterHiringPeople(hiringPeople, { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' })
   return {
     scanCount: timeline.length,
     inboxWaitingCount,
     latestScan: timeline.at(-1) ?? null,
     latestQuality: latestScan ? scanQuality(latestScan, index) : null,
-    whoIsHiring: {
-      peopleCount: currentlyHiring.length,
-      companyCount: aggregateHiringCompanies(hiringPeople).companies.length,
-      preview: currentlyHiring.slice(0, whoIsHiringPreviewSize),
-    },
+    whoIsHiring: whoIsHiringAmong(hiringPeople),
   }
 }
 

@@ -2,7 +2,7 @@ import type { HiringSummary, OpenToWorkSummary, ScanSummary } from '../../../con
 import { isReliableCompany, normalizeCompanyName } from '../../shared/domain/Company.ts'
 import { matchedCohort } from './MatchedCohort.ts'
 import type { NetworkIndex } from './NetworkIndex.ts'
-import { hiringSignal, openToWorkSignal, type Observation, type Scan } from '../../shared/domain/Observation.ts'
+import { hiringSignal, openToWorkSignal, type Observation, type Person, type Scan } from '../../shared/domain/Observation.ts'
 import { countSignal, entryExitRatio, percentagePointChange, publicRate } from './Rates.ts'
 import { addDays } from '../../shared/domain/ScanDate.ts'
 import {
@@ -84,7 +84,7 @@ function summarizeHiring(observations: Observation[], index: NetworkIndex, state
     added: tally.added,
     removed: tally.removed,
     net: netMovement(tally),
-    companyCount: countHiringCompanies(observations, index),
+    companyCount: countHiringCompanies(observations, index.personOf),
     hasComparablePrior: hasComparablePrior(tally),
   }
 }
@@ -95,10 +95,10 @@ function rateSevenDaysBefore(scanDate: string, earlierSummaries: ScanSummary[]):
   return candidates.at(-1)?.openToWork.rate ?? null
 }
 
-function countHiringCompanies(observations: Observation[], index: NetworkIndex): number {
+export function countHiringCompanies(observations: Observation[], personOf: (personId: string) => Person): number {
   const companies = observations
     .filter((observation) => hiringSignal.read(observation) === 'POSITIVE')
-    .map((observation) => index.personOf(observation.personId))
+    .map((observation) => personOf(observation.personId))
     .filter(isReliableCompany)
     .map((person) => normalizeCompanyName(person.companyName as string))
   return new Set(companies).size

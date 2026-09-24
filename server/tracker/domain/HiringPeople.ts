@@ -1,4 +1,4 @@
-import type { CompanyHiring, HiringPeopleQuery, HiringPerson, HiringSort } from '../../../contracts/api.ts'
+import type { CompanyHiring, Dashboard, HiringPeopleQuery, HiringPerson, HiringSort } from '../../../contracts/api.ts'
 import { isReliableCompany, normalizeCompanyName } from '../../shared/domain/Company.ts'
 import type { NetworkIndex } from './NetworkIndex.ts'
 import { hiringSignal, type Person, type SignalStatus } from '../../shared/domain/Observation.ts'
@@ -11,6 +11,17 @@ interface HiringHistory {
   lastSeenHiring: string | null
   lastSeen: string
   latestClassifiedStatus: SignalStatus
+}
+
+const whoIsHiringPreviewSize = 6
+
+export function whoIsHiringAmong(hiringPeople: HiringPerson[]): Dashboard['whoIsHiring'] {
+  const currentlyHiring = filterHiringPeople(hiringPeople, { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' })
+  return {
+    peopleCount: currentlyHiring.length,
+    companyCount: aggregateHiringCompanies(hiringPeople).companies.length,
+    preview: currentlyHiring.slice(0, whoIsHiringPreviewSize),
+  }
 }
 
 export function listHiringPeople(index: NetworkIndex): HiringPerson[] {
