@@ -38,7 +38,7 @@ export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, h
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 pb-4 sm:mt-6 sm:pb-5 lg:flex-nowrap lg:gap-x-3">
             {toggle}
-            <nav className="-mx-4 flex min-w-0 flex-1 basis-full gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 text-label whitespace-nowrap sm:mx-0 sm:basis-auto sm:px-0">
+            <nav className="-mx-4 flex min-w-0 flex-1 basis-full gap-0 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 text-label whitespace-nowrap sm:mx-0 sm:basis-auto sm:px-0">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}

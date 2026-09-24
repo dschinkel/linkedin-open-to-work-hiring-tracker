@@ -145,8 +145,8 @@
   --animate-invite-pulse: invite-pulse 1.8s ease-out 0.4s 5;
   --animate-upload-progress: upload-progress 2.4s ease-in-out infinite;
   --animate-rainbow-flow: rainbow-flow 2.5s linear infinite;
-  --animate-holo-drift: holo-drift 4.7s ease-in-out infinite alternate;
-  --animate-holo-sheen: holo-sheen 3.1s ease-in-out infinite alternate;
+  --animate-holo-drift: holo-drift 2.9s ease-in-out infinite alternate;
+  --animate-holo-sheen: holo-sheen 1.9s ease-in-out infinite alternate;
   --animate-rainbow-slide: rainbow-slide 4s linear infinite;
 
   @keyframes ring-draw {

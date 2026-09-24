@@ -16,7 +16,7 @@
 
 @utility rainbow-fill {
   @apply animate-holo-drift bg-size-[160%_160%] motion-reduce:animate-none;
-  background-image: linear-gradient(115deg, #c23a3a, #cf6f1c, #c8a21a, #2f9a48, #2379c0, #5d42c2, #b23f8f, #c23a3a);
+  background-image: linear-gradient(115deg, #e8202c, #f56a00, #f0b800, #10bf4a, #0a84ff, #6b3cff, #e0239c, #e8202c);
 }
 
 @utility holo-sheen {

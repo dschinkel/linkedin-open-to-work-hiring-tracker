@@ -18,7 +18,7 @@ export function GitHubLink() {
             target="_blank"
             rel="noreferrer"
             aria-label="Source code on GitHub"
-            className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-11 border-0 hover:bg-transparent aria-expanded:bg-transparent')}
+            className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), '-my-2 size-14 border-0 hover:bg-transparent aria-expanded:bg-transparent')}
           />
         }
       >
@@ -49,7 +49,7 @@ const octocat = `url("data:image/svg+xml,${encodeURIComponent('<svg xmlns="http:
 
 function GitHubMark() {
   return (
-    <span aria-hidden className="relative size-10">
+    <span aria-hidden className="relative size-13">
       <span className="rainbow-fill absolute inset-0" style={{ maskImage: octocat, WebkitMaskImage: octocat, maskSize: 'contain', WebkitMaskSize: 'contain' }}>
         <span className="holo-sheen absolute inset-0" />
       </span>
