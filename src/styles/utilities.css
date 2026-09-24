@@ -29,7 +29,7 @@
   stroke-width: 0.55;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 14 86;
+  stroke-dasharray: 88 12;
   filter: drop-shadow(0 0 0.6px var(--prompt));
 }
 
