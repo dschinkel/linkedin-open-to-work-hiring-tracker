@@ -75,10 +75,10 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 ### Easiest: GoFullPage (Chrome or Brave) <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle">
 
 1. Install [GoFullPage – Full Page Screen Capture](https://chromewebstore.google.com/detail/gofullpage-full-page-scre/fdpohaocaechififmbbbbbknoalclacl) in Chrome or Brave.
-2. Open the list you track (connections or followers, see the table above).
-3. Scroll down until everyone you want to track has loaded.
-4. Click the GoFullPage icon (or press `Alt+Shift+P`). It captures the whole scrolled page as a single image.
-5. Download the screenshot as a PNG or better, just one PDF, and drag onto the **drop box** on that dashboard.
+2. Open the list you track (connections or followers) and scroll down till you've hit the bottom of that list
+3. Scroll down until everyone you want to track has loaded
+4. Click the GoFullPage icon (or press `Alt+Shift+P`). It captures the whole scrolled page as a single image
+5. Download the screenshot as a PNG or better, just one PDF, and drag onto the **drop box** on that dashboard
 
 GoFullPage file names include the date (for example `screencapture-linkedin-com-mynetwork-2026-09-22-09_01_12.png`), and the app uses that date for the scan.
 

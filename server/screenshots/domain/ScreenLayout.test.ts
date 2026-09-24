@@ -93,6 +93,13 @@ describe('reading a list whose rows sit close together, like Connections', () =>
     expect(readNameStrip(connections, pitch, photosAt(58, 142)).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing'])
   })
 
+  it('keeps a name an emoji moved right, below a stitching seam that moved the rows below it left of the list edge', () => {
+    const aboveTheSeam = [word('Ada', 100, 60), word('Lovelace', 140, 60), word('Mathematician', 100, 82), word('Alan', 100, 160), word('Turing', 145, 160), word('Codebreaker', 100, 182)]
+    const belowTheSeam = [word('Grace', 116, 260), word('Hopper', 166, 260), word('Admiral', 88, 282), word('Katherine', 88, 360), word('Johnson', 170, 360), word('Mathematician', 88, 382), word('Mary', 88, 460), word('Jackson', 130, 460), word('Engineer', 88, 482)]
+
+    expect(readNameStrip([...aboveTheSeam, ...belowTheSeam], pitch).map((person) => person.displayName)).toContain('Grace Hopper')
+  })
+
   it('never takes the date a connection was made for their title', () => {
     const noTitle = [word('Grace', 100, 60), word('Hopper', 150, 60), word('Connected', 100, 80), word('on', 190, 80), word('June', 215, 80), word('3,', 255, 80), word('2018', 275, 80)]
 

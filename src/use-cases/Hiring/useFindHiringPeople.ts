@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
-import type { CompanyHiring, CompanyKnownFilter, HiringPeopleQuery, HiringPerson, HiringStatusFilter } from '@contracts/api'
+import type { CompanyHiring, CompanyKnownFilter, HiringPeopleQuery, HiringPerson, HiringSnapshot, HiringStatusFilter, Snapshot } from '@contracts/api'
 import type { LoadStatus } from '@/components/AsyncContent'
 import type { DataColumn, DataRow } from '@/components/DataTable'
 import type { DefinitionRow } from '@/components/DefinitionList'
@@ -10,7 +10,9 @@ import { type ExportListView, useExportList } from '@/shared-exports/useExportLi
 import { formatPeople } from '@/shared-formatting/formatMetric'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
-import { type SortedRows, useSortedRows } from '@/shared-state/useSortedRows'
+import { type SortedRows, sortRows, useSortedRows } from '@/shared-state/useSortedRows'
+import type { SnapshotRepository } from '@/use-cases/Snapshots/SnapshotRepository'
+import { type KeepSnapshotsView, useKeepSnapshots } from '@/use-cases/Snapshots/useKeepSnapshots'
 import { describeHiringPerson } from './describeHiring'
 import { type HiringRepository, hiringRepositoryFor } from './HiringRepository'
 
@@ -28,8 +30,12 @@ export interface HiringPeopleView extends SortedRows {
   hasPeople: boolean
   showNoMatches: boolean
   companyRows: DefinitionRow[]
-  /** Saves the list as shown: current filters and sort, same columns. */
+  /** While a snapshot is on show its saved status and company-visibility filters apply and cannot be changed. */
+  areSavedFiltersLocked: boolean
+  /** Saves the list as shown: current filters and sort, same columns. A snapshot on show is exported as that snapshot. */
   exporting: ExportListView
+  /** Saved copies of this list, with the filters they were taken with; one can be shown in place of the current list. */
+  snapshots: KeepSnapshotsView
 }
 
 const statusOptions: PickerOption<HiringStatusFilter>[] = [
@@ -54,25 +60,31 @@ const columns: DataColumn[] = [
   { key: 'recency', label: 'Recency' },
 ]
 
+const initialSort = { key: 'lastSeen', direction: 'desc' } as const
+const hiringList = { slug: 'hiring', title: 'Hiring' }
+
 const initialFilters: HiringPeopleQuery = { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' }
 
-/** Who's Hiring: searchable, filterable list of people seen with the public #HIRING frame. */
-export function useFindHiringPeople(injectedRepository?: HiringRepository, exporter?: ListExporter): HiringPeopleView {
+/** Who's Hiring: searchable, filterable list of people seen with the public #HIRING frame, now or in a saved snapshot. */
+export function useFindHiringPeople(injectedRepository?: HiringRepository, exporter?: ListExporter, snapshotRepository?: SnapshotRepository): HiringPeopleView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? hiringRepositoryFor(api)
   const [filters, setFilters] = useState<HiringPeopleQuery>(initialFilters)
   const people = useQuery({ queryKey: ['hiring-people', filters], queryFn: () => repository.people(filters), placeholderData: keepPreviousData })
   const companies = useQuery({ queryKey: ['hiring-companies'], queryFn: repository.companies })
-  const table = useSortedRows(columns, (people.data ?? []).map(toTableRow), { key: 'lastSeen', direction: 'desc' })
-  const exporting = useExportList(() => ({ list: { slug: 'hiring', title: 'Hiring' }, date: localToday(), ...exportTableOf(table.columns, table.rows) }), exporter)
+  const snapshots = useKeepSnapshots({ kind: 'hiring', list: hiringList, filters, tableOf: tableOfSnapshot }, snapshotRepository, exporter)
+  const viewed = hiringSnapshotIn(snapshots.viewedSnapshot)
+  const rows = viewed ? rowsOfSnapshot(viewed, viewed.people.filter((person) => matchesTextFilters(person, filters))) : (people.data ?? []).map((person) => toTableRow(person))
+  const table = useSortedRows(columns, rows, initialSort)
+  const exporting = useExportList(() => ({ ...(snapshots.viewedExportName ?? { list: hiringList, date: localToday() }), ...exportTableOf(table.columns, table.rows) }), exporter)
 
   function updateFilter<Key extends keyof HiringPeopleQuery>(key: Key) {
     return (value: HiringPeopleQuery[Key]) => setFilters((current) => ({ ...current, [key]: value }))
   }
 
   return {
-    ...loadStatusOf(people),
-    filters,
+    ...(snapshots.isViewingSnapshot ? snapshots.viewedStatus : loadStatusOf(people)),
+    filters: viewed ? { ...viewed.filters, search: filters.search, company: filters.company } : filters,
     searchByName: updateFilter('search'),
     filterByCompany: updateFilter('company'),
     filterByStatus: updateFilter('status'),
@@ -84,12 +96,37 @@ export function useFindHiringPeople(injectedRepository?: HiringRepository, expor
     showNoMatches: table.rows.length === 0,
     ...table,
     companyRows: describeCompanies(companies.data),
+    areSavedFiltersLocked: snapshots.isViewingSnapshot,
     exporting,
+    snapshots,
   }
 }
 
-function toTableRow(person: HiringPerson): DataRow {
-  const row = describeHiringPerson(person)
+function hiringSnapshotIn(snapshot: Snapshot | null): HiringSnapshot | null {
+  return snapshot?.kind === 'hiring' ? snapshot : null
+}
+
+/** Recency is told as of the day the snapshot was saved, not today. */
+function rowsOfSnapshot(snapshot: HiringSnapshot, people: HiringPerson[] = snapshot.people): DataRow[] {
+  return people.map((person) => toTableRow(person, new Date(snapshot.createdAt)))
+}
+
+function tableOfSnapshot(snapshot: Snapshot) {
+  const hiring = hiringSnapshotIn(snapshot)
+  return exportTableOf(columns, sortRows(hiring ? rowsOfSnapshot(hiring) : [], initialSort))
+}
+
+/** The name and company boxes narrow a snapshot on show, as the server narrows the current list. */
+function matchesTextFilters(person: HiringPerson, { search, company }: HiringPeopleQuery): boolean {
+  return includesText(person.displayName, search) && includesText(person.companyName, company)
+}
+
+function includesText(value: string | null, wanted: string): boolean {
+  return (value ?? '').toLowerCase().includes(wanted.trim().toLowerCase())
+}
+
+function toTableRow(person: HiringPerson, today?: Date): DataRow {
+  const row = describeHiringPerson(person, today)
   return {
     id: row.personId,
     isMuted: row.isStale,

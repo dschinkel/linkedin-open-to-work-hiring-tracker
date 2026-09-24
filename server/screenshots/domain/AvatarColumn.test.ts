@@ -55,12 +55,18 @@ describe('telling a whole row from one cut by the top of the image', () => {
   })
 })
 
-/** A capture of the page alone with dark round photos, radius 20, down one column. */
-function listWithPhotosAt(centres: number[]) {
+/**
+ * A capture of the page alone with dark round photos, radius 20, down one column. A photo taken against a white wall
+ * blends into the page where the wall shows: here its upper-left quarter.
+ */
+function listWithPhotosAt(centres: number[], againstAWhiteWall: number[] = []) {
   const page = browserShowingAList(0)
   for (const centreY of centres) {
     for (let y = Math.max(0, centreY - 20); y < Math.min(page.height, centreY + 20); y += 1) {
-      for (let x = 80; x < 120; x += 1) if ((x - 100) ** 2 + (y - centreY) ** 2 <= 400) page.data.set([60, 60, 60, 255], (y * page.width + x) * 4)
+      for (let x = 80; x < 120; x += 1) {
+        const wallShows = againstAWhiteWall.includes(centreY) && x < 100 && y < centreY
+        if ((x - 100) ** 2 + (y - centreY) ** 2 <= 400 && !wallShows) page.data.set([60, 60, 60, 255], (y * page.width + x) * 4)
+      }
     }
   }
   return page
@@ -71,6 +77,10 @@ describe('finding the column of photos', () => {
     const photos = findAvatarColumn(listWithPhotosAt([100, 185, 270, 386]))
 
     expect(photos.map((photo) => [Math.round(photo.centreY), Math.round(photo.radius)])).toEqual([[100, 20], [185, 20], [270, 20], [386, 20]])
+  })
+
+  it('finds a photo whose white background blends into the page, by its height and place in the column', () => {
+    expect(findAvatarColumn(listWithPhotosAt([100, 185, 270], [185])).map((photo) => Math.round(photo.centreY))).toEqual([100, 185, 270])
   })
 
   it('places a photo cut by the top of the image where its whole circle would be', () => {
