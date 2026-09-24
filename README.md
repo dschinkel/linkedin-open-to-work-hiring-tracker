@@ -132,13 +132,11 @@ Everything is in **`data/linkedin.sqlite`**, one file on your computer, created 
 | `screenshots` | Every screenshot added: waiting, imported, or failed (and why) |
 | `settings` | Your Settings choices |
 
-Followers and Connections share the file but never mix. It survives restarts and updates, but **git doesn't back it up**: copy `data/linkedin.sqlite` somewhere safe now and then (or let Time Machine do it). Open it with any SQLite tool, e.g. `sqlite3 data/linkedin.sqlite`.
-
 ---
 
 ## Pages
 
-Each page exists for **Followers** and **Connections**; the header toggle switches between them and keeps you on the same page.
+Each page exists for **Followers** and **Connections**; the header toggle switches between them.
 
 <img src="https://img.shields.io/badge/Dashboard-2ea043?style=flat-square" alt="Dashboard" align="absmiddle"> latest numbers, rate trend, entry vs removal, who's hiring, scan quality, daily history, and the screenshot drop box.
 
