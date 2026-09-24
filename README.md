@@ -31,12 +31,12 @@ Next, grab a [screenshot](#taking-screenshots-required) of your followers or con
 
 | Command | What it does |
 |---|---|
-| `pnpm dev` | App, API, database, and inbox watchers, with live reload |
-| `pnpm server` | Just the API on port 3001 (headless, for scripts) |
-| `pnpm test` | All tests: React hooks and views, analytics, the screenshot reader, SQLite, and headless HTTP tests of the Koa server |
-| `pnpm typecheck` | TypeScript check |
-| `pnpm lint` | oxlint |
-| `pnpm build` | Production build |
+| <code>pnpm&nbsp;dev</code> | App, API, database, and inbox watchers, with live reload |
+| <code>pnpm&nbsp;server</code> | Just the API on port 3001 (headless, for scripts) |
+| <code>pnpm&nbsp;test</code> | All tests: React hooks and views, analytics, the screenshot reader, SQLite, and headless HTTP tests of the Koa server |
+| <code>pnpm&nbsp;typecheck</code> | TypeScript check |
+| <code>pnpm&nbsp;lint</code> | oxlint |
+| <code>pnpm&nbsp;build</code> | Production build |
 
 ---
 
