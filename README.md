@@ -48,7 +48,7 @@ The app never logs into LinkedIn, crawls profiles, or automates your browser. **
 
 ### Followers or connections: pick what you track
 
-It's up to you whether you gauge your **followers** or your **connections**, or both. The app keeps them as two **separate dashboards**, and the **Followers / Connections** toggle in the header switches between them. Each has its own trends, hiring list, scans, settings, and inbox folder:
+It's up to you whether you gauge your **followers** or your **connections**, or both. The app keeps them as two **separate dashboards**.
 
 | Dashboard | Screenshot this LinkedIn list | Inbox folder |
 |---|---|---|
