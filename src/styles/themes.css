@@ -93,6 +93,8 @@
 }
 
 [data-theme='green'] {
+  --scheme-tag: #3d7a0c;
+  --scheme-on-tag: #ffffff;
   --scheme-page: #e7f5e2;
   --scheme-page-glow: #cbeabf;
   --scheme-panel: #f7fdf6;
@@ -128,6 +130,8 @@
 }
 
 [data-theme='aqua'] {
+  --scheme-tag: #0a7178;
+  --scheme-on-tag: #ffffff;
   --scheme-page: #def5f5;
   --scheme-page-glow: #bdeaea;
   --scheme-panel: #f4fdfd;
@@ -198,6 +202,8 @@
 }
 
 [data-theme='orange'] {
+  --scheme-tag: #b3500c;
+  --scheme-on-tag: #ffffff;
   --scheme-page: #fdeee0;
   --scheme-page-glow: #f9d6b4;
   --scheme-panel: #fffaf5;

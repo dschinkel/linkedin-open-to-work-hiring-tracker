@@ -38,6 +38,8 @@
   --prompt: var(--scheme-accent);
   --prompt-fill: var(--scheme-accent-fill);
   --prompt-foreground: var(--scheme-on-accent);
+  --tag: var(--scheme-tag, var(--scheme-accent-fill));
+  --tag-foreground: var(--scheme-on-tag, var(--scheme-on-accent));
   --open-to-work: var(--scheme-open-to-work);
   --open-to-work-soft: var(--scheme-open-to-work-soft);
   --hiring: var(--scheme-hiring);
@@ -83,6 +85,8 @@
   --color-prompt: var(--prompt);
   --color-prompt-fill: var(--prompt-fill);
   --color-prompt-foreground: var(--prompt-foreground);
+  --color-tag: var(--tag);
+  --color-tag-foreground: var(--tag-foreground);
   --color-open-to-work: var(--open-to-work);
   --color-open-to-work-soft: var(--open-to-work-soft);
   --color-hiring: var(--hiring);
