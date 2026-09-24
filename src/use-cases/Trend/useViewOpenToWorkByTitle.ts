@@ -17,7 +17,6 @@ export interface OpenToWorkByTitleView {
   rows: DataRow[]
 }
 
-/** Open-to-Work rate per job title family over time, with how many people that covers. */
 export function useViewOpenToWorkByTitle(timeWindow: TimeWindow, injectedRepository?: TrendRepository): OpenToWorkByTitleView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? trendRepositoryFor(api)

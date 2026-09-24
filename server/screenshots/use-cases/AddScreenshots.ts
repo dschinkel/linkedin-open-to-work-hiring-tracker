@@ -12,7 +12,6 @@ interface AddScreenshotsPorts {
 
 type ScreenshotFile = AddScreenshotsRequest['files'][number]
 
-/** Stores each acceptable screenshot once, then analyzes straight away. Anything seen before is skipped. */
 export const addScreenshots = ({ inboxFolder, trackerStore, analyzeWaitingScreenshots }: AddScreenshotsPorts) => {
   const addOne = async (file: ScreenshotFile, result: AddScreenshotsResult): Promise<void> => {
     const name = acceptedScreenshotName(file.fileName)

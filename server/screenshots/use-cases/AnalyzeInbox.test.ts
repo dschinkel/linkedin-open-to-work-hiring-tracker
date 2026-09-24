@@ -19,7 +19,6 @@ function card(displayName: string, open: boolean, photoPrint: string | null = nu
 
 const photoOf = (red: number, green: number, blue: number) => [red, green, blue].map((value) => value.toString(16).padStart(2, '0').repeat(64)).join('')
 
-/** A card reader that "sees" whatever people each file name was set up with; an unknown file can't be read. */
 function readerSeeing(peopleByFile: Record<string, Array<Omit<DetectedCard, 'screenshotFileName'>>>): CardReader {
   return {
     readCards: async (_image, fileName) => {

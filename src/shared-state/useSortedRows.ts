@@ -14,7 +14,6 @@ export interface Sort {
   direction: SortDirection
 }
 
-/** Makes every column sortable: clicking a header sorts by it, clicking again flips the direction. */
 export function useSortedRows(columns: DataColumn[], rows: DataRow[], initialSort: Sort): SortedRows {
   const [sort, setSort] = useState<Sort>(initialSort)
 
@@ -31,7 +30,6 @@ export function useSortedRows(columns: DataColumn[], rows: DataRow[], initialSor
   }
 }
 
-/** Rows in the given column order, as a table sorted that way would show them. */
 export function sortRows(rows: DataRow[], sort: Sort): DataRow[] {
   const ascending = [...rows].sort((a, b) => compareCells(a.cells[sort.key], b.cells[sort.key]))
   return sort.direction === 'asc' ? ascending : ascending.reverse()

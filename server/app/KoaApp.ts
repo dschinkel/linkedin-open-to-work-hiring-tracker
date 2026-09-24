@@ -2,7 +2,6 @@ import { bodyParser } from '@koa/bodyparser'
 import Koa from 'koa'
 import type { ApiRequest, ApiResponse } from './HttpRouting.ts'
 
-/** The Koa server: parses JSON (large enough for full-page screenshots) and hands /api requests to the app. */
 export const trackerKoaApp = (answer: (request: ApiRequest) => Promise<ApiResponse>): Koa => {
   const app = new Koa()
   app.use(bodyParser({ jsonLimit: '80mb' }))

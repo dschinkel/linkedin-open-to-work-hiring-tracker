@@ -6,7 +6,6 @@ export interface ScreenshotUseCases {
   reprocessScan: (scanId: string) => Promise<ProcessingResult | null>
 }
 
-/** Inbound adapter for adding screenshots and re-reading a scan. */
 export const screenshotsHttp = (useCases: ScreenshotUseCases) => ({
   addScreenshots: async (request: ApiRequest): Promise<ApiResponse> => ok(await useCases.addScreenshots(addScreenshotsRequestSchema.parse(request.body))),
   reprocessScan: async (_request: ApiRequest, [scanId]: string[]): Promise<ApiResponse> => orNotFound(await useCases.reprocessScan(scanId)),

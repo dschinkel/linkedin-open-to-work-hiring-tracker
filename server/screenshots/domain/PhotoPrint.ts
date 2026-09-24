@@ -1,27 +1,13 @@
 import type { AvatarCircle, Pixels } from './FrameDetection.ts'
 
-/**
- * A person's profile photo boiled down to its colours on a small grid, so one photo can be recognised in another
- * screenshot, even at another zoom. Only the middle of the photo is used: an #OPENTOWORK or #HIRING frame along the
- * edge comes and goes, the face doesn't. Written as hex: red, green, then blue for each cell, two digits each.
- */
 export type PhotoPrint = string
 
-/** Cells across (and down) the grid. */
 const grid = 8
-/** Half the side of the square read, as a share of the photo's radius; its corners stay inside any frame band. */
 const middle = 0.55
-/** Below this radius (in pixels) a photo is a smudge, and two different faces look alike. */
 const smallestPrintableRadius = 8
-/**
- * Average colour difference (0–255) under which two prints are one photo. The same photo at twice the zoom differs
- * by at most about 14; different people's photos by 29 or more, except LinkedIn's grey placeholder, shared by many.
- */
 const samePhoto = 20
-/** From here on two prints are clearly different photos; in between, a print tells nothing either way. */
 const clearlyDifferentPhotos = 26
 
-/** Null for a photo too small to tell faces apart, or whose middle runs off the screenshot (it would print the edge). */
 export function photoPrint(pixels: Pixels, photo: AvatarCircle): PhotoPrint | null {
   if (photo.radius < smallestPrintableRadius || !middleIsInside(pixels, photo)) return null
   const channels = [0, 1, 2].map((channel) => cellAverages(pixels, photo, channel))
@@ -33,7 +19,6 @@ function middleIsInside({ width, height }: Pixels, { centreX, centreY, radius }:
   return centreX - half >= 0 && centreY - half >= 0 && centreX + half <= width && centreY + half <= height
 }
 
-/** Average colour difference between two prints, 0 (the same) to 255. */
 export function photoDistance(first: PhotoPrint, second: PhotoPrint): number {
   const a = values(first)
   const b = values(second)
@@ -48,7 +33,6 @@ export function photosDiffer(first: PhotoPrint, second: PhotoPrint): boolean {
   return photoDistance(first, second) >= clearlyDifferentPhotos
 }
 
-/** Prints already turned back into numbers: a day's screenshots compare every photo with every other one. */
 const parsedPrints = new Map<PhotoPrint, number[]>()
 
 function values(print: PhotoPrint): number[] {
@@ -71,7 +55,6 @@ function cellAverages(pixels: Pixels, { centreX, centreY, radius }: AvatarCircle
   return cells.map((cell) => averageIn(pixels, cell, channel))
 }
 
-/** One colour channel's average over a square, sampled about four times each way. */
 function averageIn({ data, width, height }: Pixels, { left, top, size }: { left: number; top: number; size: number }, channel: number): number {
   const step = Math.max(1, size / 4)
   let sum = 0

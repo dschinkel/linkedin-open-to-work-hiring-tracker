@@ -4,7 +4,6 @@ import { formatCount, formatPercent, formatPercentagePoints, formatRatio, format
 
 const noPriorHint = 'Scan again another day'
 
-/** Latest-scan Open-to-Work tiles: stock first, then flow, then flow rates. */
 export function describeOpenToWorkTiles(summary: OpenToWorkSummary): StatTileView[] {
   const flowHint = summary.hasComparablePrior ? undefined : noPriorHint
   const flow = (count: number, signed: (count: number) => string) => (summary.hasComparablePrior ? signed(count) : '—')

@@ -1,6 +1,5 @@
 import type { Network, Observation, Person, Scan } from '../../shared/domain/Observation.ts'
 
-/** Read-side lookups over a network, built once. */
 export interface NetworkIndex {
   scansInOrder: Scan[]
   observationsOf: (scanId: string) => Observation[]

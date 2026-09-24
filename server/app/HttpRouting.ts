@@ -22,10 +22,6 @@ export const ok = (body: unknown): ApiResponse => ({ status: 200, body })
 export const notFound = (): ApiResponse => ({ status: 404, body: { error: 'Not found' } })
 export const orNotFound = (body: unknown): ApiResponse => (body === null ? notFound() : ok(body))
 
-/**
- * Framework-free dispatch: Koa (server) and the in-browser demo both answer requests through this.
- * Input that fails its Zod contract is a 400; anything else that throws is a 500 with its message.
- */
 export async function answerRequest(routes: Route[], request: ApiRequest): Promise<ApiResponse> {
   for (const route of routes) {
     const match = route.method === request.method ? route.pattern.exec(request.path) : null

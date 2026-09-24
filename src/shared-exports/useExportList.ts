@@ -6,9 +6,7 @@ import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { browserListExporter } from './browserListExporter'
 import type { ExportFormat, ExportTable, ListExporter } from './listExport'
 
-/** What to export: the table, which list it is (none for a whole scan), and the date it describes. */
 export interface ExportContents extends ExportTable {
-  /** E.g. { slug: 'open-to-work', title: 'Open to Work' }; null for everyone in a scan. */
   list: { slug: string; title: string } | null
   date: string
 }
@@ -33,10 +31,6 @@ const formats: ExportFormatOption[] = [
 
 const audienceNames: Record<Audience, string> = { followers: 'Followers', contacts: 'Connections' }
 
-/**
- * Saves a list of people as a spreadsheet, PDF, or CSV, named after the audience, the list, and the date,
- * e.g. "followers-open-to-work-2026-09-23.xlsx" or, for a whole scan, "connections-2026-09-22.pdf".
- */
 export function useExportList(contentsToExport: () => ExportContents | Promise<ExportContents>, exporter: ListExporter = browserListExporter): ExportListView {
   const { audience } = useTrackerEnvironment()
   const exporting = useMutation({

@@ -27,7 +27,6 @@ export interface TrackerUseCases {
 const windowQuery = z.object({ window: timeWindowSchema.default('90d') })
 const kindQuery = z.object({ kind: snapshotKindSchema })
 
-/** Inbound adapter: validates each request against the contract, calls the use case, returns the response. */
 export const trackerHttp = (useCases: TrackerUseCases) => ({
   dashboard: (): ApiResponse => ok(useCases.viewDashboard()),
   scans: (request: ApiRequest): ApiResponse => ok(useCases.listScans(windowQuery.parse(request.query).window)),

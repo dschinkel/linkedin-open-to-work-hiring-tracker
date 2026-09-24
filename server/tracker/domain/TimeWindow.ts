@@ -10,7 +10,6 @@ const windowDays: Record<TimeWindow, number | null> = {
   all: null,
 }
 
-/** Keeps items dated within the window that ends at the newest date. */
 export function withinWindow<Item extends { scanDate: string }>(items: Item[], window: TimeWindow): Item[] {
   const days = windowDays[window]
   const newest = items.at(-1)?.scanDate

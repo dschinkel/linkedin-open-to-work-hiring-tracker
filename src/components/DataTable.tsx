@@ -15,7 +15,6 @@ export interface DataColumn {
 export interface DataCell {
   text: string
   note?: string
-  /** What the column sorts by when the shown text would sort wrongly (dates, counts). */
   sortValue?: string | number
 }
 
@@ -34,7 +33,6 @@ interface DataTableProps {
   onRowClick?: (rowId: string) => void
 }
 
-/** Sticky-header table with optional sortable columns and clickable rows. */
 export function DataTable({ columns, rows, sortKey, sortDirection, onSort, onRowClick }: DataTableProps) {
   return (
     <div className="max-h-128 overflow-auto border">

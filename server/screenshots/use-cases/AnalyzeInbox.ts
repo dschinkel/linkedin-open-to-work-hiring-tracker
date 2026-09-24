@@ -28,12 +28,6 @@ interface ScreenshotReading {
   failure: string | null
 }
 
-/**
- * Turns every waiting screenshot into saved people and observations: grouped by capture date into one
- * scan per day, merged with anything already saved that day, de-duplicated, then each imported file is
- * deleted (or archived when Settings say keep). A screenshot that can't be read stays, marked failed.
- * Runs one at a time, so a burst of uploads never analyzes the same file twice.
- */
 export const analyzeInbox = (ports: AnalyzeInboxPorts) => {
   let queue: Promise<unknown> = Promise.resolve()
 
@@ -100,10 +94,6 @@ async function clearImportedFiles({ inboxFolder, trackerStore }: AnalyzeInboxPor
   for (const { fileName } of readings) await (keep ? inboxFolder.archive(fileName, scanDate) : inboxFolder.remove(fileName))
 }
 
-/**
- * Settings decide how sure a reading must be: a frame counts only when its confidence reaches the "match above"
- * threshold, and "no frame" only when it reaches 1 − "no match below". Anything less sure becomes Uncertain.
- */
 export function applyThresholds(day: AnalyzedDay, settings: Settings): AnalyzedDay {
   const open = { present: settings.openToWorkThresholds.open, absent: 1 - settings.openToWorkThresholds.notOpen }
   const hiring = { present: settings.hiringThresholds.hiring, absent: 1 - settings.hiringThresholds.notHiring }
@@ -128,13 +118,11 @@ function describeWarning(uncertainCount: number, unreadable: number, peopleCount
   return uncertainCount > 0 ? `${uncertainCount} uncertain avatar classification(s)` : null
 }
 
-/** What is already saved: the day's own data, and everyone seen on any day (to find people with a shared name again). */
 interface SavedSoFar {
   existing: AnalyzedDay | null
   knownPeople: Person[]
 }
 
-/** New cards join what was already saved for the day; someone seen again keeps the clearest reading. */
 export function mergeIntoDay(audience: Audience, scanDate: string, readings: ScreenshotReading[], { existing, knownPeople }: SavedSoFar): AnalyzedDay {
   const scanId = `${audience}-${scanDate}`
   const cards = readings.flatMap((reading) => reading.cards)

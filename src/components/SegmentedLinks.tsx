@@ -6,11 +6,9 @@ export interface SegmentLink {
   label: string
   to: string
   isActive: boolean
-  /** Optional figure shown after the label, e.g. a count. */
   detail?: string
 }
 
-/** A segmented switch whose options are links, e.g. [Followers 742 | Connections 468]; the chosen one is filled with the theme's prompt color. */
 export function SegmentedLinks({ label, links }: { label: string; links: SegmentLink[] }) {
   return (
     <nav aria-label={label} className="inline-flex border">

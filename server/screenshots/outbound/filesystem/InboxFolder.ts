@@ -2,7 +2,6 @@ import { access, mkdir, readdir, readFile, rename, rm, stat, writeFile } from 'n
 import path from 'node:path'
 import { acceptedScreenshotName } from '../../domain/ScreenshotFileName.ts'
 
-/** Port: the folder screenshots are dropped into, and the archive they can be moved to after import. */
 export interface InboxFolder {
   folderPath: () => string
   store: (fileName: string, dataBase64: string) => Promise<'stored' | 'already-present'>
@@ -12,7 +11,6 @@ export interface InboxFolder {
   archive: (fileName: string, scanDate: string) => Promise<void>
   archivedFiles: (scanDate: string) => Promise<string[]>
   readArchived: (fileName: string, scanDate: string) => Promise<Buffer>
-  /** Deletes every screenshot still in the inbox (other files are left alone). */
   emptyInbox: () => Promise<void>
 }
 
@@ -22,7 +20,6 @@ interface InboxLocations {
   archiveDirectory: () => string
 }
 
-/** File-system adapter. Both folders must stay inside the project, whatever the settings say. */
 export const inboxFolder = ({ projectRoot, inboxDirectory, archiveDirectory }: InboxLocations): InboxFolder => {
   const inbox = () => insideProject(projectRoot, inboxDirectory())
   const archiveFor = (scanDate: string) => path.join(insideProject(projectRoot, archiveDirectory()), scanDate)

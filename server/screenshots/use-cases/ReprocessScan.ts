@@ -11,7 +11,6 @@ interface ReprocessScanPorts {
   cardReader: CardReader
 }
 
-/** Re-reads a day's archived screenshots and replaces that day. Only possible when originals were kept. */
 export const reprocessScan = ({ audience, trackerStore, inboxFolder, cardReader }: ReprocessScanPorts) => ({
   reprocessScan: async (scanId: string): Promise<ProcessingResult | null> => {
     const scan = trackerStore.readNetwork().scans.find((candidate) => candidate.id === scanId)

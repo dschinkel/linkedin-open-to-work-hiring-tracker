@@ -1,7 +1,6 @@
 import type { DetectedCard } from './Deduplication.ts'
 import { isSamePerson } from './SamePerson.ts'
 
-/** Photo prints: every cell of the grid one colour. */
 const photoOf = (red: number, green: number, blue: number) => [red, green, blue].map((value) => value.toString(16).padStart(2, '0').repeat(64)).join('')
 const avery = photoOf(200, 150, 90)
 const averyAtAnotherZoom = photoOf(205, 145, 95)

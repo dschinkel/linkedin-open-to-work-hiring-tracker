@@ -15,7 +15,6 @@ interface IconChoiceSelectProps<Value extends string> {
   onChange: (value: Value) => void
 }
 
-/** A square icon button that opens a short list of labeled choices, e.g. Light / Dark / System. */
 export function IconChoiceSelect<Value extends string>({ label, value, icon: CurrentIcon, options, onChange }: IconChoiceSelectProps<Value>) {
   return (
     <Select items={options} value={value} onValueChange={(next) => next && onChange(next as Value)}>

@@ -1,7 +1,6 @@
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-/** The project's source on GitHub, opened in a new tab. */
 export const repositoryUrl = 'https://github.com/dschinkel/linkedin-open-to-work-hiring-tracker'
 
 export function GitHubLink() {
@@ -12,14 +11,13 @@ export function GitHubLink() {
       rel="noreferrer"
       aria-label="Source code on GitHub"
       title="Source code on GitHub"
-      className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'h-10 w-8')} /* same box as the light/dark toggle beside it */
+      className={cn(buttonVariants({ variant: 'outline', size: 'icon' }), 'h-10 w-8')}
     >
       <GitHubMark />
     </a>
   )
 }
 
-/** GitHub's octocat mark; lucide no longer ships brand icons. */
 function GitHubMark() {
   return (
     <svg viewBox="0 0 16 16" aria-hidden="true" className="size-4 fill-current">

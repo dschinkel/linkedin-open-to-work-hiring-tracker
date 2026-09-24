@@ -34,7 +34,6 @@ const network: Network = {
 
 const previouslyHiring = { search: '', company: '', status: 'previous', companyKnown: 'all', sort: 'lastSeen' }
 
-/** A followers tracker on sample data, with a clock that moves a minute forward on every save. */
 function trackerWithClock() {
   const trackerStore = memoryTrackerStore(network, defaultSettingsFor('followers'))
   let minute = 0

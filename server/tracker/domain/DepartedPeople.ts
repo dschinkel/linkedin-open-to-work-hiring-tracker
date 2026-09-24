@@ -2,7 +2,6 @@ import type { DepartedPeople, DepartedPerson } from '../../../contracts/api.ts'
 import type { NetworkIndex } from './NetworkIndex.ts'
 import { hiringSignal, type Observation, openToWorkSignal } from '../../shared/domain/Observation.ts'
 
-/** Missing from this many scans in a row before someone counts as no longer in your list. */
 export const scansMissedThreshold = 3
 
 interface Sightings {
@@ -12,10 +11,6 @@ interface Sightings {
   lastSeenScanIndex: number
 }
 
-/**
- * People seen before but absent from the most recent scans: likely unfollowers or removed contacts.
- * A screenshot cannot prove someone left, so this relies on each scan covering the whole list.
- */
 export function listDepartedPeople(index: NetworkIndex): DepartedPeople {
   const scanCount = index.scansInOrder.length
   const people = [...sightingsByPerson(index).entries()]

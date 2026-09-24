@@ -33,7 +33,6 @@ const columns: DataColumn[] = [
   { key: 'frames', label: 'When last seen' },
 ]
 
-/** Unfollowers or past contacts: people seen before who are missing from the latest scans. */
 export function useFindDepartedPeople(injectedRepository?: DepartureRepository): DepartedPeopleView {
   const { api, audience } = useTrackerEnvironment()
   const repository = injectedRepository ?? departureRepositoryFor(api)

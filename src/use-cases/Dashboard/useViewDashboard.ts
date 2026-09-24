@@ -29,7 +29,6 @@ export interface DashboardView {
   hiringHref: string
 }
 
-/** Latest snapshot at a glance: Open-to-Work stock and flow, Hiring, and how trustworthy the scan is. */
 export function useViewDashboard(injectedRepository?: DashboardRepository): DashboardView {
   const { api } = useTrackerEnvironment()
   const appPath = useAppPath()
@@ -63,7 +62,6 @@ const noDashboard: DashboardFields = {
   showScanReminder: false,
 }
 
-/** Points the tile with this label at the list of the people it counts. */
 function linkTile(tiles: StatTileView[], label: string, href: string): StatTileView[] {
   return tiles.map((tile) => (tile.label === label ? { ...tile, href } : tile))
 }
@@ -88,7 +86,6 @@ function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
   }
 }
 
-/** Screenshots saved in the database's inbox list that analysis has not picked up yet. */
 function describeInbox(waitingCount: number): Pick<DashboardView, 'inboxNote' | 'showInboxNote'> {
   const screenshots = waitingCount === 1 ? '1 screenshot is' : `${formatCount(waitingCount)} screenshots are`
   return { inboxNote: `${screenshots} saved and waiting in the inbox for analysis.`, showInboxNote: waitingCount > 0 }

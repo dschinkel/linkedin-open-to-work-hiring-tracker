@@ -26,7 +26,6 @@ interface UploadTotals {
   peopleInScan: number
 }
 
-/** One screenshot waiting to go up: a dropped image, or one page of a dropped PDF drawn as a PNG. */
 interface WaitingScreenshot {
   fileName: string
   label: string
@@ -35,11 +34,6 @@ interface WaitingScreenshot {
 
 const acceptedTypes = 'image/png,image/jpeg,image/webp,application/pdf'
 
-/**
- * Drag-and-drop (or pick) screenshots straight into the inbox. Files go up one at a time, so a
- * big batch of full-page captures never becomes one huge request, and one bad file can't sink the rest.
- * A PDF counts as one screenshot per page, each named "<pdf name> - page N.png".
- */
 export function useAddScreenshots(injectedRepository?: ScanRepository, injectedPdfReader: PdfReader = browserPdfReader): AddScreenshotsView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? scanRepositoryFor(api)
@@ -98,7 +92,6 @@ async function uploadOneByOne(files: File[], { repository, pdfReader, reportProg
   return totals
 }
 
-/** Every screenshot in the drop, in order: images as they are, PDFs opened into their pages. A PDF that won't open is skipped. */
 async function screenshotsIn(files: File[], pdfReader: PdfReader, totals: UploadTotals, reportProgress: (message: string) => void): Promise<WaitingScreenshot[]> {
   const screenshots: WaitingScreenshot[] = []
   for (const file of files) {
@@ -152,13 +145,11 @@ function messageOf(error: unknown): string {
   return error instanceof Error ? error.message : 'unknown error'
 }
 
-/** Live running total while a batch uploads, e.g. " · 142 people found so far". */
 function peopleSoFar(totals: UploadTotals): string {
   if (totals.importedCount === 0) return ''
   return ` · ${plural(totals.peopleInScan, 'person', 'people')} found so far`
 }
 
-/** One line for the whole batch, e.g. "23 screenshots added. 21 read, 2 couldn't be read. 480 people in this scan." */
 function summarize(totals: UploadTotals): string {
   const added = `${plural(totals.saved.length, 'screenshot')} added${totals.rejected.length > 0 ? `, ${totals.rejected.length} skipped` : ''}.`
   const read = totals.importedCount + totals.failedCount > 0 ? ` ${totals.importedCount} read${totals.failedCount > 0 ? `, ${totals.failedCount} couldn't be read` : ''}.` : ''

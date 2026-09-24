@@ -17,7 +17,6 @@ export interface ChooseAppearance {
   chooseTheme: (theme: ColorTheme) => void
 }
 
-/** Light/Dark/System plus a color theme, remembered per viewer and painted onto the page. */
 export function useChooseAppearance(repository: AppearanceRepository = appearanceRepository): ChooseAppearance {
   const [mode, setMode] = useState(repository.loadMode)
   const [theme, setTheme] = useState(repository.loadTheme)

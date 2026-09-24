@@ -30,13 +30,9 @@ export interface HiringPeopleView extends SortedRows {
   hasPeople: boolean
   showNoMatches: boolean
   companyRows: DefinitionRow[]
-  /** While a snapshot is on show its saved status and company-visibility filters apply and cannot be changed. */
   areSavedFiltersLocked: boolean
-  /** Saves the list as shown: current filters and sort, same columns. A snapshot on show is exported as that snapshot. */
   exporting: ExportListView
-  /** Saved copies of this list, with the filters they were taken with; one can be shown in place of the current list. */
   snapshots: KeepSnapshotsView
-  /** E.g. "Saved with: Currently hiring · Company known · company “Acme”. Name and company search the saved people." */
   snapshotDetail: string
 }
 
@@ -67,7 +63,6 @@ const hiringList = { slug: 'hiring', title: 'Hiring' }
 
 const initialFilters: HiringPeopleQuery = { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' }
 
-/** Who's Hiring: searchable, filterable list of people seen with the public #HIRING frame, now or in a saved snapshot. */
 export function useFindHiringPeople(injectedRepository?: HiringRepository, exporter?: ListExporter, snapshotRepository?: SnapshotRepository): HiringPeopleView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? hiringRepositoryFor(api)
@@ -119,7 +114,6 @@ function hiringSnapshotIn(snapshot: Snapshot | null): HiringSnapshot | null {
   return snapshot?.kind === 'hiring' ? snapshot : null
 }
 
-/** Recency is told as of the day the snapshot was saved, not today. */
 function rowsOfSnapshot(snapshot: HiringSnapshot, people: HiringPerson[] = snapshot.people): DataRow[] {
   return people.map((person) => toTableRow(person, new Date(snapshot.createdAt)))
 }
@@ -129,7 +123,6 @@ function tableOfSnapshot(snapshot: Snapshot) {
   return exportTableOf(columns, sortRows(hiring ? rowsOfSnapshot(hiring) : [], initialSort))
 }
 
-/** The name and company boxes narrow a snapshot on show, as the server narrows the current list. */
 function matchesTextFilters(person: HiringPerson, { search, company }: HiringPeopleQuery): boolean {
   return includesText(person.displayName, search) && includesText(person.companyName, company)
 }

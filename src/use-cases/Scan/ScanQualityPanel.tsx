@@ -1,7 +1,6 @@
 import { DefinitionList } from '@/components/DefinitionList'
 import type { QualitySection } from './describeScanQuality'
 
-/** Two columns only when the panel itself is wide enough that no label has to wrap; otherwise one. */
 export function ScanQualityPanel({ sections }: { sections: QualitySection[] }) {
   return (
     <div className="@container">

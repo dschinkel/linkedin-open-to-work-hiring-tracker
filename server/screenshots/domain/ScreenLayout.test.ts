@@ -99,7 +99,6 @@ describe('reading names beside the photo column', () => {
 })
 
 describe('reading a list whose rows sit close together, like Connections', () => {
-  // Name, a title wrapping onto two lines, and the date the connection was made: the next name follows a small gap below.
   const connections: TextBox[] = [
     word('Ada', 100, 60), word('Lovelace', 140, 60), word('Mathematician', 100, 80), word('and', 230, 80), word('writer', 265, 80), word('on', 100, 98), word('engines', 125, 98), word('Connected', 100, 116), word('on', 190, 116), word('March', 215, 116), word('1,', 270, 116), word('2020', 290, 116),
     word('Alan', 100, 144), word('Turing', 145, 144), word('Codebreaker', 100, 164), word('Connected', 100, 182), word('on', 190, 182), word('May', 215, 182), word('2,', 250, 182), word('2019', 270, 182),
@@ -191,7 +190,6 @@ describe('telling a person from a lone line of text', () => {
   })
 })
 
-/** A white page with dark lines of text: a name and a title for each of two people, 100 pixels apart. */
 function twoPeopleOfText() {
   const width = 200
   const height = 200

@@ -8,7 +8,6 @@ interface ExportMenuProps {
   label?: string
 }
 
-/** [⤓ Export] opening Spreadsheet (.xlsx) / PDF / CSV, with what the last export did beside it. */
 export function ExportMenu({ exporting, label = 'Export' }: ExportMenuProps) {
   return (
     <div className="flex items-center gap-3">

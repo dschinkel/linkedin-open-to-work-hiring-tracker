@@ -43,7 +43,6 @@ const audienceToggle: Array<{ audience: Audience; label: string }> = [
 
 const subtitle = 'Your followers and connections open to work or hiring, tracked over time'
 
-/** One tracker per mode and audience, each with its own query cache so their data never mixes. */
 export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
   const location = useLocation()
   const [queryClient] = useState(() => trackerClientFor(mode, audience))
@@ -72,13 +71,8 @@ export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
   }
 }
 
-/** Live pages re-check the API every few seconds so newly analyzed screenshots appear without a reload. */
 const liveRefreshMilliseconds = 5_000
 
-/**
- * Switching audience remounts the tracker with a fresh query cache. List sizes live in one cache per mode that
- * outlives those remounts, so the counts in the toggle stay on screen instead of blinking out and back.
- */
 const sizeClients = new Map<TrackerMode, QueryClient>()
 
 function sizeClientFor(mode: TrackerMode): QueryClient {
@@ -86,13 +80,11 @@ function sizeClientFor(mode: TrackerMode): QueryClient {
   return sizeClients.get(mode)!
 }
 
-/** Starts every cache over, as a fresh page load would. */
 export function forgetCachedTrackers(): void {
   sizeClients.clear()
   trackerClients.clear()
 }
 
-/** Each audience keeps its own cache for the whole visit, so switching back shows its pages at once. */
 const trackerClients = new Map<string, QueryClient>()
 
 function trackerClientFor(mode: TrackerMode, audience: Audience): QueryClient {
@@ -106,12 +98,10 @@ function queryClientFor(mode: TrackerMode): QueryClient {
   return new QueryClient({ defaultOptions: { queries: { staleTime: 0, refetchInterval, refetchOnWindowFocus: mode === 'live' } } })
 }
 
-/** One API client per audience, so the header can show both list sizes at once. */
 function apisFor(mode: TrackerMode, transport: Transport): Record<Audience, ApiClient> {
   return { contacts: trackerEnvironmentFor(mode, 'contacts', transport).api, followers: trackerEnvironmentFor(mode, 'followers', transport).api }
 }
 
-/** An audience with no scans yet shows 0, so an empty tab is obvious before it is opened. */
 function describeSize(size: NetworkSize | undefined): string | undefined {
   if (!size) return undefined
   return formatCount(size.latestScanDate === null ? 0 : size.peopleCount)
@@ -124,7 +114,6 @@ function navItemsUnder(routeBase: string, audience: Audience): NavItem[] {
   return withDeparture.map((page) => ({ to: `${routeBase}${page.path}`, label: page.label, isExact: page.path === '' }))
 }
 
-/** Switching audience keeps you on the same page, e.g. /demo/contacts/trends → /demo/followers/trends. */
 function audienceLinksFrom(pathname: string, environment: TrackerEnvironment, sizes: Record<Audience, NetworkSize | undefined>): SegmentLink[] {
   const pageWithinTracker = pathname.slice(environment.routeBase.length)
   const modeBase = environment.isDemo ? '/demo' : ''

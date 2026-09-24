@@ -1,6 +1,5 @@
 import type { PDFPageProxy } from 'pdfjs-dist'
 
-/** Port: opens a PDF so each page can be drawn as a PNG screenshot. */
 export interface PdfReader {
   open: (pdf: File) => Promise<PdfDocument>
 }
@@ -10,16 +9,10 @@ export interface PdfDocument {
   renderPage: (pageNumber: number) => Promise<Blob>
 }
 
-/**
- * Pages are drawn at least twice their PDF size (a Retina screenshot saved as a PDF is usually
- * placed at half its pixel size), or at the full resolution of the biggest picture on the page,
- * so avatar photos stay sharp enough for the reader. Capped so the canvas stays within browser limits.
- */
 const minimumScale = 2
 const largestCanvasSide = 16_384
 const largestCanvasArea = 120_000_000
 
-/** Browser adapter: pdf.js, loaded only when a PDF is actually dropped. */
 export const browserPdfReader: PdfReader = {
   open: async (pdf) => {
     const pdfjs = await loadPdfjs()

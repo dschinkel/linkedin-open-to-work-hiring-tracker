@@ -12,7 +12,6 @@ export interface ClearAllDataView {
   resultMessage: string
 }
 
-/** Wipes everything, but only after the user confirms in a dialog. Every page then reloads its (empty) data. */
 export function useClearAllData(injectedRepository?: SettingsRepository): ClearAllDataView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? settingsRepositoryFor(api)

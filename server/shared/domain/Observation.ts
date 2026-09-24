@@ -20,7 +20,6 @@ export interface Person extends CompanyExtraction {
   personHash: string
   displayName: string
   headline: string | null
-  /** Their profile photo boiled down (screenshots/domain/PhotoPrint.ts), to tell apart people who share a name. */
   photoPrint?: string | null
 }
 
@@ -55,7 +54,6 @@ export interface Network {
 
 export type SignalStatus = 'POSITIVE' | 'NEGATIVE' | 'UNCERTAIN'
 
-/** One visible avatar-frame dimension (Open to Work, Hiring) viewed through a common lens. */
 export interface Signal {
   name: string
   read: (observation: Observation) => SignalStatus

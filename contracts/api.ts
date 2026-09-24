@@ -1,6 +1,5 @@
 import { z } from 'zod'
 
-/** Which list the screenshots come from. Each audience is tracked as its own, separate dashboard. */
 export const audienceSchema = z.enum(['contacts', 'followers'])
 export type Audience = z.infer<typeof audienceSchema>
 export const audiences: Audience[] = audienceSchema.options
@@ -93,9 +92,7 @@ export const hiringPersonSchema = z.object({
   firstSeenHiring: z.string(),
   lastSeenHiring: z.string(),
   lastSeen: z.string(),
-  /** Start of the latest unbroken run of scans showing #HIRING (the current one, unless the frame was removed). */
   hiringSince: z.string(),
-  /** Calendar days from hiringSince to the last scan in that run that showed the frame, both included. */
   daysHiring: z.number(),
   scansSeenHiring: z.number(),
   isCurrentlyHiring: z.boolean(),
@@ -105,9 +102,7 @@ export type HiringPerson = z.infer<typeof hiringPersonSchema>
 
 export const dashboardSchema = z.object({
   scanCount: z.number(),
-  /** Screenshots saved to the inbox that have not been analyzed yet. */
   inboxWaitingCount: z.number(),
-  /** Set when a new scan is due by the chosen scan frequency, e.g. "Your weekly scan is due: the last one was 9 days ago." */
   scanReminder: z.string().nullable(),
   latestScan: scanSummarySchema.nullable(),
   latestQuality: scanQualitySchema.nullable(),
@@ -208,7 +203,6 @@ export const settingsSchema = z.object({
   visionFallback: z.boolean(),
   scanFrequency: z.enum(['daily', 'weekly', 'biweekly', 'monthly']),
   retention: z.enum(['forever', '1y', '90d']),
-  /** What happens to a screenshot once its data is saved to the database: deleted (default) or kept in the archive. */
   afterAnalysis: z.enum(['delete', 'keep']).default('delete'),
 })
 export type Settings = z.infer<typeof settingsSchema>
@@ -227,9 +221,7 @@ export type AddScreenshotsRequest = z.infer<typeof addScreenshotsRequestSchema>
 export const addScreenshotsResultSchema = z.object({
   saved: z.array(z.string()),
   rejected: z.array(z.object({ fileName: z.string(), reason: z.string() })),
-  /** What happened when the new screenshots were analyzed. */
   analysisMessage: z.string(),
-  /** Screenshots read successfully / that couldn't be read, and how many people are now in their day's scan. */
   importedCount: z.number(),
   failedCount: z.number(),
   peopleInScan: z.number(),
@@ -257,7 +249,6 @@ export const departedPeopleSchema = z.object({
 export type DepartedPeople = z.infer<typeof departedPeopleSchema>
 
 export const networkSizeSchema = z.object({
-  /** Unique people seen in the recent scans: the current size of your followers or contacts list. */
   peopleCount: z.number(),
   latestScanDate: z.string().nullable(),
 })
@@ -284,9 +275,7 @@ export const openToWorkPersonSchema = z.object({
   companyName: z.string().nullable(),
   firstSeenOpen: z.string(),
   lastSeenOpen: z.string(),
-  /** Start of the current unbroken run of scans showing #OPENTOWORK; only a clear reading without the frame breaks it. */
   openSince: z.string(),
-  /** Calendar days from openSince to the last scan that showed the frame, both included. */
   daysOpen: z.number(),
   scansSeenOpen: z.number(),
   wasObservedInLatestScan: z.boolean(),
@@ -295,7 +284,6 @@ export type OpenToWorkPerson = z.infer<typeof openToWorkPersonSchema>
 
 export const openToWorkPeopleSchema = z.object({ people: z.array(openToWorkPersonSchema) })
 
-/** One person as seen in one scan: who they are and which frames they showed that day. */
 export const scanPersonSchema = z.object({
   personId: z.string(),
   displayName: z.string(),
@@ -306,7 +294,6 @@ export const scanPersonSchema = z.object({
 })
 export type ScanPerson = z.infer<typeof scanPersonSchema>
 
-/** Everyone saved for one scan, sorted by name. */
 export const scanPeopleSchema = z.object({
   scanId: z.string(),
   scanDate: z.string(),
@@ -314,38 +301,31 @@ export const scanPeopleSchema = z.object({
 })
 export type ScanPeople = z.infer<typeof scanPeopleSchema>
 
-/** Which people list a snapshot was taken of. */
 export const snapshotKindSchema = z.enum(['open-to-work', 'hiring'])
 export type SnapshotKind = z.infer<typeof snapshotKindSchema>
 
 const snapshotFields = {
   id: z.string(),
-  /** What the user called it, or e.g. "Sep 23, 2026 · 8 people". */
   name: z.string(),
-  /** When it was saved (ISO timestamp). */
   createdAt: z.string(),
   peopleCount: z.number(),
 }
 
-/** A saved snapshot as listed: everything except its people. */
 export const snapshotSummarySchema = z.object({ ...snapshotFields, kind: snapshotKindSchema })
 export type SnapshotSummary = z.infer<typeof snapshotSummarySchema>
 
 export const snapshotListSchema = z.object({ snapshots: z.array(snapshotSummarySchema) })
 export type SnapshotList = z.infer<typeof snapshotListSchema>
 
-/** The Open to Work list exactly as it was when saved. */
 export const openToWorkSnapshotSchema = z.object({ ...snapshotFields, kind: z.literal('open-to-work'), people: z.array(openToWorkPersonSchema) })
 export type OpenToWorkSnapshot = z.infer<typeof openToWorkSnapshotSchema>
 
-/** The Hiring list exactly as it was when saved, with the filters that produced it. */
 export const hiringSnapshotSchema = z.object({ ...snapshotFields, kind: z.literal('hiring'), filters: hiringPeopleQuerySchema, people: z.array(hiringPersonSchema) })
 export type HiringSnapshot = z.infer<typeof hiringSnapshotSchema>
 
 export const snapshotSchema = z.discriminatedUnion('kind', [openToWorkSnapshotSchema, hiringSnapshotSchema])
 export type Snapshot = z.infer<typeof snapshotSchema>
 
-/** Save the list as it is now. A blank name gets a dated default; filters only apply to the Hiring list. */
 export const saveSnapshotRequestSchema = z.object({
   name: z.string().trim().max(120).default(''),
   filters: hiringPeopleQuerySchema.optional(),

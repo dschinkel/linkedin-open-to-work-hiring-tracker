@@ -9,11 +9,6 @@ import { screenshotCardReader } from '../screenshots/outbound/vision/ScreenshotC
 
 type SampleScenario = 'single' | 'full'
 
-/**
- * `pnpm dev`: serves the app and runs the same Koa API inside Vite's dev server. Normally that's your real
- * data (data/linkedin.sqlite, created on first run) with both inbox folders watched. TRACKER_SAMPLE=single|full
- * swaps in throwaway sample data held in memory instead; your database is not touched.
- */
 export function trackerDevServer(): Plugin {
   return {
     name: 'tracker-api',

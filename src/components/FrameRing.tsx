@@ -4,7 +4,6 @@ import { captionArc, frameRingArc, type RingArc, ringCenter, ringRadius, ringSiz
 
 interface FrameRingProps {
   signal: Signal
-  /** The rate exactly as the tile displays it, e.g. "9.6%"; the ring fills to match. */
   value: string
   frameText: string
   className?: string
@@ -12,7 +11,6 @@ interface FrameRingProps {
 
 const signalColor: Record<Signal, string> = { 'open-to-work': 'var(--open-to-work)', hiring: 'var(--hiring)' }
 
-/** A ring gauge drawn like the LinkedIn photo frame it counts: a thin track, an arc in the signal color, and the frame's caption along the bottom. */
 export function FrameRing({ signal, value, frameText, className }: FrameRingProps) {
   const color = signalColor[signal]
   const captionId = `frame-text-${signal}`

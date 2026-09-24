@@ -242,7 +242,6 @@ export function settings(overrides: Partial<Settings> = {}): Settings {
   }
 }
 
-/** An exporter that keeps what it was asked to save instead of downloading a file. */
 export function recordingExporter() {
   const saved: ListExport[] = []
   const exporter: ListExporter = {
@@ -270,7 +269,6 @@ export function hiringSnapshot(overrides: Partial<HiringSnapshot> = {}): HiringS
   }
 }
 
-/** Snapshots kept in memory, newest first, recording what was asked of it. */
 export function fakeSnapshotRepository(initial: Snapshot[] = []) {
   let snapshots = [...initial]
   const saves: Parameters<SnapshotRepository['save']>[] = []

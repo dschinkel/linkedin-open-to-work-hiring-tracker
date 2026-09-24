@@ -7,11 +7,6 @@ export interface FrameSighting {
   status: SignalStatus
 }
 
-/**
- * The latest unbroken run of scans showing a frame.
- * `days` counts calendar days from `since` to `lastSeen`, both included, so a frame first seen today is 1 day.
- * `scansSeen` counts the scans in the run that actually showed the frame.
- */
 export interface FrameStreak {
   since: string
   lastSeen: string
@@ -27,10 +22,6 @@ interface Run {
   isOngoing: boolean
 }
 
-/**
- * Only a clear reading without the frame ends a run; a scan the person was missing from, or an unclear photo, does not.
- * A frame seen again after it ended starts a new run.
- */
 export function latestFrameStreak(sightings: FrameSighting[]): FrameStreak | null {
   const run = sightings.reduce<Run | null>(recordSighting, null)
   if (run === null) return null
@@ -44,7 +35,6 @@ function recordSighting(run: Run | null, sighting: FrameSighting): Run | null {
   return { ...run, lastSeen: sighting.scanDate, scansSeen: run.scansSeen + 1 }
 }
 
-/** Each person's latest run of scans showing the given frame, for everyone ever seen with it. */
 export function frameStreaksByPerson(index: NetworkIndex, signal: Signal): Map<string, FrameStreak> {
   const streaks = new Map<string, FrameStreak>()
   for (const [personId, sightings] of sightingsByPerson(index, signal)) {

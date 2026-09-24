@@ -1,20 +1,11 @@
-/*
- * Recharts internals that shadcn's ChartContainer doesn't reach. Scoped to [data-slot='chart'] so nothing
- * leaks into other SVG. Grid and cursor colors come from ChartContainer itself.
- */
-
-/* Axis and brush labels. ChartContainer targets `.recharts-cartesian-axis-tick text`, which Recharts 3's
-   tick labels don't match, so without this they fall back to Recharts' hard-coded #666. */
 [data-slot='chart'] :is(.recharts-cartesian-axis-tick-value, .recharts-brush-texts text) {
   @apply fill-muted-foreground;
 }
 
-/* Tooltip body: the same hard shadow as panels. */
 [data-slot='chart'] .recharts-tooltip-wrapper > div {
   @apply border-muted-foreground shadow-block;
 }
 
-/* Zoom brush: a slim hairline track with a faint selection band and small muted handles, so it stays out of the way. */
 [data-slot='chart'] .recharts-brush > rect:first-child {
   @apply fill-transparent stroke-border;
 }
@@ -31,7 +22,6 @@
   @apply stroke-card;
 }
 
-/* End-of-line value labels: a thin halo in the panel color keeps them legible where they cross gridlines. */
 [data-slot='chart'] .recharts-reference-dot text {
   paint-order: stroke;
   stroke: var(--card);

@@ -2,10 +2,6 @@ import { createElement } from 'react'
 import type { ChartConfig } from '@/components/ui/chart'
 import type { ChartSeries } from './LineTrendChart'
 
-/**
- * Turns the app's series list into a shadcn ChartConfig. Each series gets a legend/tooltip key drawn like its mark:
- * a short line (bold for a trend, faint for context) or a bar block (split green/red for a signed series).
- */
 export function chartConfigFor(series: ChartSeries[], mark: 'line' | 'bar'): ChartConfig {
   return Object.fromEntries(
     series.map((item) => [

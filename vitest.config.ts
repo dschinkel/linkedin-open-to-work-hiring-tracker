@@ -14,7 +14,6 @@ export default defineConfig({
     globals: true,
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
-    // redesign/ is local reference material (a whole copy of the app), never part of this project's suite.
     exclude: [...configDefaults.exclude, 'redesign/**'],
   },
 })

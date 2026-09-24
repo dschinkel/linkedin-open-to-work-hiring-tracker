@@ -79,7 +79,6 @@ const columnsBySet: Record<ColumnSet, HistoryColumn[]> = {
   all: [dateColumn, sampledColumn, ...openColumns.slice(0, 2), ...openColumns.slice(4, 7), ...hiringColumns.slice(0, 5)],
 }
 
-/** Daily History: one row per scan, newest first by default, sortable and clickable. */
 export function useViewScanHistory(injectedRepository?: ScanRepository): ScanHistoryView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? scanRepositoryFor(api)

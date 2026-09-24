@@ -10,11 +10,8 @@ export interface ChartSeries {
   key: string
   label: string
   color: string
-  /** Lines: a `trend` is drawn bold and labelled with its latest value; `context` is drawn thin and faint behind it. */
   role?: 'trend' | 'context'
-  /** Bars: drawn below the zero line, so exits hang under entries on the same day. */
   isBelowZero?: boolean
-  /** Bars: color for values under zero, for a signed series such as net flow. */
   negativeColor?: string
 }
 
@@ -23,18 +20,12 @@ interface LineTrendChartProps {
   xKey: string
   series: ChartSeries[]
   formatX: (value: string) => string
-  /** Charts sharing a zoomGroup zoom and show tooltips together. */
   zoomGroup?: string
   formatY: (value: number) => string
 }
 
 const trendActiveDot = { r: 3.5, strokeWidth: 2, stroke: 'var(--card)' }
 
-/**
- * Straight segments between scans. Context lines sit faint underneath; trend lines are bold and end in a dot labelled
- * with the latest value in the right margin. The vertical scale fits the data with round steps rather than starting at
- * zero, so movement is visible.
- */
 export function LineTrendChart({ data, xKey, series, formatX, zoomGroup, formatY }: LineTrendChartProps) {
   const config = useMemo(() => chartConfigFor(series, 'line'), [series])
   const ordered = useMemo(() => inDrawOrder(series), [series])

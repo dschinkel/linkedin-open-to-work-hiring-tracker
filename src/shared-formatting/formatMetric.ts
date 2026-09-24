@@ -5,7 +5,6 @@ export function formatPercent(rate: number | null): string {
   return `${rate.toFixed(1)}%`
 }
 
-/** Rate differences are percentage points, never "%". */
 export function formatPercentagePoints(change: number | null): string {
   if (change === null) return notAvailable
   return `${signOf(change)}${Math.abs(change).toFixed(1)}pp`
@@ -47,12 +46,10 @@ export function daysSince(isoDate: string, today: Date = new Date()): number {
   return Math.round((Date.parse(`${todayIso}T00:00:00Z`) - Date.parse(`${isoDate}T00:00:00Z`)) / millisecondsPerDay)
 }
 
-/** "1 person", "42 people". */
 export function formatPeople(count: number): string {
   return count === 1 ? '1 person' : `${formatCount(count)} people`
 }
 
-/** How long a frame has been showing: "3 days · 2 scans", "1 day · 1 scan". Days count both ends, so a frame seen on one day is 1 day. */
 export function formatTimeShowingFrame(days: number, scansSeen: number): string {
   return `${plural(days, 'day')} · ${plural(scansSeen, 'scan')}`
 }
@@ -64,12 +61,10 @@ function plural(count: number, unit: string): string {
 const dateTime = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })
 const localShortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
 
-/** A moment (ISO timestamp) in the browser's time zone: "Sep 23, 2026, 10:04 AM". */
 export function formatDateTime(timestamp: string): string {
   return dateTime.format(new Date(timestamp))
 }
 
-/** The day of a moment (ISO timestamp) in the browser's time zone: "Sep 23". */
 export function formatDayOf(timestamp: string): string {
   return localShortDate.format(new Date(timestamp))
 }

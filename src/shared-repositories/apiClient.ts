@@ -11,7 +11,6 @@ export interface TransportResponse {
   body: unknown
 }
 
-/** How a request reaches the tracker API: over HTTP, or in-process for the demo. */
 export type Transport = (request: TransportRequest) => Promise<TransportResponse>
 
 export interface ApiClient {
@@ -34,7 +33,6 @@ export const httpTransport: Transport = async ({ method, path, body }) => {
   return { status: response.status, body: await response.json() }
 }
 
-/** The only place the frontend talks to the API. Every response is validated against its contract. */
 export function createApiClient(transport: Transport, apiBase: string): ApiClient {
   async function request(transportRequest: TransportRequest): Promise<unknown> {
     const response = await transport(transportRequest)

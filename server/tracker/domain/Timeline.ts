@@ -22,7 +22,6 @@ interface TimelineState {
   summaries: ScanSummary[]
 }
 
-/** Summarizes every scan in date order; each scan is compared with what was known before it. */
 export function buildTimeline(index: NetworkIndex): ScanSummary[] {
   const state: TimelineState = {
     lastKnownOpen: new Map(),
@@ -90,7 +89,6 @@ function summarizeHiring(observations: Observation[], index: NetworkIndex, state
   }
 }
 
-/** Rate of the latest earlier scan taken at least seven days before this one. */
 function rateSevenDaysBefore(scanDate: string, earlierSummaries: ScanSummary[]): number | null {
   const cutoff = addDays(scanDate, -7)
   const candidates = earlierSummaries.filter((summary) => summary.scanDate <= cutoff)

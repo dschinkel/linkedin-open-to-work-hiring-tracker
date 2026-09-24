@@ -1,18 +1,7 @@
-/*
- * Stylesheet entry. Order matters: libraries first, then this app's layers from most general to most specific.
- *   fonts.css         Geist Mono, self-hosted subsets
- *   themes.css        3 color themes (Neutral, Ocean, Green) x light/dark, as role colors (--scheme-*)
- *   tokens.css        semantic tokens → Tailwind theme (colors, type scale, shadows, animations)
- *   base.css          element defaults
- *   utilities.css     reusable devices as Tailwind utilities (figure, tui-title, dot-leader, …)
- *   shadcn-skin.css   the TUI look for stock shadcn components, via data-slot
- *   charts.css        Recharts internals, scoped to charts
- */
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @custom-variant dark (&:is(.dark *));
-
 
 @import "./styles/fonts.css";
 @import "./styles/themes.css";

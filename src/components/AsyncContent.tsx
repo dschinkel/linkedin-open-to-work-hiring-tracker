@@ -11,7 +11,6 @@ interface AsyncContentProps {
   children: ReactNode
 }
 
-/** Shows a skeleton only for slow loads, an alert on failure, and the content once ready. */
 export function AsyncContent({ status, errorMessage, children }: AsyncContentProps) {
   const showSkeleton = useShowAfterDelay(status === 'loading')
   if (showSkeleton) return <Skeleton className="h-40 w-full" />

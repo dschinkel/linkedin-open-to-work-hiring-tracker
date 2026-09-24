@@ -5,12 +5,10 @@ import { titleEvidence } from './SamePerson.ts'
 
 export { normalizeIdentity, type VisibleIdentity }
 
-/** Deterministic pseudonymous key for a visible person. No face recognition, only visible text. */
 export function personHash(identity: VisibleIdentity): string {
   return hashOf(normalizeIdentity(identity))
 }
 
-/** What is known about a person, from this upload or from earlier days. */
 export interface SeenPerson {
   displayName: string
   headline: string | null
@@ -21,11 +19,6 @@ export interface KnownPerson extends SeenPerson {
   personHash: string
 }
 
-/**
- * The identity of each person just seen, in order. Someone whose name nobody else has keeps the usual identity from
- * their name alone. People sharing a name are told apart by their photo, then their title, and keep their own
- * identity from day to day: the first one gets the usual one, the others one numbered after it.
- */
 export function resolvePersonHashes(people: SeenPerson[], known: KnownPerson[]): string[] {
   const hashes: string[] = new Array(people.length)
   const knownByName = new Map<string, KnownPerson[]>()
@@ -54,10 +47,6 @@ function resolveNamesakes(people: SeenPerson[], namesakes: KnownPerson[]): strin
   return people.map((person, index) => claimed.get(index) ?? claimNextNumber(person, taken))
 }
 
-/**
- * Someone else with the same name: a different photo and not the same title (the same person who changed only their
- * photo keeps their title), or, with no photo on one side to compare, a clearly different title.
- */
 function clearlySomeoneElse(person: SeenPerson, namesake: KnownPerson): boolean {
   const titles = titleEvidence(person.headline, namesake.headline)
   if (!person.photoPrint || !namesake.photoPrint) return titles === 'different'
@@ -68,12 +57,10 @@ function samePhoto(person: SeenPerson, namesake: KnownPerson): boolean {
   return Boolean(person.photoPrint && namesake.photoPrint) && photosMatch(person.photoPrint as PhotoPrint, namesake.photoPrint as PhotoPrint)
 }
 
-/** Without a photo on one side (saved before photos were remembered, or too small to read), the title decides. */
 function sameTitleWithoutAPhoto(person: SeenPerson, namesake: KnownPerson): boolean {
   return (!person.photoPrint || !namesake.photoPrint) && titleEvidence(person.headline, namesake.headline) !== 'different'
 }
 
-/** The usual identity if it is free, otherwise the name numbered 2, 3, … */
 function claimNextNumber(person: SeenPerson, taken: Set<string>): string {
   const name = normalizeIdentity(asIdentity(person))
   let number = 1

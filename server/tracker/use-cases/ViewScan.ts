@@ -2,7 +2,6 @@ import type { ScanDetail } from '../../../contracts/api.ts'
 import { scanQuality } from '../domain/ScanQuality.ts'
 import type { TrackerPorts } from '../domain/TrackerAnalytics.ts'
 
-/** One scan in full: its summary, quality, and per-screenshot results. Null when there is no such scan. */
 export const viewScan = ({ analytics }: TrackerPorts) => ({
   viewScan: (scanId: string): ScanDetail | null => {
     const { index, timeline } = analytics()

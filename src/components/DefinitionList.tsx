@@ -3,11 +3,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 export interface DefinitionRow {
   label: string
   value: string
-  /** Plain-English explanation shown when hovering or focusing the label. */
   help?: string
 }
 
-/** Label and value joined by a dotted leader, like a printed table of contents: Screenshots ........ 54 */
 export function DefinitionList({ rows }: { rows: DefinitionRow[] }) {
   return (
     <dl className="text-label">

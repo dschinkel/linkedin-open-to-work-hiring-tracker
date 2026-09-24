@@ -5,7 +5,6 @@ import { defineConfig } from 'vite'
 import { trackerDevServer } from './server/dev/trackerDevServer.ts'
 
 export default defineConfig({
-  // GitHub Pages serves the static demo from /<repo>/; local dev stays at /.
   base: process.env.PAGES_BASE ?? '/',
   plugins: [react(), tailwindcss(), trackerDevServer()],
   resolve: {

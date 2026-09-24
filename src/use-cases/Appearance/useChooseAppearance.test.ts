@@ -24,7 +24,6 @@ const blockedStorage: AppearanceStorage = {
   },
 }
 
-/** A device whose light/dark preference can be flipped while the page is open. */
 function deviceColorScheme(prefersDark: boolean) {
   const listeners = new Set<() => void>()
   const device = {

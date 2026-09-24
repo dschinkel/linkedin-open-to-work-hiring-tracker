@@ -1,9 +1,3 @@
-/*
- * Geist Mono, self-hosted as variable-weight subsets of just the characters this UI uses: about 55 KB for every
- * weight, upright and italic. Geist Mono has no Greek, so the one Greek letter the UI shows (Δ, in "7-day Δ") comes
- * from a single-glyph file cut from Commit Mono; unicode-range makes the browser use it for that character only.
- * How the files were made, and their licenses: src/assets/fonts/geist-mono/README.md.
- */
 @font-face {
   font-family: 'Geist Mono';
   font-style: normal;

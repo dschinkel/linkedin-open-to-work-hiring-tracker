@@ -1,6 +1,5 @@
 import { defaultAppearanceMode, defaultColorTheme, isAppearanceMode, isColorTheme, type AppearanceMode, type ColorTheme } from './appearance'
 
-/** Keep in sync with the pre-paint script in index.html, which reads the same keys before React loads. */
 export const appearanceModeKey = 'tracker.appearanceMode'
 export const colorThemeKey = 'tracker.colorTheme'
 
@@ -16,7 +15,6 @@ export interface AppearanceRepository {
   saveTheme: (theme: ColorTheme) => void
 }
 
-/** Choices are remembered per viewer; when storage is unavailable (private mode, blocked) the defaults apply and nothing breaks. */
 export function appearanceRepositoryFor(openStorage: () => AppearanceStorage): AppearanceRepository {
   return {
     loadMode: () => readChoice(openStorage, appearanceModeKey, isAppearanceMode, defaultAppearanceMode),
@@ -41,6 +39,5 @@ function writeChoice(openStorage: () => AppearanceStorage, key: string, value: s
   try {
     openStorage().setItem(key, value)
   } catch {
-    // Storage can be unavailable; the choice still applies for this visit.
   }
 }

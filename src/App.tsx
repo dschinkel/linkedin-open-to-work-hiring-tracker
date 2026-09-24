@@ -4,7 +4,6 @@ import { isStaticDemoBuild } from '@/demo/demoEnvironment'
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
 
-/** Followers is the default dashboard; the static demo site has no live pages, so it starts in the demo. */
 const homePath = isStaticDemoBuild ? '/demo/followers' : '/followers'
 
 export function App() {

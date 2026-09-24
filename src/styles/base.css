@@ -1,16 +1,12 @@
-/* Element defaults, in Tailwind's base layer so any utility on an element wins. */
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
 
   html {
-    /* Ligatures off: code fonts turn -> and != into glyphs, and this UI shows data, so characters stay literal.
-     * Regular text sits a little heavier than 400 and without grayscale smoothing, which thins light-on-dark text. */
     @apply font-sans font-[450] [font-variant-ligatures:none];
   }
 
-  /* The page fades from the theme's glow at the top to its page color, like a terminal backdrop. */
   body {
     @apply bg-background bg-fixed text-foreground;
     background-image: linear-gradient(to bottom, var(--page-glow), var(--background) 75%);
@@ -24,7 +20,6 @@
     @apply outline-2 outline-offset-2 outline-ring;
   }
 
-  /* Grid cells may shrink below their content (wide tables, charts) so pages never overflow a phone screen. */
   .grid > * {
     @apply min-w-0;
   }

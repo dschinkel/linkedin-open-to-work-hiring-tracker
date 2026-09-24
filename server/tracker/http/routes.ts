@@ -1,7 +1,6 @@
 import type { Route } from '../../app/HttpRouting.ts'
 import type { TrackerHttp } from './TrackerHttp.ts'
 
-/** Wiring only: method + path → adapter method. Paths are per audience (the audience prefix is stripped first). */
 export const trackerRoutes = (http: TrackerHttp): Route[] => [
   { method: 'GET', pattern: /^\/api\/dashboard$/, respond: http.dashboard },
   { method: 'GET', pattern: /^\/api\/scans$/, respond: http.scans },

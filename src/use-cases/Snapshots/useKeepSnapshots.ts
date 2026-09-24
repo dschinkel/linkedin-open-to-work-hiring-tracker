@@ -9,21 +9,16 @@ import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { type SnapshotRepository, snapshotRepositoryFor } from './SnapshotRepository'
 
-/** The list a page keeps snapshots of, and how a saved snapshot turns into the rows an export writes. */
 export interface SnapshotSource {
   kind: SnapshotKind
-  /** The list's name in exported files, e.g. { slug: 'open-to-work', title: 'Open to Work' }. */
   list: { slug: string; title: string }
-  /** The Hiring filters in effect, saved with a Hiring snapshot. */
   filters?: HiringPeopleQuery
-  /** A snapshot's people as the page would show them, in the list's default order. */
   tableOf: (snapshot: Snapshot) => ExportTable
 }
 
 export interface SavedSnapshotView {
   id: string
   name: string
-  /** E.g. "Saved Sep 23, 2026, 10:04 AM". */
   savedAt: string
   peopleCount: string
   isViewed: boolean
@@ -53,24 +48,16 @@ export interface KeepSnapshotsView {
   saveSnapshot: () => void
   canSave: boolean
   isSaving: boolean
-  /** What the last save or delete did. */
   message: string
   isViewingSnapshot: boolean
-  /** The snapshot on show once it has loaded; null while showing the current list. */
   viewedSnapshot: Snapshot | null
   viewedStatus: { status: LoadStatus; errorMessage: string }
-  /** E.g. "Viewing snapshot “Before the layoffs”, saved Sep 23". */
   viewingNotice: string
   backToCurrentList: () => void
-  /** How an export of the snapshot on show is named: as that snapshot, on the day it was saved. */
   viewedExportName: SnapshotExportName | null
   deleting: DeleteSnapshotView
 }
 
-/**
- * Snapshots of one list: save the list as it is now, open an old one in place of the current list (and go
- * back), export one without opening it, and delete one after confirming.
- */
 export function useKeepSnapshots(source: SnapshotSource, injectedRepository?: SnapshotRepository, exporter?: ListExporter): KeepSnapshotsView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? snapshotRepositoryFor(api)
@@ -162,7 +149,6 @@ function viewingNoticeOf(viewedId: string | null, viewedSnapshot: Snapshot | nul
   return viewedId === null ? '' : 'Loading snapshot…'
 }
 
-/** A snapshot's export is named as that snapshot, dated the day it was saved. */
 function exportNameOf(source: SnapshotSource, snapshot: Snapshot): SnapshotExportName {
   return {
     list: { slug: `${source.list.slug}-snapshot`, title: `${source.list.title} snapshot “${snapshot.name}”` },

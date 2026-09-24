@@ -3,11 +3,6 @@ import { openToWorkSignal } from '../../shared/domain/Observation.ts'
 import type { NetworkIndex } from './NetworkIndex.ts'
 import { type FrameStreak, frameStreaksByPerson } from './FrameStreaks.ts'
 
-/**
- * Everyone whose most recent clear reading shows the #OPENTOWORK frame, most recently seen first,
- * with how long their current run of open scans has lasted.
- * Someone who has since been read without the frame is left out.
- */
 export function listOpenToWorkPeople(index: NetworkIndex): OpenToWorkPerson[] {
   const latestScanDate = index.scansInOrder.at(-1)?.scanDate
   const firstSeenOpen = firstSeenOpenByPerson(index)

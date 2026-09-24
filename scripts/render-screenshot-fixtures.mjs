@@ -1,5 +1,3 @@
-// Renders synthetic LinkedIn-style list screenshots (the frame label is centred in its band, as on LinkedIn) (fictional people) for the screenshot-reader tests.
-// Usage: node scripts/render-screenshot-fixtures.mjs   (needs Google Chrome installed)
 import { execFileSync } from 'node:child_process'
 import { mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -19,7 +17,6 @@ const people = [
   { name: 'Hugo Ferreira', headline: 'DevOps Engineer at Pied Piper', frame: 'open', button: 'Following' },
 ]
 
-// A long list, as a full-page capture of the followers page gives: fictional first and last names paired up.
 const firstNames = ['Ines', 'Jonas', 'Kaia', 'Lorenzo', 'Mireille', 'Niall', 'Odette', 'Pavel', 'Quentin', 'Rosalind', 'Soren', 'Tamsin']
 const lastNames = ['Abernathy', 'Blackwood', 'Castellano', 'Drummond', 'Ellery', 'Fairbanks', 'Galloway']
 const roles = ['Backend Engineer', 'Recruiter at Vandelay', 'QA Lead', 'Solutions Architect at Contoso', 'Agile Coach']
@@ -29,13 +26,10 @@ const longList = Array.from({ length: 30 }, (_, index) => ({
   frame: [null, null, 'open', null, 'hiring'][index % 5],
   button: index % 3 === 0 ? 'Following' : 'Follow',
 }))
-// Three photos so light they blend into the page, one after the other: the reader can't find them, only the names beside them.
-// The first of them has a line of shared connections too, making its row taller than the rest, as on LinkedIn.
 longList[20].lightPhoto = true
 longList[20].followedBy = 'Followed by Sam and Priya'
 longList[21].lightPhoto = true
 longList[22].lightPhoto = true
-// A row printed so faintly that OCR is unsure of it among the page's dark text, but reads it once it is enlarged and sharpened alone.
 longList.push({ name: 'Corwin Hale', headline: 'Talent Partner', frame: null, button: 'Follow', faint: true })
 
 const colors = { open: '#448a3c', hiring: '#7a3ee8' }
@@ -62,7 +56,6 @@ function row(person, index) {
     <button class="${person.button === 'Following' ? 'on' : ''}">${person.button}</button></div>`
 }
 
-/** On LinkedIn a name starts level with the top of its photo; the older fixtures centre the text beside it instead. */
 function page(rows, nameLevelWithPhotoTop = false) {
   return `<!doctype html><html><head><style>
     body { margin: 0; background: #f4f2ee; font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; }
@@ -90,8 +83,6 @@ function render(name, subset, height, everyone = people) {
   console.log('rendered', name)
 }
 
-// The Connections list: name, title (wrapping to two lines when long), and a "Connected on" date under it, with a Message
-// button. Rows sit closer together than on the Followers list, so the gap between two people is barely bigger than a line.
 const connectionRoles = ['Platform Engineer', 'Director of Engineering at Wayne Enterprises | Mentor | Speaker on resilient distributed systems and teams', 'Data Analyst at Cyberdyne', 'Founder and CEO at Stark Robotics | Building calm software for hospitals, schools and city governments', 'Scrum Master']
 const connectionsList = Array.from({ length: 28 }, (_, index) => ({
   name: `${firstNames[(index + 5) % firstNames.length]} ${lastNames[(index + 3) % lastNames.length]}`,
@@ -105,7 +96,6 @@ function connectionRow(person, index) {
     <button>Message</button><span class="more">···</span></div>`
 }
 
-/** Full-page captures are stitched from scrolled screenshots, and a seam can land the rows below it a few pixels left of those above. */
 function connectionsPage(list, seamAfter) {
   const rows = (from, to) => list.slice(from, to).map((person, index) => connectionRow(person, from + index)).join('')
   return `<!doctype html><html><head><style>
@@ -136,10 +126,7 @@ function renderConnections(name, height) {
   console.log('rendered', name)
 }
 
-// Two overlapping screenshots, as when scrolling: the last two people of the first appear again at the top of the second.
 render('Screenshot 2026-09-22 at 9.01.12 AM.png', people.slice(0, 5), 700)
 render('Screenshot 2026-09-22 at 9.01.19 AM.png', people.slice(3, 8), 700)
-// A full-page capture of a long list: 31 people in one image about 6,500 pixels tall.
 render('Followers full page.png', longList, 3250, longList)
-// A full-page capture of the Connections list: 28 people, the last six below a stitching seam.
 renderConnections('Connections full page.png', 2800)

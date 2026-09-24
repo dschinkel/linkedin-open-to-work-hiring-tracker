@@ -7,7 +7,6 @@ type FormattedChartTooltipProps = ComponentProps<typeof ChartTooltipContent> & {
   formatLabel: (value: string) => string
 }
 
-/** shadcn's chart tooltip with this app's value and date formatting; Recharts fills in active, payload and label. */
 export function FormattedChartTooltip({ config, formatValue, formatLabel, ...props }: FormattedChartTooltipProps) {
   return (
     <ChartTooltipContent

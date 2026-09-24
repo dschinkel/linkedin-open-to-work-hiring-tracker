@@ -22,14 +22,9 @@ export interface LiveTrackerSetup {
 
 export interface LiveTrackers {
   routesByAudience: RoutesByAudience
-  /** Starts watching both inbox folders; returns a function that stops watching. */
   watchInboxes: () => () => Promise<void>
 }
 
-/**
- * Your real data: data/linkedin.sqlite (created with its tables on first run), each audience's inbox
- * folder, and the analyzer that turns screenshots into saved people.
- */
 export const liveTrackers = ({ projectRoot, cardReader, log }: LiveTrackerSetup): LiveTrackers => {
   const databasePath = path.join(projectRoot, defaultDatabasePath)
   const isNew = !existsSync(databasePath)

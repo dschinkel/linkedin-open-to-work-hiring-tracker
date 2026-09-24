@@ -1,6 +1,5 @@
 import type { ExportFormat, ListExport, ListExporter } from './listExport'
 
-/** Browser adapter: builds the file in the page (spreadsheet and PDF libraries load only when exporting) and downloads it. */
 export const browserListExporter: ListExporter = {
   save: async (listExport) => downloadFile(await fileWriters[listExport.format](listExport), listExport.fileName),
 }

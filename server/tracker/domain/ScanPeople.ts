@@ -7,7 +7,6 @@ interface SavedScan {
   observations: Observation[]
 }
 
-/** Everyone observed in one scan, joined with who they are, sorted by name. */
 export function listScanPeople({ scan, people, observations }: SavedScan): ScanPeople {
   const peopleById = new Map(people.map((person) => [person.id, person]))
   return {

@@ -7,7 +7,6 @@ export interface QualitySection {
   rows: DefinitionRow[]
 }
 
-/** Exposes classifier and extraction quality so odd chart moves can be traced to a weak batch. */
 export function describeScanQuality(quality: ScanQuality): QualitySection[] {
   return [
     {

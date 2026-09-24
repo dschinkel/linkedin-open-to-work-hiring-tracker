@@ -21,7 +21,6 @@ export interface OpenToWorkTrendView {
 
 const pointsNeededForTrend = 2
 
-/** Dashboard trend: stock (rate) and the flows (added vs removed) that explain it. */
 export function useViewOpenToWorkTrend(injectedRepository?: TrendRepository): OpenToWorkTrendView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? trendRepositoryFor(api)

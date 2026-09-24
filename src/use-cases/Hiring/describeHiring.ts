@@ -21,7 +21,6 @@ export function describeHiringTiles(summary: HiringSummary): StatTileView[] {
 export interface HiringPersonRow {
   personId: string
   name: string
-  /** Up to two letters standing in for the profile photo. */
   initials: string
   headline: string
   company: string
@@ -29,13 +28,11 @@ export interface HiringPersonRow {
   companyNeedsReview: boolean
   hiringSince: string
   lastSeenHiring: string
-  /** Length of the latest unbroken run of scans showing #HIRING, e.g. "3 days · 2 scans". */
   timeHiring: string
   recency: string
   isStale: boolean
 }
 
-/** Never claims the frame is present today unless the person was actually in today's screenshots. */
 export function describeHiringPerson(person: HiringPerson, today: Date = new Date()): HiringPersonRow {
   return {
     personId: person.personId,

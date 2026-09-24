@@ -18,7 +18,6 @@ function incrementCount(counts: SignalCounts, status: ReturnType<Signal['read']>
   else counts.uncertain += 1
 }
 
-/** Positive ÷ (positive + negative) × 100. Uncertain observations are excluded from the denominator. */
 export function publicRate(counts: SignalCounts): number | null {
   return percentage(counts.positive, counts.positive + counts.negative)
 }
@@ -28,13 +27,11 @@ export function percentage(numerator: number, denominator: number): number | nul
   return (numerator / denominator) * 100
 }
 
-/** Difference between two rates, in percentage points. */
 export function percentagePointChange(current: number | null, previous: number | null): number | null {
   if (current === null || previous === null) return null
   return current - previous
 }
 
-/** Added ÷ Removed. Null when nothing was removed, so the UI never shows an infinite ratio. */
 export function entryExitRatio(added: number, removed: number): number | null {
   if (removed === 0) return null
   return added / removed

@@ -21,13 +21,11 @@ import { viewScan } from '../tracker/use-cases/ViewScan.ts'
 import { viewTitleTrends } from '../tracker/use-cases/ViewTitleTrends.ts'
 import { viewTrends } from '../tracker/use-cases/ViewTrends.ts'
 
-/** Composition for one audience (followers or contacts): its use cases wired to its routes. */
 export interface AudienceTrackerParts {
   trackerStore: TrackerStore
   screenshots: ScreenshotUseCases
   clearAllData: () => Promise<ProcessingResult>
   today?: () => string
-  /** The moment a snapshot is saved; tests pin it. */
   now?: () => Date
 }
 

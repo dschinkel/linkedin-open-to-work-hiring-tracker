@@ -8,10 +8,6 @@ const averagedWindows = [
   { label: '90-day avg', days: 90 },
 ]
 
-/**
- * Averages the rates of scans actually taken in the trailing window (endDate − days, endDate].
- * Missing dates are skipped rather than filled in.
- */
 export function movingAverageAt(summaries: ScanSummary[], endDate: string, days: number): number | null {
   const startExclusive = addDays(endDate, -days)
   const rates = summaries
@@ -21,7 +17,6 @@ export function movingAverageAt(summaries: ScanSummary[], endDate: string, days:
   return average(rates)
 }
 
-/** "Today" is the latest scan versus the scan before it; each average is compared with itself one window earlier. */
 export function movingAverageTable(summaries: ScanSummary[]): MovingAverage[] {
   const latest = summaries.at(-1)
   if (!latest) return []

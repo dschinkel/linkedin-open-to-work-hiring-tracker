@@ -10,7 +10,6 @@ export interface Analytics {
   hiringPeople: HiringPerson[]
 }
 
-/** Every use case needs the same computed view of the stored network, rebuilt only when the data changes. */
 export const trackerAnalytics = (trackerStore: TrackerStore): (() => Analytics) => {
   let cached: { version: number; analytics: Analytics } | null = null
   return () => {
@@ -28,6 +27,5 @@ function analyze(trackerStore: TrackerStore): Analytics {
 export interface TrackerPorts {
   analytics: () => Analytics
   trackerStore: TrackerStore
-  /** Today's date (YYYY-MM-DD); the demo pins it to its fixed sample so reminders stay quiet. */
   today: () => string
 }

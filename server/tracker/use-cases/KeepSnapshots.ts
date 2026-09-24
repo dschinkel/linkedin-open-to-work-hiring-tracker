@@ -10,10 +10,6 @@ export interface SnapshotPorts extends TrackerPorts {
   newSnapshotId: () => string
 }
 
-/**
- * Saved copies of the Open to Work and Hiring lists. The list is taken here, from the saved scans, so a
- * snapshot is exactly what the list said at that moment; the Hiring list is taken through the filters in effect.
- */
 export const keepSnapshots = ({ analytics, trackerStore, now, newSnapshotId }: SnapshotPorts) => {
   const takeSnapshot = (kind: SnapshotKind, filters: HiringPeopleQuery, name: string): Snapshot => {
     const savedAt = now()

@@ -7,7 +7,6 @@ export interface MatchedCohort {
   previousRate: number | null
 }
 
-/** Only people classified in both scans, so a changing screenshot sample cannot move the rate. */
 export function matchedCohort(current: Observation[], previous: Observation[], signal: Signal): MatchedCohort {
   const classifiedBefore = classifiedByPerson(previous, signal)
   const matchedNow = current.filter((observation) => isClassified(observation, signal) && classifiedBefore.has(observation.personId))

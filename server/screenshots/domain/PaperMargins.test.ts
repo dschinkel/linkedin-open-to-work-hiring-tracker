@@ -3,10 +3,6 @@ import { screenshotOnThePage } from './PaperMargins.ts'
 const white = [255, 255, 255]
 const pageGrey = [244, 242, 238]
 
-/**
- * A 200 × 300 image of a list (grey page either side of a white card) with blank white paper `above` and `below`
- * it, as a screenshot printed to a PDF page sits on the paper.
- */
 function printedPage({ above, below }: { above: number; below: number }) {
   const width = 200
   const height = 300

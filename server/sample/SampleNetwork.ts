@@ -38,14 +38,11 @@ interface SampleState {
 }
 
 const cardsPerScreenshot = 14
-/** Cards repeated at the top of the next screenshot, as happens when scrolling. */
 const overlappingCards = 2
 const sampledShare = 0.9
 const skippedDayShare = 0.12
-/** Chance per day that someone unfollows or disconnects, so the sample has people who left. */
 const leaveChancePerDay = 0.0006
 
-/** Deterministic, realistic-looking history so the dashboard is explorable before real screenshots exist. */
 export function generateSampleNetwork(options: SampleNetworkOptions): Network {
   const random = seededRandom(options.seed)
   const people = Array.from({ length: options.peopleCount }, (_, position) => samplePerson(position, random))
@@ -57,7 +54,6 @@ export function generateSampleNetwork(options: SampleNetworkOptions): Network {
   return { people, scans: state.scans, observations: state.observations }
 }
 
-/** Mulberry32: small, fast, repeatable. */
 function seededRandom(seed: number): Random {
   let value = seed >>> 0
   return () => {
@@ -78,7 +74,7 @@ function samplePerson(position: number, random: Random): Person {
   const company = withOccasionalOcrNoise(extractCompany(headline, explicitCompany), random)
   return {
     id: `person-${String(position + 1).padStart(4, '0')}`,
-    personHash: `sample-hash-${position + 1}`, // sample people need no real SHA-256; keeps the seed browser-safe
+    personHash: `sample-hash-${position + 1}`,
     displayName,
     headline,
     ...company,
@@ -102,7 +98,6 @@ function initialFrames(people: Person[], random: Random): Map<string, TrueFrames
   return new Map(people.map((person) => [person.id, { isOpen: random() < 0.08, isHiring: random() < 0.045, hasLeft: false }]))
 }
 
-/** Entry into Open to Work slowly rises over the period, so the trend has a story to tell. */
 function advanceOneDay(state: SampleState, progress: number): void {
   const openEntry = 0.0008 + progress * 0.0012
   for (const frames of state.frames.values()) {
@@ -137,7 +132,6 @@ function recordScan(state: SampleState, scanDate: string): void {
   })
 }
 
-/** Like a person scrolling: each screenshot repeats the last few cards of the one before. */
 function overlappingScreenshots(people: Person[]): Person[][] {
   const step = cardsPerScreenshot - overlappingCards
   const shots: Person[][] = []
@@ -145,7 +139,6 @@ function overlappingScreenshots(people: Person[]): Person[][] {
   return shots
 }
 
-/** Every card is read independently, so the same person can be read differently in two screenshots. */
 function detectCard(person: Person, screenshotFileName: string, state: SampleState): DetectedCard {
   const frames = state.frames.get(person.id) as TrueFrames
   return {

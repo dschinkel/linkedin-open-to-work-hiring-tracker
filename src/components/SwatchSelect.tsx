@@ -3,7 +3,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 export interface SwatchOption<Value extends string> {
   value: Value
   label: string
-  /** Any CSS color. */
   swatch: string
 }
 
@@ -15,7 +14,6 @@ interface SwatchSelectProps<Value extends string> {
   onChange: (value: Value) => void
 }
 
-/** A compact picker of colors: phones see only the current swatch, wider screens also see its name. */
 export function SwatchSelect<Value extends string>({ label, value, swatch, options, onChange }: SwatchSelectProps<Value>) {
   return (
     <Select items={options} value={value} onValueChange={(next) => next && onChange(next as Value)}>

@@ -17,7 +17,6 @@ import { type ApiClient, queryString } from '@/shared-repositories/apiClient'
 export interface ScanRepository {
   history: (window: TimeWindow) => Promise<ScanSummary[]>
   detail: (scanId: string) => Promise<ScanDetail>
-  /** Everyone saved for a scan, sorted by name; "latest" means the most recent scan. */
   people: (scanId: string) => Promise<ScanPeople>
   reprocess: (scanId: string) => Promise<ProcessingResult>
   addScreenshots: (files: AddScreenshotsRequest['files']) => Promise<AddScreenshotsResult>

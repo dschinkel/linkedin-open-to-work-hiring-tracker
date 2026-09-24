@@ -3,7 +3,6 @@ import { percentage } from './Rates.ts'
 
 type KnownStatus = Exclude<SignalStatus, 'UNCERTAIN'>
 
-/** Each person's most recent classified status for one signal. Missing people keep their last known status. */
 export type LastKnownStatuses = Map<string, KnownStatus>
 
 export interface TransitionTally {
@@ -15,10 +14,6 @@ export interface TransitionTally {
 
 const emptyTally = (): TransitionTally => ({ added: 0, removed: 0, stayedPositive: 0, stayedNegative: 0 })
 
-/**
- * Compares each classified person in this scan with their last classified observation.
- * A person seen for the first time is not an entry; a person missing from this scan is not an exit.
- */
 export function tallyTransitions(
   observations: Observation[],
   signal: Signal,
@@ -56,12 +51,10 @@ export function netMovement(tally: TransitionTally): number {
   return tally.added - tally.removed
 }
 
-/** Newly positive ÷ people previously negative and observed again × 100. */
 export function entryRate(tally: TransitionTally): number | null {
   return percentage(tally.added, tally.added + tally.stayedNegative)
 }
 
-/** Newly negative ÷ people previously positive and observed again × 100. */
 export function removalRate(tally: TransitionTally): number | null {
   return percentage(tally.removed, tally.removed + tally.stayedPositive)
 }

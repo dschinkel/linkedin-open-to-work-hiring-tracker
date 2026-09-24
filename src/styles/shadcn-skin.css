@@ -1,19 +1,7 @@
-/*
- * The TUI skin for stock shadcn components, keyed on their data-slot attributes so the files in
- * components/ui stay exactly as `shadcn add` installs them.
- *
- * Rule for this file: only restyle what the stock class strings hard-code (borders, shadows, overflow,
- * decorations, rounded corners the radius token can't reach). Never set text color or size here. Those
- * belong to call sites, and these rules are unlayered, so they would beat a call site's utilities.
- * The one exception is a component's own state styling (a pressed toggle), which call sites don't set.
- */
-
-/* Card: a solid rule and a hard shadow, with the title set into the top border. */
 [data-slot='card'] {
-  @apply overflow-visible border shadow-block; /* overflow-visible: the title sits half outside the box */
+  @apply overflow-visible border shadow-block;
 }
 
-/* A little more room inside full-size panels; compact (size="sm") cards keep shadcn's spacing. */
 [data-slot='card']:not([data-size='sm']) {
   @apply [--card-spacing:--spacing(6)];
 }
@@ -30,7 +18,6 @@
   @apply border-dashed bg-transparent;
 }
 
-/* Avatar: a character cell, not a circle. */
 [data-slot='avatar'] {
   @apply rounded-none after:rounded-none;
 }
@@ -39,17 +26,14 @@
   @apply rounded-none;
 }
 
-/* Menus and dialogs: the same hard shadow as panels. */
 :is([data-slot='select-content'], [data-slot='alert-dialog-content']) {
   @apply shadow-block;
 }
 
-/* Toggle groups read as [7D][30D] with the pressed item inverted. */
 [data-slot='toggle-group-item'] {
   @apply data-pressed:bg-primary data-pressed:text-primary-foreground;
 }
 
-/* Table: dashed row rules and a hover row highlight. */
 [data-slot='table-row'] {
   @apply border-dashed;
 }
@@ -58,17 +42,14 @@
   @apply hover:bg-accent;
 }
 
-/* Progress: a square bar in a ruled track, like a row of block cells. */
 [data-slot='progress-track'] {
   @apply h-2 rounded-none;
 }
 
-/* Skeleton: a dim block that doesn't round. */
 [data-slot='skeleton'] {
   @apply rounded-none;
 }
 
-/* Form fields: a taller box sunk to the page color with a clear rule, so they stand out from the panel. */
 :is([data-slot='input'], [data-slot='select-trigger']) {
   @apply h-10 rounded-none border-input bg-background px-3 dark:bg-background dark:hover:bg-background;
 }

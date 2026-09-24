@@ -21,7 +21,6 @@ export interface SettingsView {
   changeRetention: (value: Settings['retention']) => void
   changeAfterAnalysis: (value: Settings['afterAnalysis']) => void
   isSaving: boolean
-  /** What happened to the latest edit: saving, saved, or why it can't be saved. */
   saveMessage: string
 }
 
@@ -55,10 +54,8 @@ const placeholderSettings: Settings = {
   afterAnalysis: 'delete',
 }
 
-/** Waits this long after the last keystroke before saving, so typing a folder path saves once, not per letter. */
 export const autosaveDelayMilliseconds = 500
 
-/** Every edit saves itself shortly after it's made, as long as it passes the settings contract. */
 export function useEditSettings(injectedRepository?: SettingsRepository): SettingsView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? settingsRepositoryFor(api)
@@ -109,8 +106,6 @@ export function useEditSettings(injectedRepository?: SettingsRepository): Settin
     saveMessage: validationMessage || saveOutcome({ isPending: saving.isPending || (draft !== null && !saving.isError), isSaved: saving.isSuccess, error: saving.error }),
   }
 }
-
-
 
 function saveOutcome({ isPending, isSaved, error }: { isPending: boolean; isSaved: boolean; error: Error | null }): string {
   if (isPending) return 'Saving…'

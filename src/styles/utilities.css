@@ -1,51 +1,36 @@
-/*
- * Reusable ASCII devices as Tailwind utilities, built from Tailwind utilities. Use them in className like any
- * other class (`figure text-figure`, `dot-leader`), including with variants (`sm:figure`).
- */
-
-/* A number meant to be read at a glance: bold, tight, digits of equal width so columns line up.
-   Color is left to the call site (text-primary, or a signal color for deltas). */
 @utility figure {
   @apply font-bold tracking-figure tabular-nums;
 }
 
-/* A panel title set into its panel's top border, like a terminal window. Uses --card-spacing, which shadcn's Card sets. */
 @utility tui-title {
   @apply -mt-[calc(var(--card-spacing)+0.8em)] -ml-[0.5ch] w-fit bg-card px-[0.5ch];
 }
 
-/* A panel title as a solid tag in the panel's color, so it reads at a glance. Color comes from the call site. */
 @utility panel-tag {
   @apply inline-block px-[1ch] py-0.5 leading-snug;
 }
 
-/* A form field's label: bold and in the theme color, so it stands apart from the value under it. */
 @utility field-label {
   @apply text-label font-bold text-prompt;
 }
 
-/* Text filled with a flowing rainbow; still (but still rainbow) for anyone who prefers reduced motion. */
 @utility rainbow-text {
   @apply animate-rainbow-slide bg-size-[200%_auto] bg-clip-text text-transparent motion-reduce:animate-none;
   background-image: linear-gradient(90deg, #ff4d4d, #ff9f1a, #ffe14d, #4dd964, #3bb8ff, #8a6bff, #ff4dc4, #ff4d4d);
 }
 
-/* Dotted leader between a label and its value: Screenshots ........ 54. Place it as a flex child between the two. */
 @utility dot-leader {
   @apply min-w-4 flex-1 -translate-y-[0.25em] border-b border-dotted border-muted-foreground/50;
 }
 
-/* A page's own heading: large, bold, tight, in the brightest ink. */
 @utility page-title {
   @apply text-xl leading-tight font-bold tracking-figure text-primary sm:text-display;
 }
 
-/* First-visit attention pulse on the Demo button; a steady outline instead when motion is reduced. */
 @utility invite-highlight {
   @apply animate-invite-pulse motion-reduce:animate-none motion-reduce:outline-2 motion-reduce:outline-offset-2 motion-reduce:outline-open-to-work;
 }
 
-/* Screenshot upload progress: flashes between the prompt color and normal text; steady prompt color when motion is reduced. */
 @utility upload-progress {
   @apply animate-upload-progress motion-reduce:animate-none motion-reduce:text-prompt;
 }

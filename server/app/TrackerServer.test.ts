@@ -12,7 +12,6 @@ const firstShot = 'Screenshot 2026-09-22 at 9.01.12 AM.png'
 const secondShot = 'Screenshot 2026-09-22 at 9.01.19 AM.png'
 const cardReader = screenshotCardReader(path.resolve('data/ocr'))
 
-/** The real server (Koa, SQLite, inbox folders, screenshot reader) running in a throwaway project folder. */
 function serverIn(projectRoot: string, log: (message: string) => void = () => undefined) {
   const trackers = liveTrackers({ projectRoot, cardReader, log })
   const app = trackerKoaApp((apiRequest) => answerAudienceRequest(trackers.routesByAudience, apiRequest)).callback()

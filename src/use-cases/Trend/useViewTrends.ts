@@ -38,7 +38,6 @@ const movingAverageColumns: DataColumn[] = [
   { key: 'change', label: 'Change', isNumeric: true },
 ]
 
-/** Deeper longitudinal analysis: rates, averages, flows, matched cohorts, observed durations. */
 export function useViewTrends(injectedRepository?: TrendRepository): TrendsView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? trendRepositoryFor(api)

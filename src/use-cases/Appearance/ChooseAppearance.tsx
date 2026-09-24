@@ -2,7 +2,6 @@ import { IconChoiceSelect } from '@/components/IconChoiceSelect'
 import { SwatchSelect } from '@/components/SwatchSelect'
 import { useChooseAppearance } from './useChooseAppearance'
 
-/** Header control: an icon button for Light/Dark/System and a swatch picker for the color theme. */
 export function ChooseAppearance() {
   const appearance = useChooseAppearance()
 

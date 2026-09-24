@@ -9,10 +9,6 @@ const openToWorkLabels: Record<ScanPerson['openToWork'], string> = { OPEN: 'Open
 const hiringLabels: Record<ScanPerson['hiring'], string> = { HIRING: 'Hiring', NOT_HIRING: 'Not hiring', UNCERTAIN: 'Unclear' }
 const columns = ['Name', 'Headline', 'Company', 'Open to Work', 'Hiring', 'Scan date']
 
-/**
- * Saves everyone in a scan, e.g. "followers-2026-09-22.xlsx". Exports the scan in the address
- * unless given one; "latest" exports the most recent scan.
- */
 export function useExportScanPeople(scanId?: string, injectedRepository?: ScanRepository, exporter?: ListExporter): ExportListView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? scanRepositoryFor(api)

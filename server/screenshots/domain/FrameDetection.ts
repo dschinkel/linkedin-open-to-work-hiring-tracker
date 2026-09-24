@@ -1,6 +1,5 @@
 import type { Classification, HiringStatus, OpenToWorkStatus } from '../../shared/domain/Observation.ts'
 
-/** Raw RGBA pixels of a screenshot. */
 export interface Pixels {
   data: Uint8Array
   width: number
@@ -18,10 +17,6 @@ export interface FrameReadings {
   hiring: Classification<HiringStatus>
 }
 
-/**
- * Below this radius (in screenshot pixels) the frame band is only a few pixels wide and its label is a blur,
- * so a green or purple photo background looks the same as a frame. Such photos are Uncertain, never "no frame".
- */
 export const smallestReadablePhotoRadius = 20
 
 const tooSmallToRead: FrameReadings = {
@@ -29,15 +24,10 @@ const tooSmallToRead: FrameReadings = {
   hiring: { status: 'UNCERTAIN', confidence: 0, classificationMethod: 'pixels' },
 }
 
-/** A real frame is one unbroken coloured band along the avatar's edge, at least this long, carrying light lettering. */
 const frameArcDegrees = 120
 const noFrameArcDegrees = 40
 const stepDegrees = 2
 
-/**
- * Finds the round avatar just left of a row's text: moving left from the text, the first non-background
- * shape is the avatar. Returns null when nothing is there.
- */
 export function locateAvatar(pixels: Pixels, textLeft: number, top: number, bottom: number): AvatarCircle | null {
   const rowTop = Math.max(0, Math.round(top))
   const rowBottom = Math.min(pixels.height - 1, Math.round(bottom))
@@ -78,11 +68,6 @@ function rowHasShape(pixels: Pixels, y: number, left: number, right: number, bac
   return false
 }
 
-/**
- * Reads both frames from the avatar's edge. LinkedIn draws #OPENTOWORK as a green band and #HIRING as a purple
- * band along the outside of the photo, with the label in light letters on it. A photo that merely has green or
- * purple in it (a shirt, a background) rarely forms an unbroken band with lettering, so it isn't counted.
- */
 export function readFrames(pixels: Pixels, avatar: AvatarCircle): FrameReadings {
   if (avatar.radius < smallestReadablePhotoRadius) return tooSmallToRead
   return {
@@ -109,17 +94,13 @@ export function frameBand(pixels: Pixels, { centreX, centreY, radius }: AvatarCi
   return { arcDegrees: run.length * stepDegrees, hasLettering: letteringInRun >= 3 }
 }
 
-/** Radii (as a share of the avatar's radius) where the frame band sits. */
 const bandRadii = [0.86, 0.9, 0.94, 0.98]
-/** Samples from inside the photo out to the edge, to find label letters sitting inside the band. */
 const radialProfile = Array.from({ length: 16 }, (_, index) => 0.7 + index * 0.02)
 
-/** A light pixel with band colour both further in and further out is a letter printed on the band. */
 function hasLetteringInside(colours: Rgb[], isBandColour: (colour: Rgb) => boolean): boolean {
   const band = colours.map(isBandColour)
   return colours.some((colour, index) => isLight(colour) && band.slice(0, index).some(Boolean) && band.slice(index + 1).some(Boolean))
 }
-/** Letters on the band interrupt its colour; breaks up to this many steps still count as one band. */
 const maximumLetterGap = 5
 
 function longestCircularRun(flags: boolean[], allowedGap: number): { length: number; indices: number[] } {
@@ -181,13 +162,11 @@ function hsv({ r, g, b }: Rgb): { hue: number; saturation: number; value: number
   return { hue: (hue + 360) % 360, saturation: max === 0 ? 0 : delta / max, value: max }
 }
 
-/** LinkedIn's #OPENTOWORK green. */
 export function isFrameGreen(colour: Rgb): boolean {
   const { hue, saturation, value } = hsv(colour)
   return hue >= 85 && hue <= 160 && saturation >= 0.35 && value >= 0.25
 }
 
-/** LinkedIn's #HIRING purple. */
 export function isFramePurple(colour: Rgb): boolean {
   const { hue, saturation, value } = hsv(colour)
   return hue >= 245 && hue <= 290 && saturation >= 0.35 && value >= 0.3

@@ -5,7 +5,6 @@ import { entryExitRatio } from '../domain/Rates.ts'
 import { withinWindow } from '../domain/TimeWindow.ts'
 import type { TrackerPorts } from '../domain/TrackerAnalytics.ts'
 
-/** Rates, averages, flows, and observed durations over a time window. */
 export const viewTrends = ({ analytics }: TrackerPorts) => ({
   viewTrends: (window: TimeWindow): Trends => {
     const { index, timeline } = analytics()

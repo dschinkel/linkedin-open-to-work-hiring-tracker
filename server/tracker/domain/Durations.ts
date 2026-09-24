@@ -23,10 +23,6 @@ const buckets = [
   { label: '90+ days', fits: (days: number) => days > 90 },
 ]
 
-/**
- * Observed duration: from the first scan showing NOT_OPEN → OPEN to the first scan showing OPEN → NOT_OPEN.
- * Episodes without an observed start or end are left out, because their true length is unknown.
- */
 export function observedDurations(index: NetworkIndex): DurationDistribution {
   const durations = [...sightingsByPerson(index).values()].flatMap(completedEpisodeDurations)
   return {

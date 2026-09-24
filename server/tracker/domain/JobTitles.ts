@@ -3,7 +3,6 @@ import type { NetworkIndex } from './NetworkIndex.ts'
 import { openToWorkSignal } from '../../shared/domain/Observation.ts'
 import { percentage, percentagePointChange } from './Rates.ts'
 
-/** Checked in order; the first family whose words appear in the title wins. */
 const titleFamilies: Array<{ family: string; words: RegExp }> = [
   { family: 'Recruiter / Talent', words: /\b(recruit\w*|talent|sourc\w+|hr\b|human resources|people partner)/i },
   { family: 'Founder / Executive', words: /\b(founder|co-founder|ceo|cto|cio|coo|chief|president|owner)\b/i },
@@ -19,7 +18,6 @@ const titleFamilies: Array<{ family: string; words: RegExp }> = [
   { family: 'Software Engineer', words: /\b(software|engineer\w*|developer|programmer|architect|full[- ]?stack|front[- ]?end|back[- ]?end|swe)\b/i },
 ]
 
-/** The job family a visible headline belongs to, or null when the headline doesn't say (e.g. "Building the future"). */
 export function titleFamily(headline: string | null): string | null {
   if (!headline) return null
   const title = headline.split(/\s(?:at|@)\s|\||·|•/)[0]
@@ -28,10 +26,6 @@ export function titleFamily(headline: string | null): string | null {
 
 const maximumPeriods = 6
 
-/**
- * Open-to-Work rate per job family over time. Only people whose title could be read are included, so the
- * result also says how many people that covers. Periods are months for long histories, otherwise scan days.
- */
 export function openToWorkByTitle(index: NetworkIndex, scansInWindow: ScanSummary[]): TitleTrends {
   const periods = periodsFor(scansInWindow)
   const familyOf = new Map(index.scansInOrder.flatMap((scan) => index.observationsOf(scan.id)).map((observation) => [observation.personId, titleFamily(index.personOf(observation.personId).headline)]))

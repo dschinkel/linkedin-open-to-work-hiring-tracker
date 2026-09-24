@@ -12,15 +12,9 @@ interface BarComparisonChartProps {
   xKey: string
   series: ChartSeries[]
   formatX: (value: string) => string
-  /** Charts sharing a zoomGroup zoom and show tooltips together. */
   zoomGroup?: string
 }
 
-/**
- * One column per scan. Series marked isBelowZero hang under the zero line, so entries and exits read as a push and
- * a pull on the same day; values are shown unsigned in the axis and tooltip. A series with a negativeColor is signed
- * (net flow) and each bar takes the color of its sign.
- */
 export function BarComparisonChart({ data, xKey, series, formatX, zoomGroup }: BarComparisonChartProps) {
   const config = useMemo(() => chartConfigFor(series, 'bar'), [series])
   const isMirrored = series.some((bar) => bar.isBelowZero)

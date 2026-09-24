@@ -17,7 +17,6 @@ describe('spacing between rows of people', () => {
   })
 })
 
-/** A white list with grey page margins, under a dark browser toolbar 40 pixels tall (or none, for a capture of the page alone). */
 function browserShowingAList(toolbarHeight = 40) {
   const width = 300
   const height = 400
@@ -67,10 +66,6 @@ describe('telling a whole row from one cut by the top of the image', () => {
   })
 })
 
-/**
- * A capture of the page alone with dark round photos, radius 20, down one column. A photo taken against a white wall
- * blends into the page where the wall shows: here its upper-left quarter.
- */
 function listWithPhotosAt(centres: number[], againstAWhiteWall: number[] = []) {
   const page = browserShowingAList(0)
   for (const centreY of centres) {

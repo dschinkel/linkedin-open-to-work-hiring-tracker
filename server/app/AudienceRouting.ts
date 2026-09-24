@@ -5,7 +5,6 @@ export type RoutesByAudience = Record<Audience, Route[]>
 
 const audiencePath = /^\/api\/([^/]+)(\/.*)$/
 
-/** "/api/followers/dashboard" is answered by the followers tracker as "/api/dashboard". */
 export function answerAudienceRequest(routesByAudience: RoutesByAudience, request: ApiRequest): Promise<ApiResponse> {
   const match = audiencePath.exec(request.path)
   const audience = audienceSchema.safeParse(match?.[1])

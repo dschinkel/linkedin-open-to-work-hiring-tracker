@@ -21,9 +21,7 @@ export interface OpenToWorkPeopleView extends SortedRows {
   searchByNameOrTitle: (search: string) => void
   hasPeople: boolean
   showNobodyOpen: boolean
-  /** Saves the list as shown: current search and sort, same columns. A snapshot on show is exported as that snapshot. */
   exporting: ExportListView
-  /** Saved copies of this list; one can be shown in place of the current list. */
   snapshots: KeepSnapshotsView
   snapshotDetail: string
 }
@@ -40,7 +38,6 @@ const columns: DataColumn[] = [
 const initialSort = { key: 'lastSeen', direction: 'desc' } as const
 const openToWorkList = { slug: 'open-to-work', title: 'Open to Work' }
 
-/** Everyone currently showing #OPENTOWORK (or everyone in a saved snapshot), searchable by name or title. */
 export function useFindOpenToWorkPeople(injectedRepository?: OpenToWorkRepository, exporter?: ListExporter, snapshotRepository?: SnapshotRepository): OpenToWorkPeopleView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? openToWorkRepositoryFor(api)

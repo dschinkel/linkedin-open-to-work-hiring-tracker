@@ -1,18 +1,3 @@
-/*
- * Color themes: 3 themes x light/dark. Each block sets the same 13 role colors (--scheme-*); tokens.css maps
- * them onto shadcn's tokens, so a theme never touches components. Every text color here (dim, text, bright, prompt
- * and the signal colors) meets WCAG AA (4.5:1) against the page, panel, raised, fill and hover colors.
- * accent is the prompt color as text; accent-fill is the prompt color as a filled cell (the chosen audience, the
- * selection, chart handles), which may be livelier than text allows, with on-accent as the text on it (also 4.5:1).
- *
- * Applied with <html data-theme="ocean" class="dark">; the choice lives in src/use-cases/Appearance and the pre-paint
- * script in index.html. The selectors also work on any element, so a swatch can be drawn in a theme's own colors.
- * Ocean comes first: it is the default, so its :root block must lose to every named theme.
- * To add a theme: copy a pair of blocks, rename, check contrast, and add it to colorThemeOptions in
- * src/use-cases/Appearance/appearance.ts and to the list in the inline script in index.html.
- */
-
-/* Light and dark basics shared by every theme: signal colors and block shadow. Signals never change per theme. */
 :root {
   color-scheme: light;
   --scheme-open-to-work: #1b7039;
@@ -35,7 +20,6 @@
   --scheme-shadow: rgb(0 0 0 / 0.35);
 }
 
-/* Ocean: blue-tinted slate, blue prompt (default) --------------------------------------------------------------- */
 :root,
 [data-theme='ocean'] {
   --scheme-page: #e2f2ff;
@@ -73,7 +57,6 @@
   --scheme-on-accent: #0c1a29;
 }
 
-/* Neutral: grey ink, no tint ------------------------------------------------------------------------------------ */
 [data-theme='neutral'] {
   --scheme-page: #eeeeee;
   --scheme-page-glow: #dcdcdc;
@@ -109,7 +92,6 @@
   --scheme-on-accent: #1a1a1a;
 }
 
-/* Green: lightly green-tinted ink, bright summer yellow-green prompt (kept clear of the Open to Work green) ----- */
 [data-theme='green'] {
   --scheme-page: #e7f5e2;
   --scheme-page-glow: #cbeabf;
@@ -145,7 +127,6 @@
   --scheme-on-accent: #10200f;
 }
 
-/* Aqua: sea-glass teal fading to deep water ------------------------------------------------------------------ */
 [data-theme='aqua'] {
   --scheme-page: #def5f5;
   --scheme-page-glow: #bdeaea;
@@ -181,7 +162,6 @@
   --scheme-on-accent: #06181c;
 }
 
-/* Yellow: sunlit gold ----------------------------------------------------------------------------------------- */
 [data-theme='yellow'] {
   --scheme-page: #fbf6dc;
   --scheme-page-glow: #f3e7a8;
@@ -217,7 +197,6 @@
   --scheme-on-accent: #1f1a05;
 }
 
-/* Orange: warm ember ------------------------------------------------------------------------------------------ */
 [data-theme='orange'] {
   --scheme-page: #fdeee0;
   --scheme-page-glow: #f9d6b4;
@@ -253,7 +232,6 @@
   --scheme-on-accent: #231104;
 }
 
-/* Red: deep crimson ------------------------------------------------------------------------------------------- */
 [data-theme='red'] {
   --scheme-page: #fde8e8;
   --scheme-page-glow: #f9c8c9;

@@ -15,10 +15,6 @@ import type {
 } from '../../../shared/domain/Observation.ts'
 import type { AnalyzedDay, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
 
-/**
- * Schema changes, applied in order. The database remembers how many it has applied (PRAGMA user_version),
- * so opening an older file upgrades it and opening a current one changes nothing.
- */
 const migrations: string[] = [
   `CREATE TABLE people (
      id TEXT PRIMARY KEY,
@@ -81,7 +77,6 @@ const migrations: string[] = [
 
 export const defaultDatabasePath = 'data/linkedin.sqlite'
 
-/** Opens the database file, creating the folder, the file, and every table on first use. */
 export function openTrackerDatabase(databasePath: string): DatabaseSync {
   if (databasePath !== ':memory:') mkdirSync(path.dirname(databasePath), { recursive: true })
   const database = new DatabaseSync(databasePath)
@@ -97,7 +92,6 @@ function applyMigrations(database: DatabaseSync): void {
   })
 }
 
-/** One audience's data in the shared database file. Every read comes straight from SQLite. */
 export const sqliteTrackerStore = (database: DatabaseSync, audience: Audience, defaultSettings: Settings): TrackerStore => {
   return {
     readNetwork: () => readNetwork(database, audience),
@@ -130,7 +124,6 @@ export const sqliteTrackerStore = (database: DatabaseSync, audience: Audience, d
   }
 }
 
-/** Deletes every row from every table, for both audiences, in one step. The tables themselves stay. */
 export function eraseTrackerDatabase(database: DatabaseSync): void {
   database.exec('BEGIN; DELETE FROM observations; DELETE FROM screenshots; DELETE FROM scans; DELETE FROM people; DELETE FROM settings; DELETE FROM snapshots; COMMIT;')
 }
@@ -144,7 +137,6 @@ function readDay(database: DatabaseSync, audience: Audience, scanDate: string): 
   return { scan, observations, people: network.people.filter((person) => personIds.has(person.id)) }
 }
 
-/** Reads just the one scan, its observations, and the people in them, rather than the whole network. */
 function readScan(database: DatabaseSync, audience: Audience, scanId: string): AnalyzedDay | null {
   const scan = readScans(database, audience).find((existing) => existing.id === scanId)
   if (!scan) return null
@@ -161,7 +153,6 @@ function readScan(database: DatabaseSync, audience: Audience, scanId: string): A
   }
 }
 
-/** Total rows changed through this connection; bumps the version when this app writes. */
 function changeCount(database: DatabaseSync): number {
   return Number((database.prepare('SELECT total_changes() AS changes').get() as { changes: number }).changes)
 }
@@ -196,11 +187,6 @@ function readScans(database: DatabaseSync, audience: Audience): Scan[] {
   }))
 }
 
-/**
- * Writes one analyzed day for an audience in a single transaction: its people, the scan, each person's
- * observation, and which screenshots it came from. Re-saving the same day replaces it, so re-analysis
- * never duplicates anything.
- */
 function saveAnalyzedScan(database: DatabaseSync, audience: Audience, scan: Scan, people: Person[], observations: Observation[]): void {
   database.exec('BEGIN')
   try {
@@ -216,7 +202,6 @@ function saveAnalyzedScan(database: DatabaseSync, audience: Audience, scan: Scan
   }
 }
 
-/** The people and any filters are kept as JSON: a snapshot is read back whole and never queried by its contents. */
 function saveSnapshot(database: DatabaseSync, audience: Audience, snapshot: Snapshot): void {
   database
     .prepare('INSERT INTO snapshots (id, audience, kind, name, created_at, people_count, filters_json, people_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')

@@ -40,7 +40,6 @@ export function WhoIsHiringPreview({ people, showNoHiringPeople, hiringHref }: W
   )
 }
 
-/** Initials in a square purple frame, standing in for the purple #HIRING frame LinkedIn draws around the photo. */
 function HiringAvatar({ initials }: { initials: string }) {
   return (
     <Avatar aria-hidden className="after:border-hiring after:mix-blend-normal dark:after:mix-blend-normal">

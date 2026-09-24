@@ -6,11 +6,9 @@ export interface StatTileView {
   label: string
   value: string
   hint?: string
-  /** When set, the tile links to the list behind the number. */
   href?: string
 }
 
-/** A figure with its name directly beneath; used where stats stand on their own. */
 export function StatTile({ label, value, hint, href }: StatTileView) {
   const body = (
     <Card size="sm" className="h-full">

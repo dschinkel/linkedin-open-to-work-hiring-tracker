@@ -109,20 +109,14 @@ describe('reading a LinkedIn connections capture', () => {
   }, 120_000)
 })
 
-/** Part of a capture as a PDF page shows it: on white paper, with a blank margin above and below. */
 function printedOnAPage(capture: Buffer, { top, height }: { top: number; height: number }): Promise<Buffer> {
   const paperMargin = 150
   const white = { r: 255, g: 255, b: 255, alpha: 1 }
   return sharp(capture).extract({ left: 0, top, width: 1800, height }).extend({ top: paperMargin, bottom: paperMargin, background: white }).png().toBuffer()
 }
 
-/** The full-page capture split as a long page is split into several images: the cut runs through Soren Drummond's name, leaving his title below it. */
 const throughSorenDrummondsName = 2255
-/** A page break under Soren Drummond's name, through his photo, leaving his title on the next page. */
 const belowSorenDrummondsName = 2270
-/** A page break through the bottom few rows of Soren Drummond's letters. */
 const throughTheFootOfSorenDrummondsName = 2258
-/** A cut through the lower half of Tamsin Ellery's name, the next person down. */
 const throughTamsinEllerysName = 2450
-/** A cut below Tamsin Ellery's name but through her photo. */
 const throughTamsinEllerysPhoto = 2485

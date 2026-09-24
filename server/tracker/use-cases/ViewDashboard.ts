@@ -6,7 +6,6 @@ import type { Analytics, TrackerPorts } from '../domain/TrackerAnalytics.ts'
 
 const whoIsHiringPreviewSize = 6
 
-/** The latest scan at a glance: Open-to-Work and Hiring, who's hiring, quality, and the inbox. */
 export const viewDashboard = ({ analytics, trackerStore, today }: TrackerPorts) => ({
   viewDashboard: (): Dashboard => ({
     ...dashboardOf(analytics(), trackerStore.waitingScreenshotCount()),
@@ -33,7 +32,6 @@ function dashboardOf({ index, timeline, hiringPeople }: Analytics, inboxWaitingC
 const daysBetweenScans: Record<Settings['scanFrequency'], number> = { daily: 1, weekly: 7, biweekly: 14, monthly: 30 }
 const frequencyNames: Record<Settings['scanFrequency'], string> = { daily: 'daily', weekly: 'weekly', biweekly: 'every-2-weeks', monthly: 'monthly' }
 
-/** A nudge once the chosen scan frequency has passed since the last scan. No reminder before the first scan. */
 export function scanReminder(lastScanDate: string | null, frequency: Settings['scanFrequency'], today: string): string | null {
   if (lastScanDate === null) return null
   const daysSince = daysBetween(lastScanDate, today)

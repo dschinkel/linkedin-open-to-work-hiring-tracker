@@ -7,10 +7,8 @@ import { memoryTrackerStore } from '../tracker/outbound/persistence/MemoryTracke
 import { demoNetworks } from './DemoNetworks.ts'
 import { generateSampleNetwork } from './SampleNetwork.ts'
 
-/** Fixed end date so every visitor sees the same static demo, whatever day it is. */
 export const demoLatestScanDate = '2026-09-22'
 
-/** Browser-safe: fictional contacts and followers with 180 days of made-up scans. Nothing comes from LinkedIn. */
 export const demoTrackers = (): RoutesByAudience => ({
   contacts: sampleTrackerRoutes('contacts', demoNetworkFor('contacts')),
   followers: sampleTrackerRoutes('followers', demoNetworkFor('followers')),
@@ -20,7 +18,6 @@ function demoNetworkFor(audience: Audience): Network {
   return generateSampleNetwork({ latestScanDate: demoLatestScanDate, days: 180, ...demoNetworks[audience] })
 }
 
-/** Sample data held in memory: nothing is saved, and dropped screenshots are politely refused. */
 export const sampleTrackerRoutes = (audience: Audience, network: Network) =>
   audienceTrackerRoutes({
     trackerStore: memoryTrackerStore(network, defaultSettingsFor(audience)),

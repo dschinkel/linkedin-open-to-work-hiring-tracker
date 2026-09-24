@@ -1,12 +1,3 @@
-/*
- * Design tokens. Three tiers, each built only from the one above it:
- *   1. Schemes   – themes.css: 3 color themes (Neutral, Ocean, Green) x light/dark, each setting the same role colors (--scheme-*).
- *   2. Semantic  – shadcn's standard token contract (so any `shadcn add` component works) plus this app's signal colors,
- *                  all pointing at scheme roles. Switching theme or mode swaps every color at once.
- *   3. Theme     – Tailwind bindings: colors, type scale, tracking, shadows and animations as utilities.
- */
-
-/* 2. Semantic ---------------------------------------------------------------------------------------------------- */
 :root {
   --background: var(--scheme-page);
   --page-glow: var(--scheme-page-glow);
@@ -44,7 +35,6 @@
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 
-  /* App signals: Open to Work (green frame) and Hiring (purple frame) stay distinct in every theme. */
   --prompt: var(--scheme-accent);
   --prompt-fill: var(--scheme-accent-fill);
   --prompt-foreground: var(--scheme-on-accent);
@@ -57,7 +47,6 @@
   --muted-series: var(--scheme-dim);
 }
 
-/* 3. Theme ------------------------------------------------------------------------------------------------------- */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -111,48 +100,41 @@
 }
 
 @theme {
-  /* One monospace family for everything: body, headings, figures. */
   --font-sans: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --font-mono: var(--font-sans);
   --font-heading: var(--font-sans);
 
-  /*
-   * Type scale. Tailwind's steps are redefined one to two sizes up so every page reads comfortably: hints never go
-   * below 14px, body and table text is 16px, labels 17px. Components keep using the plain names (text-xs, text-sm).
-   */
-  --text-2xs: 0.875rem; /* 14px: ring captions, small hints */
+  --text-2xs: 0.875rem;
   --text-2xs--line-height: calc(1.25 / 0.875);
-  --text-xs: 0.875rem; /* 14px: hints, secondary copy */
+  --text-xs: 0.875rem;
   --text-xs--line-height: calc(1.25 / 0.875);
-  --text-sm: 1rem; /* 16px: body, descriptions, table cells, buttons */
+  --text-sm: 1rem;
   --text-sm--line-height: 1.5;
-  --text-label: 1.0625rem; /* 17px: stat labels, nav */
+  --text-label: 1.0625rem;
   --text-label--line-height: 1.45;
-  --text-base: 1.0625rem; /* 17px */
+  --text-base: 1.0625rem;
   --text-base--line-height: 1.5;
-  --text-lg: 1.25rem; /* 20px */
+  --text-lg: 1.25rem;
   --text-lg--line-height: 1.4;
-  --text-xl: 1.375rem; /* 22px */
+  --text-xl: 1.375rem;
   --text-xl--line-height: 1.35;
-  --text-2xl: 1.75rem; /* 28px: movement figures, phone page heading */
+  --text-2xl: 1.75rem;
   --text-2xl--line-height: 1.2;
-  --text-3xl: 2rem; /* 32px: app title */
+  --text-3xl: 2rem;
   --text-3xl--line-height: 1.15;
-  --text-title: 1.375rem; /* 22px: panel titles */
+  --text-title: 1.375rem;
   --text-title--line-height: 1.3;
-  --text-figure: 2.375rem; /* 38px: key counts */
+  --text-figure: 2.375rem;
   --text-figure--line-height: 1;
-  --text-display: 1.875rem; /* 30px: page heading */
+  --text-display: 1.875rem;
   --text-display--line-height: 1.15;
-  --text-figure-lg: 3rem; /* 48px: the ring's rate */
+  --text-figure-lg: 3rem;
   --text-figure-lg--line-height: 1;
 
   --tracking-figure: -0.03em;
 
-  /* Comfortable reading width for help text. */
   --container-measure: 60ch;
 
-  /* Hard offset shadows, like a window drawn one cell down and right. */
   --shadow-block: 4px 4px 0 0 var(--scheme-shadow);
 
   --animate-ring-draw: ring-draw 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms backwards;
@@ -160,7 +142,6 @@
   --animate-upload-progress: upload-progress 2.4s ease-in-out infinite;
   --animate-rainbow-slide: rainbow-slide 4s linear infinite;
 
-  /* The frame arc draws itself in once: it starts fully offset (hidden) and settles at its length. */
   @keyframes ring-draw {
     from { stroke-dashoffset: var(--arc); }
   }
@@ -175,7 +156,6 @@
     80%, 100% { box-shadow: 0 0 0 14px transparent; }
   }
 
-  /* Slides a rainbow gradient along text drawn with rainbow-text, so the colors flow. */
   @keyframes rainbow-slide {
     to { background-position: 200% center; }
   }

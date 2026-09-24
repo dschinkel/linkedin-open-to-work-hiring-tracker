@@ -1,6 +1,5 @@
 import type { Audience, Settings } from '../../../contracts/api.ts'
 
-/** Each audience keeps its own inbox and archive, so contacts and followers never mix. */
 export function defaultSettingsFor(audience: Audience): Settings {
   return {
     inboxDirectory: `LinkedinScreenShots/${audience}/`,

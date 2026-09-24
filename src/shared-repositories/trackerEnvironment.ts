@@ -4,7 +4,6 @@ import { type ApiClient, createApiClient, httpTransport, type Transport } from '
 
 export type TrackerMode = 'live' | 'demo'
 
-/** Which data the pages show (real API or in-browser demo, contacts or followers) and where their routes live. */
 export interface TrackerEnvironment {
   api: ApiClient
   routeBase: string
@@ -28,7 +27,6 @@ export function useTrackerEnvironment(): TrackerEnvironment {
   return useContext(TrackerEnvironmentContext)
 }
 
-/** Builds an in-app link that stays inside the current tracker (e.g. "/hiring" → "/demo/followers/hiring"). */
 export function useAppPath(): (path: string) => string {
   const { routeBase } = useTrackerEnvironment()
   return (path) => `${routeBase}${path}`

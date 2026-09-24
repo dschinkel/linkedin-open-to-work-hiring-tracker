@@ -18,7 +18,6 @@ interface SignalSnapshotProps {
 const titleColor: Record<Signal, string> = { 'open-to-work': 'bg-open-to-work text-background', hiring: 'bg-hiring text-background' }
 const toneColor: Record<DeltaTone, string> = { up: 'text-open-to-work', down: 'text-removed', flat: 'text-primary' }
 
-/** The same tiles as a stat grid, laid out as a ring with key facts beside it and movement since the last scan below. */
 export function SignalSnapshot({ signal, title, description, frameText, tiles }: SignalSnapshotProps) {
   const { headline, keyFacts, movement } = snapshotLayout(tiles)
   if (!headline) return null
@@ -62,7 +61,6 @@ export function SignalSnapshot({ signal, title, description, frameText, tiles }:
   )
 }
 
-/** A big figure with its name beneath; links to the list behind the number when it has one. */
 function KeyFact({ label, value, hint, href }: StatTileView) {
   const body = (
     <>

@@ -13,7 +13,6 @@ interface HiringHistory {
   latestClassifiedStatus: SignalStatus
 }
 
-/** Everyone ever observed with the #HIRING frame, with how recently it was actually seen and how long their latest run lasted. */
 export function listHiringPeople(index: NetworkIndex): HiringPerson[] {
   const latestScanDate = index.scansInOrder.at(-1)?.scanDate
   const streaks = frameStreaksByPerson(index, hiringSignal)
@@ -103,7 +102,6 @@ const comparators: Record<HiringSort, (a: HiringPerson, b: HiringPerson) => numb
   name: (a, b) => a.displayName.localeCompare(b.displayName),
 }
 
-/** Counts currently-Hiring people per reliably visible company. A count is people, not open roles. */
 export function aggregateHiringCompanies(people: HiringPerson[]): CompanyHiring {
   const current = people.filter((person) => person.isCurrentlyHiring)
   return {

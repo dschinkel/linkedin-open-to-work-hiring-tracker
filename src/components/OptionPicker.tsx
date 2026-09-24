@@ -12,7 +12,6 @@ interface OptionPickerProps<Value extends string> {
   onChange: (value: Value) => void
 }
 
-/** Single-choice segmented control, e.g. [7D] [30D] [90D] [6M] [1Y] [ALL]. */
 export function OptionPicker<Value extends string>({ label, value, options, onChange }: OptionPickerProps<Value>) {
   return (
     <ToggleGroup
@@ -32,7 +31,6 @@ export function OptionPicker<Value extends string>({ label, value, options, onCh
   )
 }
 
-/** Ignores the empty selection Base UI reports when the active item is clicked again. */
 function reportSelection<Value extends string>(selected: string[], onChange: (value: Value) => void): void {
   if (selected.length > 0) onChange(selected[0] as Value)
 }

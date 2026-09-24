@@ -12,10 +12,6 @@ const unknownCompany: CompanyExtraction = {
   companyExtractionMethod: 'unknown',
 }
 
-/**
- * Uses only visible card text. Prefers an explicit company field, then a clear "Title at Company"
- * headline. Never guesses a company from a name, title, or vague headline.
- */
 export function extractCompany(headline: string | null, explicitCompanyField: string | null): CompanyExtraction {
   if (explicitCompanyField?.trim()) return fromExplicitField(explicitCompanyField)
   return fromHeadline(headline)
@@ -31,7 +27,6 @@ function fromHeadline(headline: string | null): CompanyExtraction {
   return { companyName: match[1].trim(), companyConfidence: headlineConfidence, companyExtractionMethod: 'ocr-headline' }
 }
 
-/** Conservative: folds case, trailing punctuation, and spacing only. "Acme Corp." = "ACME Corp" ≠ "Acme". */
 export function normalizeCompanyName(companyName: string): string {
   return companyName.toLowerCase().replace(/[.,]+/g, '').replace(/\s+/g, ' ').trim()
 }

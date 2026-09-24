@@ -1,7 +1,6 @@
 import type { AvatarCircle, Pixels } from './FrameDetection.ts'
 import { photoDistance, photoPrint, photosDiffer, photosMatch } from './PhotoPrint.ts'
 
-/** A photo drawn at a given size: a coloured background with a darker "head" in the upper middle. */
 function photo(size: number, background: number[], head: number[], frame: number[] | null = null): { pixels: Pixels; circle: AvatarCircle } {
   const data = new Uint8Array(size * size * 4)
   const radius = size / 2

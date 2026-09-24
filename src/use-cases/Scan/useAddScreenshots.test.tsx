@@ -17,7 +17,6 @@ function pdf(name: string): File {
   return new File(['%PDF-1.7'], name, { type: 'application/pdf' })
 }
 
-/** A stand-in PDF reader: knows how many pages each named PDF has; any other PDF can't be opened. */
 function pdfReaderKnowing(pageCounts: Record<string, number>, unreadablePage?: string): PdfReader {
   return {
     open: async (file) => {

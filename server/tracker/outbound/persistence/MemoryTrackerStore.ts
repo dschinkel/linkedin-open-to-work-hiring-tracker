@@ -3,7 +3,6 @@ import { summaryOf } from '../../domain/Snapshots.ts'
 import type { Network, Scan } from '../../../shared/domain/Observation.ts'
 import type { AnalyzedDay, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
 
-/** In-memory store: the demo's fixed sample data and test fixtures. Nothing is written to disk. */
 export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Settings): TrackerStore => {
   let network = initialNetwork
   let settings = initialSettings

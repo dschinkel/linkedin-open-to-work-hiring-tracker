@@ -9,11 +9,6 @@ interface InboxWatch {
   onFileSkipped: (fileName: string, reason: string) => void
 }
 
-/**
- * Inbound job: notices screenshots copied straight into an inbox folder (not just ones dropped in the app),
- * including any already sitting there at startup. Waits until a file has finished writing.
- * A PDF is skipped with a reason: only the app splits a PDF into page screenshots. Other stray files are ignored quietly.
- */
 export const watchInbox = ({ folderPath, onScreenshotFound, onFileSkipped }: InboxWatch): (() => Promise<void>) => {
   mkdirSync(folderPath, { recursive: true })
   const watcher = watch(folderPath, { depth: 0, awaitWriteFinish: { stabilityThreshold: 800, pollInterval: 100 } })
