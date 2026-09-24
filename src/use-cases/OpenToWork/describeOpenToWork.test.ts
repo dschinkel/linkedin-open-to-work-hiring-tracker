@@ -61,6 +61,12 @@ describe('open-to-work tiles', () => {
     expect(tileLabelled(tiles, 'Newly open')?.hint).toBeDefined()
   })
 
+  it('shows flows as not available and says so once, before there is a scan to compare against', () => {
+    const tiles = describeOpenToWorkTiles(openToWorkSummary({ hasComparablePrior: false, added: 3, removed: 2 }))
+
+    expect([tileLabelled(tiles, 'Newly open')?.value, tileLabelled(tiles, 'Removed open')?.value, tileLabelled(tiles, 'Removed open')?.hint]).toEqual(['—', '—', undefined])
+  })
+
   it('shows flows without a warning once a prior scan exists', () => {
     const tiles = describeOpenToWorkTiles(openToWorkSummary({ hasComparablePrior: true }))
 

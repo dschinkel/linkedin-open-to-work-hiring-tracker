@@ -31,13 +31,13 @@ export function SignalSnapshot({ signal, title, description, frameText, tiles }:
         </CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="grid gap-x-6 gap-y-4 sm:grid-cols-[auto_1fr] sm:items-center">
+      <CardContent className="grid gap-x-8 gap-y-6 sm:grid-cols-[auto_1fr] sm:items-center">
         <FrameRing signal={signal} value={headline.value} frameText={frameText} className="justify-self-center" />
         <div>
           <p className="sr-only">
             {headline.label}: {headline.value}
           </p>
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+          <div className="grid gap-y-5">
             {keyFacts.map((fact) => (
               <KeyFact key={fact.label} {...fact} />
             ))}
@@ -70,7 +70,7 @@ function KeyFact({ label, value, hint, href }: StatTileView) {
         <span className="figure text-figure text-primary">{value}</span>
         {href && <ChevronRight className="size-5 text-prompt" />}
       </div>
-      <div className={cn('mt-2 text-label', href && 'underline decoration-dotted underline-offset-4 group-hover:text-prompt')}>{label}</div>
+      <div className={cn('mt-1 text-label whitespace-nowrap', href && 'underline decoration-dotted underline-offset-4 group-hover:text-prompt')}>{label}</div>
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </>
   )

@@ -2,18 +2,19 @@ import type { HiringPerson, HiringSummary } from '@contracts/api'
 import type { StatTileView } from '@/components/StatTile'
 import { daysSince, formatCount, formatPercent, formatShortDate, formatSignedCount } from '@/shared-formatting/formatMetric'
 
-const noPriorHint = 'No comparable prior observations yet.'
+const noPriorHint = 'Needs a second scan'
 const recentDays = 14
 
 export function describeHiringTiles(summary: HiringSummary): StatTileView[] {
   const flowHint = summary.hasComparablePrior ? undefined : noPriorHint
+  const flow = (count: number) => (summary.hasComparablePrior ? formatSignedCount(count) : '—')
   return [
-    { label: 'Hiring rate', value: formatPercent(summary.rate), hint: summary.uncertain ? `${summary.uncertain} uncertain excluded` : undefined },
-    { label: 'Hiring people', value: formatCount(summary.hiring), hint: `of ${formatCount(summary.hiring + summary.notHiring)} classified` },
-    { label: 'Companies', value: formatCount(summary.companyCount), hint: 'Reliably visible on cards' },
-    { label: 'Newly hiring', value: formatSignedCount(summary.added), hint: flowHint },
-    { label: 'Removed hiring', value: formatSignedCount(-summary.removed), hint: flowHint },
-    { label: 'Net hiring', value: formatSignedCount(summary.net), hint: flowHint },
+    { label: 'Hiring rate', value: formatPercent(summary.rate), hint: summary.uncertain ? `${summary.uncertain} unclear photos not counted` : undefined },
+    { label: 'Hiring people', value: formatCount(summary.hiring), hint: `of ${formatCount(summary.hiring + summary.notHiring)} read` },
+    { label: 'Companies', value: formatCount(summary.companyCount), hint: 'Clearly visible on cards' },
+    { label: 'Newly hiring', value: flow(summary.added), hint: flowHint },
+    { label: 'Removed hiring', value: flow(-summary.removed) },
+    { label: 'Net hiring', value: flow(summary.net) },
   ]
 }
 
