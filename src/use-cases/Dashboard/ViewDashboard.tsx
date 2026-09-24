@@ -1,6 +1,5 @@
 import { BellRing } from 'lucide-react'
 import { AsyncContent } from '@/components/AsyncContent'
-import { EmptyState } from '@/components/EmptyState'
 import { SectionCard } from '@/components/SectionCard'
 import { Alert, AlertTitle } from '@/components/ui/alert'
 import { HiringSnapshot } from '../Hiring/HiringSnapshot'
@@ -33,12 +32,6 @@ export function ViewDashboard() {
       )}
       <AddScreenshots />
       {dashboard.showInboxNote && <p className="text-label text-muted-foreground">{dashboard.inboxNote}</p>}
-      {dashboard.showFirstRunInvite && (
-        <EmptyState
-          title="No scans yet"
-          description="Drop screenshots in the box above, or copy them into this dashboard’s LinkedinScreenShots/ folder. They’re read straight away and this page updates by itself."
-        />
-      )}
       {dashboard.hasScans && (
         <>
           <div className="grid gap-6 xl:grid-cols-2">

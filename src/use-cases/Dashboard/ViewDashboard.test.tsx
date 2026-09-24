@@ -17,12 +17,12 @@ function renderDashboard() {
 }
 
 describe('dashboard', () => {
-  it('invites the user to drop screenshots before any scan exists', async () => {
+  it('shows just the drop box before any scan exists', async () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(noScansYet))))
 
     renderDashboard()
 
-    expect(await screen.findByText('No scans yet')).toBeInTheDocument()
+    expect([await screen.findByText(/Drag LinkedIn screenshots here/), screen.queryByText('Open to Work')]).toEqual([expect.anything(), null])
   })
 
 })

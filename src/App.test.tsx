@@ -9,7 +9,7 @@ describe('switching to the demo', () => {
     vi.stubGlobal('fetch', vi.fn(async () => new Response(JSON.stringify(noScansYet))))
     window.history.pushState({}, '', '/')
     render(<App />)
-    await screen.findByText('No scans yet')
+    await screen.findByText(/Drag LinkedIn screenshots here/)
 
     fireEvent.click(screen.getByRole('link', { name: 'Demo' }))
 

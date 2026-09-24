@@ -14,7 +14,6 @@ export interface DashboardView {
   status: LoadStatus
   errorMessage: string
   hasScans: boolean
-  showFirstRunInvite: boolean
   latestScanLabel: string
   sampledCount: string
   sampleDetail: string
@@ -50,7 +49,6 @@ type DashboardFields = Omit<DashboardView, 'status' | 'errorMessage' | 'hiringHr
 
 const noDashboard: DashboardFields = {
   hasScans: false,
-  showFirstRunInvite: true,
   latestScanLabel: '',
   sampledCount: '',
   sampleDetail: '',
@@ -76,7 +74,6 @@ function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
   if (!latest) return { ...noDashboard, ...describeInbox(dashboard.inboxWaitingCount) }
   return {
     hasScans: true,
-    showFirstRunInvite: false,
     latestScanLabel: `Latest scan: ${formatLongDate(latest.scanDate)}`,
     sampledCount: formatCount(latest.peopleCount),
     sampleDetail: `${latest.peopleCount === 1 ? 'person' : 'people'} sampled · ${formatCount(dashboard.scanCount)} ${dashboard.scanCount === 1 ? 'scan' : 'scans'} total`,
