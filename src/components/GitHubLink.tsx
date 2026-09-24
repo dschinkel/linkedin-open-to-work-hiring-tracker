@@ -12,6 +12,7 @@ export function GitHubLink() {
   return (
     <Tooltip>
       <TooltipTrigger
+        delay={0}
         render={
           <a
             href={repositoryUrl}
