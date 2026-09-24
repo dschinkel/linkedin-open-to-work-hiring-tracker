@@ -46,7 +46,7 @@ export function ViewDashboard() {
             <HiringSnapshot tiles={dashboard.hiringTiles} />
           </div>
           <ViewOpenToWorkTrend />
-          <div className="grid gap-6 xl:grid-cols-[3fr_2fr]">
+          <div className="grid gap-6 xl:grid-cols-2">
             <WhoIsHiringPreview
               people={dashboard.whoIsHiringPeople}
               showNoHiringPeople={dashboard.showNoHiringPeople}

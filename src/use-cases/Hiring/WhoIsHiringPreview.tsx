@@ -15,14 +15,10 @@ interface WhoIsHiringPreviewProps {
 
 export function WhoIsHiringPreview({ people, showNoHiringPeople, hiringHref }: WhoIsHiringPreviewProps) {
   return (
-    <SectionCard
-      title="Who's hiring"
-      action={
-        <Link to={hiringHref} className={buttonVariants({ variant: 'outline' })}>
-          View all hiring
-        </Link>
-      }
-    >
+    <SectionCard title="Who's hiring">
+      <Link to={hiringHref} className={cn(buttonVariants({ variant: 'outline' }), 'mb-3')}>
+        View all hiring
+      </Link>
       {showNoHiringPeople && <EmptyState title="No one is currently observed with the #HIRING frame." />}
       <ul className="divide-y divide-dashed">
         {people.map((person) => (
