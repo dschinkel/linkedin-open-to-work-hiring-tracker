@@ -38,7 +38,7 @@ describe('people who left the list', () => {
   it('calls contacts who left past contacts', async () => {
     const { result } = await readyDepartures(twoDeparted, 'contacts')
 
-    expect(result.current.title).toBe('Past contacts')
+    expect(result.current.title).toBe('Past connections')
   })
 
   it('explains how many missed scans count as leaving', async () => {

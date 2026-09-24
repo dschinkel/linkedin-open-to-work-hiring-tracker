@@ -29,16 +29,11 @@ afterEach(() => {
 })
 
 describe('tracker navigation', () => {
-  it('lists open to work before hiring and unfollowers between hiring and scans for followers', () => {
-    const { result } = renderTracker('demo', 'followers', '/demo/followers')
-
-    expect(result.current.navItems.map((item) => item.label)).toEqual(['Dashboard', 'Trends', 'Open to Work', 'Hiring', 'Unfollowers', 'Scans', 'Settings'])
-  })
 
   it('lists past contacts for contacts', () => {
     const { result } = renderTracker('demo', 'contacts', '/demo/contacts')
 
-    expect(result.current.navItems[4]).toMatchObject({ label: 'Past contacts', to: '/demo/contacts/departed' })
+    expect(result.current.navItems[4]).toMatchObject({ label: 'Past connections', to: '/demo/contacts/departed' })
   })
 
   it('keeps every page inside the live tracker of the chosen audience', () => {

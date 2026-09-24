@@ -29,7 +29,7 @@ export function Tracker({ mode, audience }: { mode: TrackerMode; audience: Audie
         <AppShell
           title="LinkedIn Open-to-Work & Hiring Tracker"
           subtitle={tracker.subtitle}
-          toggle={<SegmentedLinks label="Followers or contacts" links={tracker.audienceLinks} />}
+          toggle={<SegmentedLinks label="Followers or connections" links={tracker.audienceLinks} />}
           logoSrc={tracker.logoSrc}
           navItems={tracker.navItems}
           banner={tracker.showDemoBanner && <DemoBanner sampleDescription={tracker.demoSampleDescription} />}

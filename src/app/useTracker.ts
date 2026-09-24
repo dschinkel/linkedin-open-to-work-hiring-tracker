@@ -38,10 +38,10 @@ const pages = [
 
 const audienceToggle: Array<{ audience: Audience; label: string }> = [
   { audience: 'followers', label: 'Followers' },
-  { audience: 'contacts', label: 'Contacts' },
+  { audience: 'contacts', label: 'Connections' },
 ]
 
-const subtitle = 'Your followers and contacts open to work or hiring, tracked over time'
+const subtitle = 'Your followers and connections open to work or hiring, tracked over time'
 
 /** One tracker per mode and audience, each with its own query cache so their data never mixes. */
 export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {

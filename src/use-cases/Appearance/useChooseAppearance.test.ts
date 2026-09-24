@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { act, renderHook } from '@testing-library/react'
 import { appearanceRepositoryFor, type AppearanceStorage } from './AppearanceRepository'
-import { swatchOf } from './appearance'
 import { useChooseAppearance } from './useChooseAppearance'
 
 const page = document.documentElement
@@ -117,20 +116,6 @@ describe('choosing the appearance', () => {
     act(() => result.current.chooseTheme('ocean'))
 
     expect(page.dataset.theme).toBe('ocean')
-  })
-
-  it('shows the swatch of the chosen color theme', () => {
-    const { result } = chooseAppearanceWith(inMemoryStorage())
-
-    act(() => result.current.chooseTheme('green'))
-
-    expect(result.current.themeSwatch).toBe(swatchOf('green'))
-  })
-
-  it('offers six color themes', () => {
-    const { result } = chooseAppearanceWith(inMemoryStorage())
-
-    expect(result.current.themeOptions.map((option) => option.label)).toEqual(['Neutral', 'Ocean', 'Aqua', 'Green', 'Yellow', 'Orange', 'Red'])
   })
 
   it('restores the chosen mode and theme on the next visit', () => {

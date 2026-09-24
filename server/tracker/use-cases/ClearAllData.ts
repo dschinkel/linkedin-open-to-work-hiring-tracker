@@ -12,6 +12,6 @@ export const clearAllData = ({ eraseDatabase, emptyInboxes }: ClearAllDataPorts)
   clearAllData: async (): Promise<ProcessingResult> => {
     eraseDatabase()
     await emptyInboxes()
-    return { message: 'All data was deleted. Followers and Contacts are empty.' }
+    return { message: 'All data was deleted. Followers and Connections are empty.' }
   },
 })

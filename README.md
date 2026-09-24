@@ -15,7 +15,7 @@ This app is semi-vibe-coded, meaning it's using some of my XP rules but not all.
 
 Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**.
 
-The goal is a clearer picture of how your close network of contacts is doing, not a single snapshot.
+The goal is a clearer picture of how your close network of connections is doing, not a single snapshot.
 
 The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avatars in LinkedIn screenshots that you take. It then shows:
 
@@ -23,11 +23,11 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 **Hiring:** who shows the #HIRING frame, their title and company, and which companies are hiring.
 
-**Who left:** who **unfollowed you** or who you **lost as contacts**, and whether they were Open to Work or Hiring when last seen.
+**Who left:** who **unfollowed you** or who you **lost as connections**, and whether they were Open to Work or Hiring when last seen.
 
 **Open to Work by job title:** which kinds of roles (engineers, recruiters, product, and so on) are Open to Work, and how that's changing. It only covers people whose title could be read, and says how many that is.
 
-**Followers and contacts count:** shown in the header, counting each person once across your recent screenshots.
+**Followers and connections count:** shown in the header, counting each person once across your recent screenshots.
 
 **Trust signals:** matched-cohort rates, scan quality, and classifier confidence, so you can tell a real change from a different set of screenshots.
 
@@ -39,16 +39,16 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 The app never logs into LinkedIn, crawls profiles, or automates your browser. **You** take screenshots, and the app does the rest.
 
-### Followers or contacts: pick what you track
+### Followers or connections: pick what you track
 
-It's up to you whether you gauge your **followers** or your **contacts** (your LinkedIn connections), or both. The app keeps them as two **separate dashboards**, and the **Followers / Contacts** toggle in the header switches between them. Each has its own trends, hiring list, scans, settings, and inbox folder:
+It's up to you whether you gauge your **followers** or your **connections**, or both. The app keeps them as two **separate dashboards**, and the **Followers / Connections** toggle in the header switches between them. Each has its own trends, hiring list, scans, settings, and inbox folder:
 
 | Dashboard | Screenshot this LinkedIn list | Inbox folder |
 |---|---|---|
-| Contacts | <https://www.linkedin.com/mynetwork/invite-connect/connections/> | `LinkedinScreenShots/contacts/` |
+| Connections | <https://www.linkedin.com/mynetwork/invite-connect/connections/> | `LinkedinScreenShots/contacts/` |
 | Followers | Your followers list (Me → View profile → Followers): <https://www.linkedin.com/mynetwork/network-manager/people-follow/followers/> | `LinkedinScreenShots/followers/` |
 
-**Keep each dashboard consistent.** Only ever drop contacts screenshots into Contacts and followers screenshots into Followers. Mixing them would make people appear and disappear between scans, which shows up as fake transitions, fake unfollowers, and a jumpy rate.
+**Keep each dashboard consistent.** Only ever drop connections screenshots into Connections and followers screenshots into Followers. Mixing them would make people appear and disappear between scans, which shows up as fake transitions, fake unfollowers, and a jumpy rate.
 
 > **Zoom matters:** set the browser to **67% zoom** (`Cmd+0`, then `Cmd+-` four times). That fits about 24 people per screenshot on a laptop screen and keeps each photo big enough to read the #OPENTOWORK / #HIRING frame. Anything from 67% to 100% works; below 50% frames can't be read, and those people are marked Uncertain.
 >
@@ -75,7 +75,7 @@ It's up to you whether you gauge your **followers** or your **contacts** (your L
 ### Easiest: GoFullPage (Chrome or Brave) <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle">
 
 1. Install [GoFullPage – Full Page Screen Capture](https://chromewebstore.google.com/detail/gofullpage-full-page-scre/fdpohaocaechififmbbbbbknoalclacl) in Chrome or Brave.
-2. Open the list you track (contacts or followers, see the table above).
+2. Open the list you track (connections or followers, see the table above).
 3. Scroll down until everyone you want to track has loaded.
 4. Click the GoFullPage icon (or press `Alt+Shift+P`). It captures the whole scrolled page as a single image.
 5. Download the PNG and drag it onto the **drop box** on that dashboard (or its Scans page), or copy it into its inbox folder yourself.
@@ -126,7 +126,7 @@ Everything is in **`data/linkedin.sqlite`**, one file on your computer, created 
 | `screenshots` | Every screenshot added: waiting, imported, or failed (and why) |
 | `settings` | Your Settings choices |
 
-Followers and Contacts share the file but never mix. It survives restarts and updates, but **git doesn't back it up**: copy `data/linkedin.sqlite` somewhere safe now and then (or let Time Machine do it). Open it with any SQLite tool, e.g. `sqlite3 data/linkedin.sqlite`.
+Followers and Connections share the file but never mix. It survives restarts and updates, but **git doesn't back it up**: copy `data/linkedin.sqlite` somewhere safe now and then (or let Time Machine do it). Open it with any SQLite tool, e.g. `sqlite3 data/linkedin.sqlite`.
 
 ---
 
@@ -145,7 +145,7 @@ The app opens in **dark mode** with an **ocean** blue accent. Switch light/dark/
 
 ### Demo
 
-<https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers> (or **Demo** in the app header). It runs in your browser with fictional data: 800 followers and 500 contacts over 180 days. Every chart zooms like a stock chart: drag the handles under it.
+<https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers> (or **Demo** in the app header). It runs in your browser with fictional data: 800 followers and 500 connections over 180 days. Every chart zooms like a stock chart: drag the handles under it.
 
 For sample data in your local dashboards (kept in memory; your database isn't touched): `TRACKER_SAMPLE=full pnpm dev`.
 
@@ -164,7 +164,7 @@ For sample data in your local dashboards (kept in memory; your database isn't to
 
 ## Pages
 
-Each page exists for **Followers** and **Contacts**; the header toggle switches between them and keeps you on the same page.
+Each page exists for **Followers** and **Connections**; the header toggle switches between them and keeps you on the same page.
 
 <img src="https://img.shields.io/badge/Dashboard-2ea043?style=flat-square" alt="Dashboard" align="absmiddle"> latest numbers, rate trend, entry vs removal, who's hiring, scan quality, daily history, and the screenshot drop box.
 
@@ -172,7 +172,7 @@ Each page exists for **Followers** and **Contacts**; the header toggle switches 
 
 <img src="https://img.shields.io/badge/Hiring-2ea043?style=flat-square" alt="Hiring" align="absmiddle"> everyone seen with #HIRING, searchable and filterable, plus counts per company.
 
-<img src="https://img.shields.io/badge/Unfollowers-2ea043?style=flat-square" alt="Unfollowers" align="absmiddle"> / <img src="https://img.shields.io/badge/Past_contacts-2ea043?style=flat-square" alt="Past contacts" align="absmiddle"> people missing from your last 3 scans, and whether they were Open to Work or Hiring when last seen.
+<img src="https://img.shields.io/badge/Unfollowers-2ea043?style=flat-square" alt="Unfollowers" align="absmiddle"> / <img src="https://img.shields.io/badge/Past_connections-2ea043?style=flat-square" alt="Past connections" align="absmiddle"> people missing from your last 3 scans, and whether they were Open to Work or Hiring when last seen.
 
 Only reliable when each scan covers your whole list, since a screenshot can't prove someone left.
 

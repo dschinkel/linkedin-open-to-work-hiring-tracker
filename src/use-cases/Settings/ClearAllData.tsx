@@ -30,7 +30,7 @@ export function ClearAllData() {
           <AlertDialogHeader>
             <AlertDialogTitle>Delete all data?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently deletes everything for both Followers and Contacts: every person, scan, and trend, your settings, and any screenshots
+              This permanently deletes everything for both Followers and Connections: every person, scan, and trend, your settings, and any screenshots
               still waiting in the inbox. It can't be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>

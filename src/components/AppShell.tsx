@@ -20,7 +20,7 @@ interface AppShellProps {
   children: ReactNode
 }
 
-/** Title and subtitle beside the header controls, then the Followers / Contacts toggle leading the page tabs (current one inverted). On phones the tabs wrap below the toggle and scroll sideways. */
+/** Title and subtitle beside the header controls, then the Followers / Connections toggle leading the page tabs (current one inverted). On phones the tabs wrap below the toggle and scroll sideways. */
 export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, headerAction, children }: AppShellProps) {
   return (
     <div className="min-h-svh text-foreground">
