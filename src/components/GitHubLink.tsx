@@ -26,15 +26,15 @@ export function GitHubLink() {
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-none">
         <span className="flex items-center gap-2 whitespace-nowrap">
-          <span className="text-sm">{repositoryUrl}</span>
+          <span className="text-xs">{repositoryUrl}</span>
           <button
             type="button"
             onClick={clipboard.copy}
             aria-label={clipboard.wasCopied ? 'Copied' : 'Copy link'}
             title={clipboard.wasCopied ? 'Copied' : 'Copy link'}
-            className="grid size-7 cursor-pointer place-items-center border border-current/30 hover:bg-background/15"
+            className="grid size-6 cursor-pointer place-items-center border border-current/30 hover:bg-background/15"
           >
-            {clipboard.wasCopied ? <Check className="size-4" /> : <Copy className="size-4" />}
+            {clipboard.wasCopied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
           </button>
         </span>
       </TooltipContent>
