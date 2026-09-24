@@ -2,8 +2,8 @@ import type { DefinitionRow } from '@/components/DefinitionList'
 import { scanQuality } from '@/test-support/trackerFixtures'
 import { describeScanQuality, type QualitySection } from './describeScanQuality'
 
-function rowsOf(sections: QualitySection[], title: string): DefinitionRow[] {
-  return sections.find((section) => section.title === title)?.rows ?? []
+function rowsOf(sections: QualitySection[], title: string): Pick<DefinitionRow, 'label' | 'value'>[] {
+  return (sections.find((section) => section.title === title)?.rows ?? []).map(({ label, value }) => ({ label, value }))
 }
 
 describe('scan quality', () => {
