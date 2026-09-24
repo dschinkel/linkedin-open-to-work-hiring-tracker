@@ -101,7 +101,7 @@ Scroll manually and take screenshots as you go. On macOS:
 `Shift+Cmd+4`: drag to capture just the list of people<br>
 `Shift+Cmd+5`: open the screenshot toolbar (screen, window, or selection, plus where to save)
 
-Overlapping screenshots are fine, because people are de-duplicated. macOS names such as `Screenshot 2026-09-22 at 9.01.12 AM.png` are dated automatically.
+Overlapping screenshots are fine, because people are de-duplicated.
 
 ### A PDF of screenshots
 
