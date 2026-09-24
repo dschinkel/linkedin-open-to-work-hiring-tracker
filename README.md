@@ -154,7 +154,7 @@ Only reliable when each scan covers your whole list, since a screenshot can't pr
 
 <img src="https://img.shields.io/badge/Settings-2ea043?style=flat-square" alt="Settings" align="absmiddle"> inbox and archive folders, what happens after import, thresholds, reminders, and **Clear all data** (asks you to confirm first).
 
-## How the metrics are defined
+## Metrics
 
 | Metric | What it means |
 |---|---|
