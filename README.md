@@ -90,7 +90,6 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 
 **A PDF is the easiest source.** In GoFullPage's result tab, choose **Download PDF** instead of the image.
 
-
 ### <img src="https://img.shields.io/badge/Safest-2ea043?style=flat-square" alt="Safest" align="absmiddle"> Scroll and take screenshots yourself
 
 This is the safest option because nothing is automated: you scroll LinkedIn like any normal visitor and use your operating system's own screenshot tool. No browser extension or app touches the LinkedIn page, so there is nothing for LinkedIn to flag as scraping.
@@ -177,5 +176,3 @@ Only reliable when each scan covers your whole list, since a screenshot can't pr
 3. **Read the frame.** Each photo is checked for an unbroken green (#OPENTOWORK) or purple (#HIRING) band with a label printed on it. A green shirt or purple background doesn't count, and anything unclear is marked Uncertain.
 
 No face recognition, and nothing leaves your machine.
-
-It's tested on LinkedIn-style screenshots with fictional people (`server/screenshots/fixtures/`, regenerated with `node scripts/render-screenshot-fixtures.mjs`). If your real screenshots read poorly, open an issue with the zoom level you used.
