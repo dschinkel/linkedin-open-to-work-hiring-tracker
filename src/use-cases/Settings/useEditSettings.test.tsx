@@ -43,38 +43,21 @@ describe('editing settings', () => {
     expect(result.current.settings.inboxDirectory).toBe('/Users/dana/LinkedIn/inbox')
   })
 
-  it('shows the confidence thresholds as editable text', async () => {
-    const { repository } = settingsRepositoryHolding(settings())
+  it('saves nothing before anything changes', async () => {
+    const { repository, savedSettings } = settingsRepositoryHolding(settings())
 
     const { result } = await readySettings(repository)
 
-    expect(result.current.thresholds).toEqual({ open: '0.85', notOpen: '0.15', hiring: '0.9', notHiring: '0.1' })
+    expect([savedSettings, result.current.saveMessage]).toEqual([[], 'Changes save automatically.'])
   })
 
-  it('has nothing to save before anything changes', async () => {
-    const { repository } = settingsRepositoryHolding(settings())
-
-    const { result } = await readySettings(repository)
-
-    expect(result.current.isSaveDisabled).toBe(true)
-  })
-
-  it('can be saved once something changes', async () => {
+  it('shows a change straight away while it saves', async () => {
     const { repository } = settingsRepositoryHolding(settings())
     const { result } = await readySettings(repository)
 
     act(() => result.current.changeScanFrequency('weekly'))
 
-    expect(result.current).toMatchObject({ isSaveDisabled: false, settings: { scanFrequency: 'weekly' } })
-  })
-
-  it('changes one threshold and keeps its partner', async () => {
-    const { repository } = settingsRepositoryHolding(settings())
-    const { result } = await readySettings(repository)
-
-    act(() => result.current.changeThreshold('hiring')('0.75'))
-
-    expect(result.current.settings.hiringThresholds).toEqual({ hiring: 0.75, notHiring: 0.1 })
+    expect(result.current).toMatchObject({ saveMessage: 'Saving…', settings: { scanFrequency: 'weekly' } })
   })
 
   it('keeps earlier edits when making another', async () => {
@@ -87,62 +70,59 @@ describe('editing settings', () => {
     expect(result.current.settings).toMatchObject({ afterAnalysis: 'keep', retention: '90d' })
   })
 
-  it('saves the edited settings', async () => {
+  it('saves an edit by itself shortly after it is made', async () => {
     const { repository, savedSettings } = settingsRepositoryHolding(settings())
     const { result } = await readySettings(repository)
-    act(() => result.current.changeArchiveDirectory('/Volumes/Backup/archive'))
 
-    act(() => result.current.save())
+    act(() => result.current.changeArchiveDirectory('/Volumes/Backup/archive'))
 
     await waitFor(() => expect(savedSettings).toEqual([settings({ archiveDirectory: '/Volumes/Backup/archive' })]))
   })
 
-  it('confirms the save and has nothing left to save', async () => {
-    const { repository } = settingsRepositoryHolding(settings())
-    const { result } = await readySettings(repository)
-    act(() => result.current.changeAutomaticProcessing(false))
-
-    act(() => result.current.save())
-
-    await waitFor(() => expect(result.current).toMatchObject({ isSaveDisabled: true, saveMessage: expect.any(String), settings: { automaticProcessing: false } }))
-  })
-
-  it('refuses to save a threshold above 1', async () => {
+  it('saves a burst of typing once, with the final value', async () => {
     const { repository, savedSettings } = settingsRepositoryHolding(settings())
     const { result } = await readySettings(repository)
-    act(() => result.current.changeThreshold('open')('1.5'))
 
-    act(() => result.current.save())
+    act(() => result.current.changeInboxDirectory('/Users/dana/Link'))
+    act(() => result.current.changeInboxDirectory('/Users/dana/LinkedIn'))
 
-    expect([savedSettings, result.current.saveMessage === '']).toEqual([[], false])
+    await waitFor(() => expect(savedSettings).toEqual([settings({ inboxDirectory: '/Users/dana/LinkedIn' })]))
   })
 
-  it('refuses to save an empty inbox directory', async () => {
+  it('confirms once every change is saved', async () => {
+    const { repository } = settingsRepositoryHolding(settings())
+    const { result } = await readySettings(repository)
+
+    act(() => result.current.changeAutomaticProcessing(false))
+
+    await waitFor(() => expect(result.current).toMatchObject({ saveMessage: 'All changes saved.', settings: { automaticProcessing: false } }))
+  })
+
+  it('does not save an empty inbox directory', async () => {
+    const { repository, savedSettings } = settingsRepositoryHolding(settings())
+    const { result } = await readySettings(repository)
+
+    act(() => result.current.changeInboxDirectory(''))
+
+    await waitFor(() => expect(result.current.saveMessage).toContain('Not saved'))
+    expect(savedSettings).toEqual([])
+  })
+
+  it('saves again once an invalid value is corrected', async () => {
     const { repository, savedSettings } = settingsRepositoryHolding(settings())
     const { result } = await readySettings(repository)
     act(() => result.current.changeInboxDirectory(''))
+    await waitFor(() => expect(result.current.saveMessage).toContain('Not saved'))
 
-    act(() => result.current.save())
+    act(() => result.current.changeInboxDirectory('/Users/dana/LinkedIn'))
 
-    expect([savedSettings, result.current.saveMessage === '']).toEqual([[], false])
-  })
-
-  it('drops the refusal as soon as the draft is edited again', async () => {
-    const { repository } = settingsRepositoryHolding(settings())
-    const { result } = await readySettings(repository)
-    act(() => result.current.changeThreshold('open')('1.5'))
-    act(() => result.current.save())
-
-    act(() => result.current.changeThreshold('open')('0.95'))
-
-    expect(result.current.saveMessage).toBe('')
+    await waitFor(() => expect(savedSettings).toEqual([settings({ inboxDirectory: '/Users/dana/LinkedIn' })]))
   })
 
   it('explains why saving failed', async () => {
     const { result } = await readySettings(settingsRepositoryRefusingSaves(settings(), 'Inbox directory does not exist'))
-    act(() => result.current.changeScanFrequency('monthly'))
 
-    act(() => result.current.save())
+    act(() => result.current.changeScanFrequency('monthly'))
 
     await waitFor(() => expect(result.current.saveMessage).toContain('Inbox directory does not exist'))
   })

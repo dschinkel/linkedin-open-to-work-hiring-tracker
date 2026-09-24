@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { settingsSchema, type Settings } from '@contracts/api'
 import type { LoadStatus } from '@/components/AsyncContent'
 import type { PickerOption } from '@/components/OptionPicker'
@@ -7,29 +7,22 @@ import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { type SettingsRepository, settingsRepositoryFor } from './SettingsRepository'
 
-type Threshold = 'open' | 'notOpen' | 'hiring' | 'notHiring'
-
 export interface SettingsView {
   status: LoadStatus
   errorMessage: string
   settings: Settings
-  thresholds: Record<Threshold, string>
   frequencyOptions: PickerOption<Settings['scanFrequency']>[]
   retentionOptions: PickerOption<Settings['retention']>[]
   afterAnalysisOptions: PickerOption<Settings['afterAnalysis']>[]
   changeInboxDirectory: (value: string) => void
   changeArchiveDirectory: (value: string) => void
   changeAutomaticProcessing: (value: boolean) => void
-  changeThreshold: (threshold: Threshold) => (value: string) => void
   changeScanFrequency: (value: Settings['scanFrequency']) => void
   changeRetention: (value: Settings['retention']) => void
   changeAfterAnalysis: (value: Settings['afterAnalysis']) => void
-  save: () => void
   isSaving: boolean
-  isSaveDisabled: boolean
+  /** What happened to the latest edit: saving, saved, or why it can't be saved. */
   saveMessage: string
-  /** Whether the form holds edits that aren't saved yet, said plainly next to the Save button. */
-  saveStatus: string
 }
 
 const frequencyOptions: PickerOption<Settings['scanFrequency']>[] = [
@@ -62,7 +55,10 @@ const placeholderSettings: Settings = {
   afterAnalysis: 'delete',
 }
 
-/** Edits a local draft of settings and saves it only when it passes the settings contract. */
+/** Waits this long after the last keystroke before saving, so typing a folder path saves once, not per letter. */
+export const autosaveDelayMilliseconds = 500
+
+/** Every edit saves itself shortly after it's made, as long as it passes the settings contract. */
 export function useEditSettings(injectedRepository?: SettingsRepository): SettingsView {
   const { api } = useTrackerEnvironment()
   const repository = injectedRepository ?? settingsRepositoryFor(api)
@@ -72,65 +68,52 @@ export function useEditSettings(injectedRepository?: SettingsRepository): Settin
   const [validationMessage, setValidationMessage] = useState('')
   const saving = useMutation({
     mutationFn: repository.save,
-    onSuccess: (saved) => {
+    onSuccess: (saved, sent) => {
       queryClient.setQueryData(['settings'], saved)
-      setDraft(null)
+      setDraft((current) => (current !== null && JSON.stringify(current) === JSON.stringify(sent) ? null : current))
     },
   })
   const settings = draft ?? query.data ?? placeholderSettings
 
+  useEffect(() => {
+    if (draft === null) return undefined
+    const timer = setTimeout(() => saveDraft(draft), autosaveDelayMilliseconds)
+    return () => clearTimeout(timer)
+  }, [draft])
+
   function change(patch: Partial<Settings>): void {
     setDraft({ ...settings, ...patch })
     setValidationMessage('')
+    saving.reset()
   }
 
-  function changeThreshold(threshold: Threshold) {
-    return (value: string) => change(withThreshold(settings, threshold, Number(value)))
-  }
-
-  function save(): void {
-    const parsed = settingsSchema.safeParse(settings)
-    if (!parsed.success) return setValidationMessage('Thresholds must be between 0 and 1 and directories cannot be empty.')
+  function saveDraft(edited: Settings): void {
+    const parsed = settingsSchema.safeParse(edited)
+    if (!parsed.success) return setValidationMessage('Not saved: folders cannot be empty.')
     saving.mutate(parsed.data)
   }
 
   return {
     ...loadStatusOf(query),
     settings,
-    thresholds: thresholdTexts(settings),
     frequencyOptions,
     retentionOptions,
     afterAnalysisOptions,
     changeInboxDirectory: (inboxDirectory) => change({ inboxDirectory }),
     changeArchiveDirectory: (archiveDirectory) => change({ archiveDirectory }),
     changeAutomaticProcessing: (automaticProcessing) => change({ automaticProcessing }),
-    changeThreshold,
     changeScanFrequency: (scanFrequency) => change({ scanFrequency }),
     changeRetention: (retention) => change({ retention }),
     changeAfterAnalysis: (afterAnalysis) => change({ afterAnalysis }),
-    save,
     isSaving: saving.isPending,
-    isSaveDisabled: draft === null || saving.isPending,
-    saveMessage: validationMessage || saveOutcome(saving.isSuccess, saving.error),
-    saveStatus: draft === null ? 'No unsaved changes' : 'You have unsaved changes',
+    saveMessage: validationMessage || saveOutcome({ isPending: saving.isPending || (draft !== null && !saving.isError), isSaved: saving.isSuccess, error: saving.error }),
   }
 }
 
-function withThreshold(settings: Settings, threshold: Threshold, value: number): Partial<Settings> {
-  if (threshold === 'open' || threshold === 'notOpen') return { openToWorkThresholds: { ...settings.openToWorkThresholds, [threshold]: value } }
-  return { hiringThresholds: { ...settings.hiringThresholds, [threshold]: value } }
-}
 
-function thresholdTexts(settings: Settings): Record<Threshold, string> {
-  return {
-    open: String(settings.openToWorkThresholds.open),
-    notOpen: String(settings.openToWorkThresholds.notOpen),
-    hiring: String(settings.hiringThresholds.hiring),
-    notHiring: String(settings.hiringThresholds.notHiring),
-  }
-}
 
-function saveOutcome(isSaved: boolean, error: Error | null): string {
+function saveOutcome({ isPending, isSaved, error }: { isPending: boolean; isSaved: boolean; error: Error | null }): string {
+  if (isPending) return 'Saving…'
   if (error) return `Could not save: ${error.message}`
-  return isSaved ? 'Settings saved.' : ''
+  return isSaved ? 'All changes saved.' : 'Changes save automatically.'
 }
