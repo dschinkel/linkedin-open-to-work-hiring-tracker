@@ -2,7 +2,7 @@ import type { OpenToWorkSummary } from '@contracts/api'
 import type { StatTileView } from '@/components/StatTile'
 import { formatCount, formatPercent, formatPercentagePoints, formatRatio, formatSignedCount } from '@/shared-formatting/formatMetric'
 
-const noPriorHint = 'Needs a second scan'
+const noPriorHint = 'Scan again another day'
 
 /** Latest-scan Open-to-Work tiles: stock first, then flow, then flow rates. */
 export function describeOpenToWorkTiles(summary: OpenToWorkSummary): StatTileView[] {
@@ -28,5 +28,5 @@ function uncertainHint(uncertain: number): string | undefined {
 
 function sevenDayHint(change: number | null): string | undefined {
   if (change !== null) return undefined
-  return 'Needs a second scan'
+  return 'Needs a scan from 7+ days ago'
 }

@@ -2,7 +2,7 @@ import type { HiringPerson, HiringSummary } from '@contracts/api'
 import type { StatTileView } from '@/components/StatTile'
 import { daysSince, formatCount, formatPercent, formatShortDate, formatSignedCount } from '@/shared-formatting/formatMetric'
 
-const noPriorHint = 'Needs a second scan'
+const noPriorHint = 'Scan again another day'
 const recentDays = 14
 
 export function describeHiringTiles(summary: HiringSummary): StatTileView[] {

@@ -12,7 +12,7 @@ export function ViewOpenToWorkTrend() {
 
   return (
     <AsyncContent status={trend.status} errorMessage={trend.errorMessage}>
-      {trend.showTrendPending && <EmptyState title="Trend data available after additional scans." />}
+      {trend.showTrendPending && <EmptyState title="Scan again tomorrow or any later day to see trends. Each day's screenshots make one scan." />}
       {trend.hasTrend && (
         <div className="grid gap-6 lg:grid-cols-[3fr_2fr]">
           <SectionCard

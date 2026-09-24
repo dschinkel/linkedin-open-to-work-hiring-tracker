@@ -33,7 +33,7 @@ export function ViewTrends() {
         <OptionPicker label="Time window" value={trends.timeWindow} options={trends.windowOptions} onChange={trends.chooseTimeWindow} />
       </div>
       <AsyncContent status={trends.status} errorMessage={trends.errorMessage}>
-        {trends.showTrendPending && <EmptyState title="Trend data available after additional scans." />}
+        {trends.showTrendPending && <EmptyState title="Scan again tomorrow or any later day to see trends. Each day's screenshots make one scan." />}
         {trends.hasTrend && (
           <div className="grid gap-6 lg:grid-cols-2">
             <SectionCard title="Open-to-Work rate" description="Daily rate with a 7-day moving average across actual scans">
