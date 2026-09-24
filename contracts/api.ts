@@ -313,3 +313,41 @@ export const scanPeopleSchema = z.object({
   people: z.array(scanPersonSchema),
 })
 export type ScanPeople = z.infer<typeof scanPeopleSchema>
+
+/** Which people list a snapshot was taken of. */
+export const snapshotKindSchema = z.enum(['open-to-work', 'hiring'])
+export type SnapshotKind = z.infer<typeof snapshotKindSchema>
+
+const snapshotFields = {
+  id: z.string(),
+  /** What the user called it, or e.g. "Sep 23, 2026 · 8 people". */
+  name: z.string(),
+  /** When it was saved (ISO timestamp). */
+  createdAt: z.string(),
+  peopleCount: z.number(),
+}
+
+/** A saved snapshot as listed: everything except its people. */
+export const snapshotSummarySchema = z.object({ ...snapshotFields, kind: snapshotKindSchema })
+export type SnapshotSummary = z.infer<typeof snapshotSummarySchema>
+
+export const snapshotListSchema = z.object({ snapshots: z.array(snapshotSummarySchema) })
+export type SnapshotList = z.infer<typeof snapshotListSchema>
+
+/** The Open to Work list exactly as it was when saved. */
+export const openToWorkSnapshotSchema = z.object({ ...snapshotFields, kind: z.literal('open-to-work'), people: z.array(openToWorkPersonSchema) })
+export type OpenToWorkSnapshot = z.infer<typeof openToWorkSnapshotSchema>
+
+/** The Hiring list exactly as it was when saved, with the filters that produced it. */
+export const hiringSnapshotSchema = z.object({ ...snapshotFields, kind: z.literal('hiring'), filters: hiringPeopleQuerySchema, people: z.array(hiringPersonSchema) })
+export type HiringSnapshot = z.infer<typeof hiringSnapshotSchema>
+
+export const snapshotSchema = z.discriminatedUnion('kind', [openToWorkSnapshotSchema, hiringSnapshotSchema])
+export type Snapshot = z.infer<typeof snapshotSchema>
+
+/** Save the list as it is now. A blank name gets a dated default; filters only apply to the Hiring list. */
+export const saveSnapshotRequestSchema = z.object({
+  name: z.string().trim().max(120).default(''),
+  filters: hiringPeopleQuerySchema.optional(),
+})
+export type SaveSnapshotRequest = z.input<typeof saveSnapshotRequestSchema>

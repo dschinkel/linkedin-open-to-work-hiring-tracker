@@ -6,18 +6,23 @@ import type {
   Dashboard,
   DepartedPerson,
   HiringPerson,
+  HiringSnapshot,
   HiringSummary,
+  OpenToWorkSnapshot,
   OpenToWorkSummary,
   ScanDetail,
   ScanQuality,
   ScanSummary,
   Settings,
+  Snapshot,
+  SnapshotSummary,
   TrendPoint,
   Trends,
 } from '@contracts/api'
 import type { ListExport, ListExporter } from '@/shared-exports/listExport'
-import type { Transport } from '@/shared-repositories/apiClient'
+import { ApiError, type Transport } from '@/shared-repositories/apiClient'
 import { TrackerEnvironmentContext, type TrackerMode, trackerEnvironmentFor } from '@/shared-repositories/trackerEnvironment'
+import type { SnapshotRepository } from '@/use-cases/Snapshots/SnapshotRepository'
 
 const offlineTransport: Transport = async ({ path }) => {
   throw new Error(`No network in hook tests (asked for ${path})`)
@@ -246,4 +251,50 @@ export function recordingExporter() {
     },
   }
   return { exporter, saved }
+}
+
+export function openToWorkSnapshot(overrides: Partial<OpenToWorkSnapshot> = {}): OpenToWorkSnapshot {
+  return { id: 'snapshot-before-layoffs', kind: 'open-to-work', name: 'Before the layoffs', createdAt: '2026-09-23T12:00:00.000Z', peopleCount: 0, people: [], ...overrides }
+}
+
+export function hiringSnapshot(overrides: Partial<HiringSnapshot> = {}): HiringSnapshot {
+  return {
+    id: 'snapshot-hiring-in-june',
+    kind: 'hiring',
+    name: 'Hiring in June',
+    createdAt: '2026-06-15T12:00:00.000Z',
+    peopleCount: 0,
+    filters: { search: '', company: '', status: 'current', companyKnown: 'all', sort: 'lastSeen' },
+    people: [],
+    ...overrides,
+  }
+}
+
+/** Snapshots kept in memory, newest first, recording what was asked of it. */
+export function fakeSnapshotRepository(initial: Snapshot[] = []) {
+  let snapshots = [...initial]
+  const saves: Parameters<SnapshotRepository['save']>[] = []
+  const summaryOf = ({ id, kind, name, createdAt, peopleCount }: Snapshot): SnapshotSummary => ({ id, kind, name, createdAt, peopleCount })
+  const find = (snapshotId: string) => {
+    const snapshot = snapshots.find((candidate) => candidate.id === snapshotId)
+    if (!snapshot) throw new ApiError(404, 'No such snapshot')
+    return snapshot
+  }
+  const repository: SnapshotRepository = {
+    list: async (kind) => snapshots.filter((snapshot) => snapshot.kind === kind).sort((a, b) => b.createdAt.localeCompare(a.createdAt)).map(summaryOf),
+    save: async (kind, request) => {
+      saves.push([kind, request])
+      const fields = { id: `snapshot-saved-${saves.length}`, name: request.name || 'Sep 23, 2026 · 0 people', createdAt: `2026-09-23T12:0${saves.length}:00.000Z`, peopleCount: 0 }
+      const snapshot: Snapshot = kind === 'hiring' ? hiringSnapshot({ ...fields, filters: { ...hiringSnapshot().filters, ...request.filters } }) : openToWorkSnapshot(fields)
+      snapshots = [...snapshots, snapshot]
+      return summaryOf(snapshot)
+    },
+    load: async (snapshotId) => find(snapshotId),
+    remove: async (snapshotId) => {
+      const snapshot = find(snapshotId)
+      snapshots = snapshots.filter((candidate) => candidate !== snapshot)
+      return summaryOf(snapshot)
+    },
+  }
+  return { repository, saves, snapshotIds: () => snapshots.map((snapshot) => snapshot.id) }
 }

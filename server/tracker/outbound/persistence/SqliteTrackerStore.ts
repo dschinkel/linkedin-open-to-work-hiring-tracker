@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import path from 'node:path'
 import { DatabaseSync } from 'node:sqlite'
-import { type Audience, type Settings, settingsSchema } from '../../../../contracts/api.ts'
+import { type Audience, type Settings, type Snapshot, type SnapshotKind, type SnapshotSummary, settingsSchema, snapshotSchema } from '../../../../contracts/api.ts'
 import type {
   ClassificationMethod,
   CompanyExtractionMethod,
@@ -66,6 +66,17 @@ const migrations: string[] = [
      json TEXT NOT NULL
    );`,
   `ALTER TABLE people ADD COLUMN photo_print TEXT`,
+  `CREATE TABLE snapshots (
+     id TEXT PRIMARY KEY,
+     audience TEXT NOT NULL,
+     kind TEXT NOT NULL,
+     name TEXT NOT NULL,
+     created_at TEXT NOT NULL,
+     people_count INTEGER NOT NULL,
+     filters_json TEXT,
+     people_json TEXT NOT NULL
+   );
+   CREATE INDEX snapshots_by_list ON snapshots (audience, kind, created_at)`,
 ]
 
 export const defaultDatabasePath = 'data/linkedin.sqlite'
@@ -112,12 +123,16 @@ export const sqliteTrackerStore = (database: DatabaseSync, audience: Audience, d
         .prepare("UPDATE screenshots SET outcome = 'failed', warning = ? WHERE audience = ? AND file_name = ?")
         .run(reason, audience, fileName)
     },
+    saveSnapshot: (snapshot) => saveSnapshot(database, audience, snapshot),
+    listSnapshots: (kind) => listSnapshots(database, audience, kind),
+    readSnapshot: (snapshotId) => readSnapshot(database, audience, snapshotId),
+    deleteSnapshot: (snapshotId) => Number(database.prepare('DELETE FROM snapshots WHERE audience = ? AND id = ?').run(audience, snapshotId).changes) > 0,
   }
 }
 
 /** Deletes every row from every table, for both audiences, in one step. The tables themselves stay. */
 export function eraseTrackerDatabase(database: DatabaseSync): void {
-  database.exec('BEGIN; DELETE FROM observations; DELETE FROM screenshots; DELETE FROM scans; DELETE FROM people; DELETE FROM settings; COMMIT;')
+  database.exec('BEGIN; DELETE FROM observations; DELETE FROM screenshots; DELETE FROM scans; DELETE FROM people; DELETE FROM settings; DELETE FROM snapshots; COMMIT;')
 }
 
 function readDay(database: DatabaseSync, audience: Audience, scanDate: string): AnalyzedDay | null {
@@ -201,6 +216,34 @@ function saveAnalyzedScan(database: DatabaseSync, audience: Audience, scan: Scan
   }
 }
 
+/** The people and any filters are kept as JSON: a snapshot is read back whole and never queried by its contents. */
+function saveSnapshot(database: DatabaseSync, audience: Audience, snapshot: Snapshot): void {
+  database
+    .prepare('INSERT INTO snapshots (id, audience, kind, name, created_at, people_count, filters_json, people_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    .run(snapshot.id, audience, snapshot.kind, snapshot.name, snapshot.createdAt, snapshot.peopleCount, snapshot.kind === 'hiring' ? JSON.stringify(snapshot.filters) : null, JSON.stringify(snapshot.people))
+}
+
+function listSnapshots(database: DatabaseSync, audience: Audience, kind: SnapshotKind): SnapshotSummary[] {
+  return database
+    .prepare('SELECT id, kind, name, created_at AS createdAt, people_count AS peopleCount FROM snapshots WHERE audience = ? AND kind = ? ORDER BY created_at DESC')
+    .all(audience, kind)
+    .map((row) => ({ ...(row as unknown as SnapshotSummary) }))
+}
+
+function readSnapshot(database: DatabaseSync, audience: Audience, snapshotId: string): Snapshot | null {
+  const row = database.prepare('SELECT * FROM snapshots WHERE audience = ? AND id = ?').get(audience, snapshotId) as SnapshotRow | undefined
+  if (!row) return null
+  return snapshotSchema.parse({
+    id: row.id,
+    kind: row.kind,
+    name: row.name,
+    createdAt: row.created_at,
+    peopleCount: row.people_count,
+    ...(row.filters_json ? { filters: JSON.parse(row.filters_json) } : {}),
+    people: JSON.parse(row.people_json),
+  })
+}
+
 function upsertPerson(database: DatabaseSync, audience: Audience, person: Person): void {
   database
     .prepare(
@@ -269,6 +312,16 @@ interface ObservationRow {
   hiring_status: string
   hiring_confidence: number
   hiring_classification_method: string
+}
+
+interface SnapshotRow {
+  id: string
+  kind: string
+  name: string
+  created_at: string
+  people_count: number
+  filters_json: string | null
+  people_json: string
 }
 
 interface ScreenshotRow {

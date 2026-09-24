@@ -1,6 +1,6 @@
 import { z } from 'zod'
-import type { CompanyHiring, Dashboard, DepartedPeople, HiringPeopleQuery, HiringPerson, NetworkSize, OpenToWorkPerson, ProcessingResult, ScanDetail, ScanPeople, ScanHistory, Settings, TimeWindow, TitleTrends, Trends } from '../../../contracts/api.ts'
-import { hiringPeopleQuerySchema, settingsSchema, timeWindowSchema } from '../../../contracts/api.ts'
+import type { CompanyHiring, SaveSnapshotRequest, Snapshot, SnapshotKind, SnapshotList, SnapshotSummary, Dashboard, DepartedPeople, HiringPeopleQuery, HiringPerson, NetworkSize, OpenToWorkPerson, ProcessingResult, ScanDetail, ScanPeople, ScanHistory, Settings, TimeWindow, TitleTrends, Trends } from '../../../contracts/api.ts'
+import { hiringPeopleQuerySchema, saveSnapshotRequestSchema, settingsSchema, snapshotKindSchema, timeWindowSchema } from '../../../contracts/api.ts'
 import { type ApiRequest, type ApiResponse, ok, orNotFound } from '../../app/HttpRouting.ts'
 
 export interface TrackerUseCases {
@@ -18,9 +18,14 @@ export interface TrackerUseCases {
   viewSettings: () => Settings
   saveSettings: (settings: Settings) => Settings
   clearAllData: () => Promise<ProcessingResult>
+  listSnapshots: (kind: SnapshotKind) => SnapshotList
+  saveSnapshot: (kind: SnapshotKind, request: SaveSnapshotRequest) => SnapshotSummary
+  viewSnapshot: (snapshotId: string) => Snapshot | null
+  deleteSnapshot: (snapshotId: string) => SnapshotSummary | null
 }
 
 const windowQuery = z.object({ window: timeWindowSchema.default('90d') })
+const kindQuery = z.object({ kind: snapshotKindSchema })
 
 /** Inbound adapter: validates each request against the contract, calls the use case, returns the response. */
 export const trackerHttp = (useCases: TrackerUseCases) => ({
@@ -38,6 +43,10 @@ export const trackerHttp = (useCases: TrackerUseCases) => ({
   settings: (): ApiResponse => ok(useCases.viewSettings()),
   saveSettings: (request: ApiRequest): ApiResponse => ok(useCases.saveSettings(settingsSchema.parse(request.body))),
   clearAllData: async (): Promise<ApiResponse> => ok(await useCases.clearAllData()),
+  snapshots: (request: ApiRequest): ApiResponse => ok(useCases.listSnapshots(kindQuery.parse(request.query).kind)),
+  saveSnapshot: (request: ApiRequest): ApiResponse => ok(useCases.saveSnapshot(kindQuery.parse(request.query).kind, saveSnapshotRequestSchema.parse(request.body ?? {}))),
+  snapshot: (_request: ApiRequest, [snapshotId]: string[]): ApiResponse => orNotFound(useCases.viewSnapshot(snapshotId)),
+  deleteSnapshot: (_request: ApiRequest, [snapshotId]: string[]): ApiResponse => orNotFound(useCases.deleteSnapshot(snapshotId)),
 })
 
 export type TrackerHttp = ReturnType<typeof trackerHttp>

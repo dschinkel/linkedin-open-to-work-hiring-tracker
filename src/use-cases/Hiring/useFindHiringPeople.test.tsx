@@ -2,7 +2,7 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { CompanyHiring, HiringPeopleQuery, HiringPerson } from '@contracts/api'
 import { localToday } from '@/shared-exports/listExport'
-import { hiringPerson, insideTracker, recordingExporter } from '@/test-support/trackerFixtures'
+import { fakeSnapshotRepository, hiringPerson, hiringSnapshot, insideTracker, recordingExporter } from '@/test-support/trackerFixtures'
 import type { HiringRepository } from './HiringRepository'
 import { useFindHiringPeople } from './useFindHiringPeople'
 
@@ -30,9 +30,15 @@ function hiringRepositoryReturning(people: HiringPerson[]) {
   return { repository, queries }
 }
 
-async function readyHiringSearch(people: HiringPerson[]) {
+const juneHiring = hiringSnapshot({
+  filters: { search: '', company: '', status: 'all', companyKnown: 'known', sort: 'lastSeen' },
+  people: [hiringPerson({ lastSeenHiring: '2026-06-14' }), hiringPerson({ personId: 'person-priya-nair', displayName: 'Priya Nair', lastSeenHiring: '2026-06-01' })],
+  peopleCount: 2,
+})
+
+async function readyHiringSearch(people: HiringPerson[], exporter = recordingExporter().exporter) {
   const { repository, queries } = hiringRepositoryReturning(people)
-  const rendered = renderHook(() => useFindHiringPeople(repository), { wrapper: insideTracker() })
+  const rendered = renderHook(() => useFindHiringPeople(repository, exporter, fakeSnapshotRepository([juneHiring]).repository), { wrapper: insideTracker() })
   await waitFor(() => expect(rendered.result.current.status).toBe('ready'))
   return { ...rendered, queries }
 }
@@ -174,5 +180,61 @@ describe("who's hiring", () => {
     act(() => result.current.exporting.exportAs('pdf'))
 
     await waitFor(() => expect(saved[0].fileName).toBe(`connections-hiring-${localToday()}.pdf`))
+  })
+})
+
+describe('hiring snapshot on show', () => {
+  async function viewingJuneHiring(exporter = recordingExporter().exporter) {
+    const rendered = await readyHiringSearch([mikeBrown], exporter)
+    act(() => rendered.result.current.snapshots.snapshots[0].load())
+    await waitFor(() => expect(rendered.result.current.snapshots.viewedSnapshot).not.toBeNull())
+    return rendered
+  }
+
+  it('shows the saved people in place of the current list', async () => {
+    const { result } = await viewingJuneHiring()
+    expect(result.current.rows.map((row) => row.cells.name.text)).toEqual(['Mike Brown', 'Priya Nair'])
+  })
+
+  it('shows the filters the snapshot was taken with', async () => {
+    const { result } = await viewingJuneHiring()
+    expect([result.current.filters.status, result.current.filters.companyKnown, result.current.areSavedFiltersLocked]).toEqual(['all', 'known', true])
+  })
+
+  it('searches the saved people by name', async () => {
+    const { result } = await viewingJuneHiring()
+    act(() => result.current.searchByName('priya'))
+    expect(result.current.rows.map((row) => row.cells.name.text)).toEqual(['Priya Nair'])
+  })
+
+  it('describes recency as of the day the snapshot was saved', async () => {
+    const { result } = await viewingJuneHiring()
+    expect(result.current.rows[0].cells.recency.text).toBe('Observed Hiring yesterday')
+  })
+
+  it('shows the current people again after going back', async () => {
+    const { result } = await viewingJuneHiring()
+    act(() => result.current.snapshots.backToCurrentList())
+    expect([result.current.rows.map((row) => row.cells.name.text), result.current.areSavedFiltersLocked]).toEqual([['Mike Brown'], false])
+  })
+
+  it('exports the snapshot on show, named as that snapshot', async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await viewingJuneHiring(exporter)
+
+    act(() => result.current.exporting.exportAs('pdf'))
+
+    await waitFor(() => expect([saved[0].fileName, saved[0].rows.length]).toEqual(['followers-hiring-snapshot-2026-06-15.pdf', 2]))
+  })
+
+  it('saves a snapshot with the filters in effect', async () => {
+    const { repository } = hiringRepositoryReturning([mikeBrown])
+    const snapshots = fakeSnapshotRepository()
+    const { result } = renderHook(() => useFindHiringPeople(repository, recordingExporter().exporter, snapshots.repository), { wrapper: insideTracker() })
+    act(() => result.current.filterByStatus('previous'))
+
+    act(() => result.current.snapshots.saveSnapshot())
+
+    await waitFor(() => expect(snapshots.saves[0][1].filters).toMatchObject({ status: 'previous' }))
   })
 })

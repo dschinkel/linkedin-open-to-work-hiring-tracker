@@ -60,3 +60,16 @@ export function formatTimeShowingFrame(days: number, scansSeen: number): string 
 function plural(count: number, unit: string): string {
   return `${formatCount(count)} ${unit}${count === 1 ? '' : 's'}`
 }
+
+const dateTime = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })
+const localShortDate = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' })
+
+/** A moment (ISO timestamp) in the browser's time zone: "Sep 23, 2026, 10:04 AM". */
+export function formatDateTime(timestamp: string): string {
+  return dateTime.format(new Date(timestamp))
+}
+
+/** The day of a moment (ISO timestamp) in the browser's time zone: "Sep 23". */
+export function formatDayOf(timestamp: string): string {
+  return localShortDate.format(new Date(timestamp))
+}

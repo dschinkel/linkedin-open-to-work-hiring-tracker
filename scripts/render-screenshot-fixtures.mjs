@@ -90,8 +90,56 @@ function render(name, subset, height, everyone = people) {
   console.log('rendered', name)
 }
 
+// The Connections list: name, title (wrapping to two lines when long), and a "Connected on" date under it, with a Message
+// button. Rows sit closer together than on the Followers list, so the gap between two people is barely bigger than a line.
+const connectionRoles = ['Platform Engineer', 'Director of Engineering at Wayne Enterprises | Mentor | Speaker on resilient distributed systems and teams', 'Data Analyst at Cyberdyne', 'Founder and CEO at Stark Robotics | Building calm software for hospitals, schools and city governments', 'Scrum Master']
+const connectionsList = Array.from({ length: 28 }, (_, index) => ({
+  name: `${firstNames[(index + 5) % firstNames.length]} ${lastNames[(index + 3) % lastNames.length]}`,
+  headline: connectionRoles[index % connectionRoles.length],
+  connectedOn: `Connected on ${['March', 'June', 'October'][index % 3]} ${index + 1}, 20${10 + (index % 15)}`,
+}))
+
+function connectionRow(person, index) {
+  return `<div class="row"><div class="avatar">${avatar(person, index)}</div>
+    <div class="text"><div class="name">${person.name}</div><div class="headline">${person.headline}</div><div class="connected">${person.connectedOn}</div></div>
+    <button>Message</button><span class="more">···</span></div>`
+}
+
+/** Full-page captures are stitched from scrolled screenshots, and a seam can land the rows below it a few pixels left of those above. */
+function connectionsPage(list, seamAfter) {
+  const rows = (from, to) => list.slice(from, to).map((person, index) => connectionRow(person, from + index)).join('')
+  return `<!doctype html><html><head><style>
+    body { margin: 0; background: #f4f2ee; font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; }
+    .card { width: 760px; margin: 24px auto; background: #fff; border-radius: 8px; border: 1px solid #ddd; }
+    .title { padding: 16px 20px 4px; font-size: 18px; color: #333; }
+    .tools { display: flex; justify-content: space-between; padding: 4px 20px 12px; font-size: 13px; color: #666; border-bottom: 1px solid #eee; }
+    .tools span:last-child { border: 1px solid #999; border-radius: 4px; padding: 2px 40px 2px 8px; }
+    .row { display: flex; align-items: flex-start; gap: 12px; padding: 7px 20px 7px 16px; border-bottom: 1px solid #eee; }
+    .avatar { width: 72px; height: 72px; flex: none; }
+    .text { flex: 1; min-width: 0; line-height: 1.2; }
+    .name { font-size: 16px; font-weight: 600; color: #191919; }
+    .headline { font-size: 14px; color: #333; margin-top: 3px; }
+    .connected { font-size: 13px; color: #666; margin-top: 1px; }
+    button { margin-top: 20px; border: 1px solid #0a66c2; color: #0a66c2; background: #fff; border-radius: 16px; padding: 5px 14px; font-size: 15px; font-weight: 600; }
+    .more { margin-top: 24px; color: #555; }
+    .seam { margin-left: -6px; }
+  </style></head><body><div class="card"><div class="title">${list.length} connections</div>
+    <div class="tools"><span>Sort by: Recently added</span><span>Search by name</span></div>
+    ${rows(0, seamAfter)}<div class="seam">${rows(seamAfter, list.length)}</div></div></body></html>`
+}
+
+function renderConnections(name, height) {
+  const folder = mkdtempSync(path.join(tmpdir(), 'fixture-'))
+  const html = path.join(folder, 'page.html')
+  writeFileSync(html, connectionsPage(connectionsList, 22))
+  execFileSync(chrome, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=2', `--window-size=900,${height}`, `--screenshot=${path.join(outputFolder, name)}`, `file://${html}`], { stdio: 'ignore' })
+  console.log('rendered', name)
+}
+
 // Two overlapping screenshots, as when scrolling: the last two people of the first appear again at the top of the second.
 render('Screenshot 2026-09-22 at 9.01.12 AM.png', people.slice(0, 5), 700)
 render('Screenshot 2026-09-22 at 9.01.19 AM.png', people.slice(3, 8), 700)
 // A full-page capture of a long list: 31 people in one image about 6,500 pixels tall.
 render('Followers full page.png', longList, 3250, longList)
+// A full-page capture of the Connections list: 28 people, the last six below a stitching seam.
+renderConnections('Connections full page.png', 2800)

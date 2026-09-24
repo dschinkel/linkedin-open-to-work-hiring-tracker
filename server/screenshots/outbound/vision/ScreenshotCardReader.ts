@@ -92,7 +92,7 @@ interface Screenshot {
 async function readWholeNames(worker: Worker, { pixels, photos, paper }: Screenshot): Promise<NameBlock[]> {
   const pitch = rowSpacing(photos)
   const strip = { ...nameStripBeside(photos, pitch, pixels), paper }
-  const namesOnThePage = readNameStrip(await readStrip(worker, strip), pitch).filter((name) => isAName(name, photos))
+  const namesOnThePage = readNameStrip(await readStrip(worker, strip), pitch, photos).filter((name) => isAName(name, photos))
   const unreadRows = photosWithoutAName(photos, namesOnThePage).filter((photo) => !hasLostItsName(photo))
   const namesReadAlone = await readRowsAlone(worker, { strip, pitch, photos: unreadRows })
   const lineHeight = photos[0].radius * 2 * nameToPhotoRatio * (endsAtAPageBreak(paper) ? legibleShareOfAPrintedName : 1)
@@ -129,7 +129,7 @@ async function decode(image: Buffer): Promise<Pixels> {
  */
 function nameStripBeside(photos: AvatarCircle[], pitch: number, pixels: Pixels): Omit<NameStrip, 'paper'> {
   const diameter = photos[0].radius * 2
-  const left = Math.round(typicalRightEdge(photos) + diameter * 0.12)
+  const left = Math.round(leftmostRightEdge(photos) + diameter * 0.12)
   const width = Math.min(pixels.width - left, Math.round(diameter * 18))
   const firstRowTop = gapBetweenRowsAbove(pixels, startOfTheText(left, photos), Math.max(0, photos[0].centreY - pitch * 2.5), pitch)
   const scale = Math.min(6, Math.max(1, Math.round(readableTextHeight / (diameter * nameToPhotoRatio))))
@@ -144,10 +144,16 @@ function startOfTheText(left: number, photos: AvatarCircle[]): { left: number; r
   return { left, right: left + photos[0].radius * 6 }
 }
 
-/** Most photos' right edge; one photo read a little off-centre must not push the strip into the names. */
-function typicalRightEdge(photos: AvatarCircle[]): number {
+/**
+ * The photos' right edge, where it is furthest left: a full-page capture is stitched from scrolled screenshots, and a
+ * seam can land the rows below it a few pixels left of those above, names and all. Starting the strip right of the
+ * rows further right would cut the first letters off the names below the seam. One photo read well off-centre (much
+ * further left than the rest) must not push the strip into the photos.
+ */
+function leftmostRightEdge(photos: AvatarCircle[]): number {
   const edges = photos.map((photo) => photo.centreX + photo.radius).sort((a, b) => a - b)
-  return edges[Math.floor(edges.length / 2)]
+  const typical = edges[Math.floor(edges.length / 2)]
+  return edges.find((edge) => typical - edge <= photos[0].radius * 0.3) ?? typical
 }
 
 /**
@@ -162,7 +168,7 @@ async function readRowsAlone(worker: Worker, { strip, pitch, photos }: { strip: 
     const top = Math.max(strip.top, Math.round(photo.centreY - pitch / 2))
     const bottom = Math.min(strip.top + strip.height, Math.round(photo.centreY + pitch / 2))
     for (const scale of [strip.scale, Math.min(6, strip.scale * 2)]) {
-      const row = readNameStrip(await readStrip(worker, { ...strip, top, height: bottom - top, scale }), pitch)
+      const row = readNameStrip(await readStrip(worker, { ...strip, top, height: bottom - top, scale }), pitch, [photo])
       const named = row.filter((name) => sitsBeside(name, photo) && startsLevelWithTheTopOf(name, photo))
       names.push(...named)
       if (named.length > 0) break

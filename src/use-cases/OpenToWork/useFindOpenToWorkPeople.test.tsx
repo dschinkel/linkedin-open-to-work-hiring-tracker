@@ -2,7 +2,8 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import type { OpenToWorkPerson } from '@contracts/api'
 import { localToday } from '@/shared-exports/listExport'
-import { insideTracker, recordingExporter } from '@/test-support/trackerFixtures'
+import { fakeSnapshotRepository, insideTracker, openToWorkSnapshot, recordingExporter } from '@/test-support/trackerFixtures'
+import type { SnapshotRepository } from '@/use-cases/Snapshots/SnapshotRepository'
 import type { OpenToWorkRepository } from './OpenToWorkRepository'
 import { useFindOpenToWorkPeople } from './useFindOpenToWorkPeople'
 
@@ -25,9 +26,11 @@ function openPerson(overrides: Partial<OpenToWorkPerson> = {}): OpenToWorkPerson
 const danaLee = openPerson()
 const samOrtiz = openPerson({ personId: 'person-sam-ortiz', displayName: 'Sam Ortiz', headline: 'Product Designer', companyName: 'Contoso', firstSeenOpen: '2026-09-15', lastSeenOpen: '2026-09-18', openSince: '2026-09-15', daysOpen: 4, scansSeenOpen: 1, wasObservedInLatestScan: false })
 
-async function readyOpenList(people: OpenToWorkPerson[], exporter = recordingExporter().exporter) {
+const julyList = openToWorkSnapshot({ people: [samOrtiz, danaLee], peopleCount: 2 })
+
+async function readyOpenList(people: OpenToWorkPerson[], exporter = recordingExporter().exporter, snapshots: SnapshotRepository = fakeSnapshotRepository([julyList]).repository) {
   const repository: OpenToWorkRepository = { people: async () => people }
-  const rendered = renderHook(() => useFindOpenToWorkPeople(repository, exporter), { wrapper: insideTracker() })
+  const rendered = renderHook(() => useFindOpenToWorkPeople(repository, exporter, snapshots), { wrapper: insideTracker() })
   await waitFor(() => expect(rendered.result.current.status).toBe('ready'))
   return rendered
 }
@@ -130,5 +133,54 @@ describe('people open to work', () => {
     act(() => result.current.exporting.exportAs('xlsx'))
 
     await waitFor(() => expect(saved[0].fileName).toBe(`followers-open-to-work-${localToday()}.xlsx`))
+  })
+})
+
+describe('open to work snapshot on show', () => {
+  async function viewingJulyList(exporter = recordingExporter().exporter) {
+    const rendered = await readyOpenList([danaLee], exporter)
+    act(() => rendered.result.current.snapshots.snapshots[0].load())
+    await waitFor(() => expect(rendered.result.current.snapshots.viewedSnapshot).not.toBeNull())
+    return rendered
+  }
+
+  it('shows the saved people in place of the current list', async () => {
+    const { result } = await viewingJulyList()
+    expect(names(result.current.rows)).toEqual(['Dana Lee', 'Sam Ortiz'])
+  })
+
+  it('keeps greying out people who were missing from the latest scan when it was saved', async () => {
+    const { result } = await viewingJulyList()
+    expect(result.current.rows.map((row) => row.isMuted)).toEqual([false, true])
+  })
+
+  it('searches the saved people', async () => {
+    const { result } = await viewingJulyList()
+    act(() => result.current.searchByNameOrTitle('designer'))
+    expect(names(result.current.rows)).toEqual(['Sam Ortiz'])
+  })
+
+  it('shows the current people again after going back', async () => {
+    const { result } = await viewingJulyList()
+    act(() => result.current.snapshots.backToCurrentList())
+    expect(names(result.current.rows)).toEqual(['Dana Lee'])
+  })
+
+  it('exports the snapshot on show, named as that snapshot', async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await viewingJulyList(exporter)
+
+    act(() => result.current.exporting.exportAs('xlsx'))
+
+    await waitFor(() => expect([saved[0].fileName, saved[0].rows.map((row) => row[0])]).toEqual(['followers-open-to-work-snapshot-2026-09-23.xlsx', ['Dana Lee', 'Sam Ortiz']]))
+  })
+
+  it('exports a saved snapshot with the same columns as the list', async () => {
+    const { exporter, saved } = recordingExporter()
+    const { result } = await readyOpenList([danaLee], exporter)
+
+    act(() => result.current.snapshots.snapshots[0].exporting.exportAs('csv'))
+
+    await waitFor(() => expect([saved[0].columns, saved[0].rows[1]]).toEqual([result.current.columns.map((column) => column.label), ['Sam Ortiz', 'Product Designer', 'Contoso', 'Sep 15', '4 days · 1 scan', 'Sep 18']]))
   })
 })

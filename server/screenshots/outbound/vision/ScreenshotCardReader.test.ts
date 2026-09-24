@@ -94,6 +94,21 @@ describe('reading a LinkedIn followers screenshot', () => {
   }, 120_000)
 })
 
+describe('reading a LinkedIn connections capture', () => {
+  it('finds every person on the list, with the rows close together and a date under each title', async () => {
+    const cards = await reader.readCards(fixture('Connections full page.png'), 'connections.png')
+
+    expect(cards).toHaveLength(28)
+    expect(cards.every((card) => !/^connected on/i.test(card.headline ?? ''))).toBe(true)
+  }, 120_000)
+
+  it('reads whole names below a stitching seam that moved the rows a few pixels left', async () => {
+    const cards = await reader.readCards(fixture('Connections full page.png'), 'connections.png')
+
+    expect(cards.slice(-6).map((card) => card.displayName)).toEqual(['Lorenzo Ellery', 'Mireille Fairbanks', 'Niall Galloway', 'Odette Abernathy', 'Pavel Blackwood', 'Quentin Castellano'])
+  }, 120_000)
+})
+
 /** Part of a capture as a PDF page shows it: on white paper, with a blank margin above and below. */
 function printedOnAPage(capture: Buffer, { top, height }: { top: number; height: number }): Promise<Buffer> {
   const paperMargin = 150

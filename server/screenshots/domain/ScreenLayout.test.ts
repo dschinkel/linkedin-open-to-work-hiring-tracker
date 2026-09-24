@@ -81,6 +81,25 @@ describe('reading names beside the photo column', () => {
   })
 })
 
+describe('reading a list whose rows sit close together, like Connections', () => {
+  // Name, a title wrapping onto two lines, and the date the connection was made: the next name follows a small gap below.
+  const connections: TextBox[] = [
+    word('Ada', 100, 60), word('Lovelace', 140, 60), word('Mathematician', 100, 80), word('and', 230, 80), word('writer', 265, 80), word('on', 100, 98), word('engines', 125, 98), word('Connected', 100, 116), word('on', 190, 116), word('March', 215, 116), word('1,', 270, 116), word('2020', 290, 116),
+    word('Alan', 100, 144), word('Turing', 145, 144), word('Codebreaker', 100, 164), word('Connected', 100, 182), word('on', 190, 182), word('May', 215, 182), word('2,', 250, 182), word('2019', 270, 182),
+  ]
+  const photosAt = (...tops: number[]) => tops.map((top) => ({ centreX: 40, centreY: top + 40, radius: 40 }))
+
+  it('starts a new person at each name level with the top of a photo, however small the gap above it', () => {
+    expect(readNameStrip(connections, pitch, photosAt(58, 142)).map((person) => person.displayName)).toEqual(['Ada Lovelace', 'Alan Turing'])
+  })
+
+  it('never takes the date a connection was made for their title', () => {
+    const noTitle = [word('Grace', 100, 60), word('Hopper', 150, 60), word('Connected', 100, 80), word('on', 190, 80), word('June', 215, 80), word('3,', 255, 80), word('2018', 275, 80)]
+
+    expect(readNameStrip(noTitle, pitch).map((person) => person.headline)).toEqual([null])
+  })
+})
+
 describe('cleaning names', () => {
   it('drops the connection degree', () => {
     expect(cleanName('Jane Smith · 2nd')).toBe('Jane Smith')

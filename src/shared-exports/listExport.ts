@@ -32,3 +32,8 @@ export function exportTableOf(columns: DataColumn[], rows: DataRow[]): ExportTab
 export function localToday(now: Date = new Date()): string {
   return [now.getFullYear(), now.getMonth() + 1, now.getDate()].map((part) => String(part).padStart(2, '0')).join('-')
 }
+
+/** The day of a moment (ISO timestamp) in the browser's time zone, as YYYY-MM-DD. */
+export function localDateOf(timestamp: string): string {
+  return localToday(new Date(timestamp))
+}

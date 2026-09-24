@@ -16,7 +16,8 @@ interface TextLine extends TextBox {
   bestConfidence: number
 }
 
-const notAHeadline = /^(followed by|\d+ mutual|and \d+ others|follow|following|message|connect|pending)\b/i
+/** Lines under a name that are not the person's title: shared connections, buttons, and the date a connection was made. */
+const notAHeadline = /^(followed by|\d+ mutual|and \d+ others|follow|following|message|connect|pending|connected on)\b/i
 const trustworthyConfidence = 60
 
 const actionButton = /^(follow|following|message|connect|pending|remove)$/i
@@ -37,12 +38,25 @@ export interface NameBlock {
 
 /**
  * Every name in the strip of text beside the photo column is one person, whether or not their photo is empty.
- * Lines that sit close together belong to one person; a bigger gap starts the next person.
+ * Lines that sit close together belong to one person; a bigger gap starts the next person, and so does the line
+ * nearest the top of a photo found in the column (a name starts level with it), however small the gap above it: on
+ * some lists (Connections) a title wraps and a date follows it, leaving only a sliver between two people.
  */
-export function readNameStrip(words: TextBox[], rowPitch: number): NameBlock[] {
+export function readNameStrip(words: TextBox[], rowPitch: number, photos: AvatarCircle[] = []): NameBlock[] {
   const lines = groupIntoLines(withoutSlivers(words).filter(couldBeAWord)).filter(isReadableLine)
   const listLines = linesOfTheList(lines, rowPitch).sort((a, b) => a.y0 - b.y0)
-  return splitIntoBlocksBy(listLines, rowPitch * 0.3).map(toNameBlock)
+  return splitIntoBlocksBy(listLines, { gapBetweenPeople: rowPitch * 0.3, names: namesLevelWithPhotos(listLines, photos) }).map(toNameBlock)
+}
+
+/** For each photo, the line starting nearest its top, when that is level with it: the person's name. */
+function namesLevelWithPhotos(lines: TextLine[], photos: AvatarCircle[]): Set<TextLine> {
+  const names = new Set<TextLine>()
+  for (const photo of photos) {
+    const top = photo.centreY - photo.radius
+    const nearest = [...lines].sort((a, b) => Math.abs(a.y0 - top) - Math.abs(b.y0 - top))[0]
+    if (nearest && Math.abs(nearest.y0 - top) <= photo.radius * 0.5) names.add(nearest)
+  }
+  return names
 }
 
 /** Every photo in the column is a person; these are the ones no name was read beside. */
@@ -165,12 +179,12 @@ function toNameBlock(block: TextLine[]): NameBlock {
   }
 }
 
-function splitIntoBlocksBy(lines: TextLine[], gapBetweenPeople: number): TextLine[][] {
+function splitIntoBlocksBy(lines: TextLine[], { gapBetweenPeople, names }: { gapBetweenPeople: number; names: Set<TextLine> }): TextLine[][] {
   const blocks: TextLine[][] = []
   for (const line of lines) {
     const current = blocks.at(-1)
     const previous = current?.at(-1)
-    if (current && previous && line.y0 - previous.y1 <= gapBetweenPeople) current.push(line)
+    if (current && previous && line.y0 - previous.y1 <= gapBetweenPeople && !names.has(line)) current.push(line)
     else blocks.push([line])
   }
   return blocks

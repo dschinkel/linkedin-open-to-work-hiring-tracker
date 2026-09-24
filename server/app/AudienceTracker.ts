@@ -11,6 +11,7 @@ import { editSettings } from '../tracker/use-cases/EditSettings.ts'
 import { findDepartedPeople } from '../tracker/use-cases/FindDepartedPeople.ts'
 import { findOpenToWorkPeople } from '../tracker/use-cases/FindOpenToWorkPeople.ts'
 import { findHiringPeople } from '../tracker/use-cases/FindHiringPeople.ts'
+import { keepSnapshots } from '../tracker/use-cases/KeepSnapshots.ts'
 import { listHiringCompanies } from '../tracker/use-cases/ListHiringCompanies.ts'
 import { listScanPeople } from '../tracker/use-cases/ListScanPeople.ts'
 import { listScans } from '../tracker/use-cases/ListScans.ts'
@@ -26,9 +27,11 @@ export interface AudienceTrackerParts {
   screenshots: ScreenshotUseCases
   clearAllData: () => Promise<ProcessingResult>
   today?: () => string
+  /** The moment a snapshot is saved; tests pin it. */
+  now?: () => Date
 }
 
-export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData, today = localToday }: AudienceTrackerParts): Route[] => {
+export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData, today = localToday, now = () => new Date() }: AudienceTrackerParts): Route[] => {
   const ports = { analytics: trackerAnalytics(trackerStore), trackerStore, today }
   const useCases: TrackerUseCases = {
     ...viewDashboard(ports),
@@ -44,6 +47,7 @@ export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData,
     ...measureNetworkSize(ports),
     ...editSettings(ports),
     clearAllData,
+    ...keepSnapshots({ ...ports, now, newSnapshotId: () => crypto.randomUUID() }),
   }
   return [...trackerRoutes(trackerHttp(useCases)), ...screenshotRoutes(screenshotsHttp(screenshots))]
 }

@@ -1,4 +1,4 @@
-import type { Settings } from '../../../../contracts/api.ts'
+import type { Settings, Snapshot, SnapshotKind, SnapshotSummary } from '../../../../contracts/api.ts'
 import type { Network, Observation, Person, Scan } from '../../../shared/domain/Observation.ts'
 
 /** Everything learned from one day's screenshots for one audience. */
@@ -37,4 +37,12 @@ export interface TrackerStore {
   saveAnalyzedDay: (day: AnalyzedDay) => void
   /** A screenshot that could not be read stays listed, marked failed with the reason. */
   markScreenshotFailed: (fileName: string, reason: string) => void
+  /** Keeps a saved copy of a people list; later scans never change it. */
+  saveSnapshot: (snapshot: Snapshot) => void
+  /** One list's saved snapshots, newest first, without their people. */
+  listSnapshots: (kind: SnapshotKind) => SnapshotSummary[]
+  /** Null when this audience has no such snapshot. */
+  readSnapshot: (snapshotId: string) => Snapshot | null
+  /** True when there was such a snapshot to delete. */
+  deleteSnapshot: (snapshotId: string) => boolean
 }

@@ -1,4 +1,5 @@
-import type { Settings } from '../../../../contracts/api.ts'
+import type { Settings, Snapshot } from '../../../../contracts/api.ts'
+import { summaryOf } from '../../domain/Snapshots.ts'
 import type { Network, Scan } from '../../../shared/domain/Observation.ts'
 import type { AnalyzedDay, TrackerStore, WaitingScreenshot } from './TrackerStore.ts'
 
@@ -9,6 +10,7 @@ export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Set
   let version = 0
   const waiting = new Map<string, WaitingScreenshot>()
   const seen = new Set<string>()
+  const snapshots = new Map<string, Snapshot>()
 
   const saveAnalyzedDay = ({ scan, people, observations }: AnalyzedDay): void => {
     const peopleIds = new Set(people.map((person) => person.id))
@@ -54,5 +56,13 @@ export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Set
       waiting.delete(fileName)
       version += 1
     },
+    saveSnapshot: (snapshot) => void snapshots.set(snapshot.id, snapshot),
+    listSnapshots: (kind) =>
+      [...snapshots.values()]
+        .filter((snapshot) => snapshot.kind === kind)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+        .map(summaryOf),
+    readSnapshot: (snapshotId) => snapshots.get(snapshotId) ?? null,
+    deleteSnapshot: (snapshotId) => snapshots.delete(snapshotId),
   }
 }

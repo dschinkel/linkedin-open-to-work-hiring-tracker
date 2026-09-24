@@ -1,9 +1,10 @@
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
+import type { HiringSnapshot, OpenToWorkSnapshot } from '../../../../contracts/api.ts'
 import { defaultSettingsFor } from '../../domain/DefaultSettings.ts'
 import type { Observation, Person, Scan } from '../../../shared/domain/Observation.ts'
-import { openTrackerDatabase, sqliteTrackerStore } from './SqliteTrackerStore.ts'
+import { eraseTrackerDatabase, openTrackerDatabase, sqliteTrackerStore } from './SqliteTrackerStore.ts'
 
 function freshDatabaseFile(): string {
   return path.join(mkdtempSync(path.join(tmpdir(), 'tracker-db-')), 'data', 'linkedin.sqlite')
@@ -35,6 +36,27 @@ const janeIsOpen: Observation = {
 }
 
 const janesDay = { scan, people: [jane], observations: [janeIsOpen] }
+
+const janeOpenSnapshot: OpenToWorkSnapshot = {
+  id: 'snapshot-1',
+  kind: 'open-to-work',
+  name: 'Before the layoffs',
+  createdAt: '2026-09-23T10:00:00.000Z',
+  peopleCount: 1,
+  people: [
+    { personId: jane.id, displayName: 'Jane Smith', headline: 'VP Engineering at Acme', companyName: 'Acme', firstSeenOpen: '2026-09-01', lastSeenOpen: '2026-09-22', openSince: '2026-09-01', daysOpen: 22, scansSeenOpen: 4, wasObservedInLatestScan: false },
+  ],
+}
+
+const janeHiringSnapshot: HiringSnapshot = {
+  id: 'snapshot-2',
+  kind: 'hiring',
+  name: 'Sep 24, 2026 · 0 people',
+  createdAt: '2026-09-24T10:00:00.000Z',
+  peopleCount: 0,
+  filters: { search: 'jane', company: 'Acme', status: 'previous', companyKnown: 'known', sort: 'name' },
+  people: [],
+}
 
 function followersStore(database: ReturnType<typeof openTrackerDatabase>) {
   return sqliteTrackerStore(database, 'followers', defaultSettingsFor('followers'))
@@ -128,5 +150,61 @@ describe('SQLite database', () => {
     followersStore(database).markScreenshotFailed('blurry.png', 'No people found')
 
     expect(followersStore(database).waitingScreenshots()).toEqual([])
+  })
+})
+
+describe('saved snapshots in SQLite', () => {
+  it('reads back a snapshot with its people exactly as saved, after reopening', () => {
+    const file = freshDatabaseFile()
+    followersStore(openTrackerDatabase(file)).saveSnapshot(janeOpenSnapshot)
+    expect(followersStore(openTrackerDatabase(file)).readSnapshot('snapshot-1')).toEqual(janeOpenSnapshot)
+  })
+
+  it('reads back the hiring filters a snapshot was taken with', () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    followersStore(database).saveSnapshot(janeHiringSnapshot)
+    expect(followersStore(database).readSnapshot('snapshot-2')).toEqual(janeHiringSnapshot)
+  })
+
+  it("lists one list's snapshots, newest first, without their people", () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    const later = { ...janeOpenSnapshot, id: 'snapshot-3', name: 'Later', createdAt: '2026-09-25T09:00:00.000Z' }
+    followersStore(database).saveSnapshot(janeOpenSnapshot)
+    followersStore(database).saveSnapshot(janeHiringSnapshot)
+    followersStore(database).saveSnapshot(later)
+
+    expect(followersStore(database).listSnapshots('open-to-work')).toEqual([
+      { id: 'snapshot-3', kind: 'open-to-work', name: 'Later', createdAt: '2026-09-25T09:00:00.000Z', peopleCount: 1 },
+      { id: 'snapshot-1', kind: 'open-to-work', name: 'Before the layoffs', createdAt: '2026-09-23T10:00:00.000Z', peopleCount: 1 },
+    ])
+  })
+
+  it("keeps each audience's snapshots apart", () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    followersStore(database).saveSnapshot(janeOpenSnapshot)
+    expect([sqliteTrackerStore(database, 'contacts', defaultSettingsFor('contacts')).listSnapshots('open-to-work'), sqliteTrackerStore(database, 'contacts', defaultSettingsFor('contacts')).readSnapshot('snapshot-1')]).toEqual([[], null])
+  })
+
+  it('deletes a snapshot, and says whether there was one to delete', () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    followersStore(database).saveSnapshot(janeOpenSnapshot)
+
+    const deletions = [followersStore(database).deleteSnapshot('snapshot-1'), followersStore(database).deleteSnapshot('snapshot-1')]
+
+    expect([deletions, followersStore(database).readSnapshot('snapshot-1')]).toEqual([[true, false], null])
+  })
+
+  it("does not delete another audience's snapshot", () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    followersStore(database).saveSnapshot(janeOpenSnapshot)
+    sqliteTrackerStore(database, 'contacts', defaultSettingsFor('contacts')).deleteSnapshot('snapshot-1')
+    expect(followersStore(database).readSnapshot('snapshot-1')).toEqual(janeOpenSnapshot)
+  })
+
+  it('erases snapshots along with everything else when all data is cleared', () => {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    followersStore(database).saveSnapshot(janeOpenSnapshot)
+    eraseTrackerDatabase(database)
+    expect(followersStore(database).listSnapshots('open-to-work')).toEqual([])
   })
 })
