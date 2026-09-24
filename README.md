@@ -27,12 +27,6 @@ Open <http://localhost:5173>.
 
 Next, grab a [screenshot](#taking-screenshots-required) of your followers or connections and upload them to the app.  The rest is magic.
 
-### Demo
-
-<https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers> (or **Demo** in the app header). It runs in your browser with fictional data: 800 followers and 500 connections over 180 days. Every chart zooms like a stock chart: drag the handles under it.
-
-For sample data in your local dashboards (kept in memory; your database isn't touched): `TRACKER_SAMPLE=full pnpm dev`.
-
 ### Scripts
 
 | Command | What it does |
