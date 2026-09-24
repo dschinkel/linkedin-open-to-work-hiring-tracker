@@ -15,11 +15,13 @@
 }
 
 @utility rainbow-fill {
-  @apply animate-holo-shimmer motion-reduce:animate-none;
-  background-image:
-    linear-gradient(115deg, transparent 35%, rgb(255 255 255 / 0.35) 48%, transparent 60%),
-    linear-gradient(90deg, #e25c5c, #ec9340, #e3c43c, #4fbf66, #3f9fe0, #7d62e0, #d860b0, #e25c5c, #ec9340, #e3c43c, #4fbf66, #3f9fe0, #7d62e0, #d860b0, #e25c5c);
-  background-size: 300% 300%, 200% 200%;
+  @apply animate-holo-drift bg-size-[160%_160%] motion-reduce:animate-none;
+  background-image: linear-gradient(115deg, #c23a3a, #cf6f1c, #c8a21a, #2f9a48, #2379c0, #5d42c2, #b23f8f, #c23a3a);
+}
+
+@utility holo-sheen {
+  @apply animate-holo-sheen bg-size-[300%_300%] motion-reduce:animate-none;
+  background-image: linear-gradient(115deg, transparent 38%, rgb(255 255 255 / 0.32) 48%, transparent 58%);
 }
 
 @utility cat-outline {
