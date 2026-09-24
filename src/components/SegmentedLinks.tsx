@@ -19,6 +19,7 @@ export function SegmentedLinks({ label, links }: { label: string; links: Segment
           aria-current={link.isActive ? 'page' : undefined}
           className={cn(
             buttonVariants({ variant: 'ghost' }),
+            'px-2',
             link.isActive ? 'bg-prompt-fill font-bold text-prompt-foreground hover:bg-prompt-fill hover:text-prompt-foreground' : 'font-normal text-muted-foreground',
           )}
         >

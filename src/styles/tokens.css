@@ -144,6 +144,7 @@
   --animate-ring-draw: ring-draw 700ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms backwards;
   --animate-invite-pulse: invite-pulse 1.8s ease-out 0.4s 5;
   --animate-upload-progress: upload-progress 2.4s ease-in-out infinite;
+  --animate-rainbow-flow: rainbow-flow 6s linear infinite;
   --animate-rainbow-slide: rainbow-slide 4s linear infinite;
 
   @keyframes ring-draw {
@@ -158,6 +159,11 @@
     15% { transform: scale(1.08); }
     30% { transform: scale(1); }
     80%, 100% { box-shadow: 0 0 0 14px transparent; }
+  }
+
+  @keyframes rainbow-flow {
+    from { background-position: 0% 50%; }
+    to { background-position: 100% 50%; }
   }
 
   @keyframes rainbow-slide {

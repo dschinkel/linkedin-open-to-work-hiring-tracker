@@ -36,23 +36,23 @@ export function AppShell({ title, subtitle, toggle, logoSrc, navItems, banner, h
             </div>
             <div className="ml-auto flex shrink-0 flex-wrap items-center justify-end gap-2 self-start pt-1">{headerAction}</div>
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 pb-4 sm:mt-6 sm:pb-5 lg:flex-nowrap">
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 pb-4 sm:mt-6 sm:pb-5 lg:flex-nowrap lg:gap-x-3">
             {toggle}
-            <nav className="-mx-4 flex min-w-0 flex-1 basis-full gap-0.5 overflow-x-auto px-4 text-label whitespace-nowrap sm:mx-0 sm:basis-auto sm:px-0">
+            <nav className="-mx-4 flex min-w-0 flex-1 basis-full gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden px-4 text-label whitespace-nowrap sm:mx-0 sm:basis-auto sm:px-0">
               {navItems.map((item) => (
                 <NavLink
                   key={item.to}
                   to={item.to}
                   end={item.isExact}
                   className={({ isActive }) =>
-                    cn(buttonVariants({ variant: isActive ? 'default' : 'ghost' }), 'px-2', isActive ? 'font-bold' : 'font-normal text-muted-foreground')
+                    cn(buttonVariants({ variant: isActive ? 'default' : 'ghost' }), 'px-1', isActive ? 'font-bold' : 'font-normal text-muted-foreground')
                   }
                 >
                   {item.label}
                 </NavLink>
               ))}
             </nav>
-            <div className="flex shrink-0 items-center">{navAction}</div>
+            <div className="flex shrink-0 items-center gap-1.5">{navAction}</div>
           </div>
         </div>
       </header>
