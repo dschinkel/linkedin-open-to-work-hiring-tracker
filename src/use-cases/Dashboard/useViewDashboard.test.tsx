@@ -60,12 +60,6 @@ describe('dashboard at a glance', () => {
     expect([view.openToWorkTiles.length, view.hiringTiles.length]).toEqual([9, 6])
   })
 
-  it('shows how many people are hiring at how many companies', async () => {
-    const view = await readyDashboard(repositoryReturning(dashboard({ whoIsHiring: { peopleCount: 1_046, companyCount: 312, preview: [] } })))
-
-    expect(view.whoIsHiringHeadline).toMatch(/1,046.*312/)
-  })
-
   it('previews the people who are hiring', async () => {
     const view = await readyDashboard(repositoryReturning(dashboard()))
 

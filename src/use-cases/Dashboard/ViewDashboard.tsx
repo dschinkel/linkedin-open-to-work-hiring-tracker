@@ -48,7 +48,6 @@ export function ViewDashboard() {
           <ViewOpenToWorkTrend />
           <div className="grid gap-6 xl:grid-cols-[3fr_2fr]">
             <WhoIsHiringPreview
-              headline={dashboard.whoIsHiringHeadline}
               people={dashboard.whoIsHiringPeople}
               showNoHiringPeople={dashboard.showNoHiringPeople}
               hiringHref={dashboard.hiringHref}

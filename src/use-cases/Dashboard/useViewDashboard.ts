@@ -20,7 +20,6 @@ export interface DashboardView {
   sampleDetail: string
   openToWorkTiles: StatTileView[]
   hiringTiles: StatTileView[]
-  whoIsHiringHeadline: string
   whoIsHiringPeople: HiringPersonRow[]
   showNoHiringPeople: boolean
   qualitySections: QualitySection[]
@@ -57,7 +56,6 @@ const noDashboard: DashboardFields = {
   sampleDetail: '',
   openToWorkTiles: [],
   hiringTiles: [],
-  whoIsHiringHeadline: '',
   whoIsHiringPeople: [],
   showNoHiringPeople: true,
   qualitySections: [],
@@ -84,7 +82,6 @@ function describeDashboard(dashboard: Dashboard | undefined): DashboardFields {
     sampleDetail: `${latest.peopleCount === 1 ? 'person' : 'people'} sampled · ${formatCount(dashboard.scanCount)} ${dashboard.scanCount === 1 ? 'scan' : 'scans'} total`,
     openToWorkTiles: describeOpenToWorkTiles(latest.openToWork),
     hiringTiles: describeHiringTiles(latest.hiring),
-    whoIsHiringHeadline: describeWhoIsHiring(dashboard.whoIsHiring),
     whoIsHiringPeople: dashboard.whoIsHiring.preview.map((person) => describeHiringPerson(person)),
     showNoHiringPeople: dashboard.whoIsHiring.peopleCount === 0,
     qualitySections: dashboard.latestQuality ? describeScanQuality(dashboard.latestQuality) : [],
@@ -100,6 +97,3 @@ function describeInbox(waitingCount: number): Pick<DashboardView, 'inboxNote' | 
   return { inboxNote: `${screenshots} saved and waiting in the inbox for analysis.`, showInboxNote: waitingCount > 0 }
 }
 
-function describeWhoIsHiring(whoIsHiring: Dashboard['whoIsHiring']): string {
-  return `${formatCount(whoIsHiring.peopleCount)} people currently displaying #HIRING · ${formatCount(whoIsHiring.companyCount)} companies identified`
-}

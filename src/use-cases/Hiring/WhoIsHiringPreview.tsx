@@ -8,17 +8,15 @@ import { cn } from '@/lib/utils'
 import type { HiringPersonRow } from './describeHiring'
 
 interface WhoIsHiringPreviewProps {
-  headline: string
   people: HiringPersonRow[]
   showNoHiringPeople: boolean
   hiringHref: string
 }
 
-export function WhoIsHiringPreview({ headline, people, showNoHiringPeople, hiringHref }: WhoIsHiringPreviewProps) {
+export function WhoIsHiringPreview({ people, showNoHiringPeople, hiringHref }: WhoIsHiringPreviewProps) {
   return (
     <SectionCard
       title="Who's hiring"
-      description={headline}
       action={
         <Link to={hiringHref} className={buttonVariants({ variant: 'outline' })}>
           View all hiring
