@@ -1,4 +1,4 @@
-import { daysSince, formatCount, formatLongDate, formatPercent, formatPercentagePoints, formatRatio, formatShortDate, formatSignedCount } from './formatMetric'
+import { daysSince, formatCount, formatLongDate, formatPercent, formatPercentagePoints, formatRatio, formatShortDate, formatSignedCount, formatTimeShowingFrame } from './formatMetric'
 
 describe('rates', () => {
   it('shows a rate as a percentage with one decimal', () => {
@@ -71,5 +71,15 @@ describe('scan dates', () => {
 
   it('counts a scan from today as zero days ago', () => {
     expect(daysSince('2026-09-22', new Date(2026, 8, 22, 23, 30))).toBe(0)
+  })
+})
+
+describe('time showing a frame', () => {
+  it('gives the days and the scans that saw the frame', () => {
+    expect(formatTimeShowingFrame(3, 2)).toBe('3 days · 2 scans')
+  })
+
+  it('counts a frame seen on a single day as one day and one scan', () => {
+    expect(formatTimeShowingFrame(1, 1)).toBe('1 day · 1 scan')
   })
 })

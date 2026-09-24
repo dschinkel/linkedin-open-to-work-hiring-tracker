@@ -38,4 +38,9 @@ describe('people currently Open to Work', () => {
 
     expect(listOpenToWorkPeople(indexNetwork(network))[0]).toMatchObject({ displayName: 'cy', wasObservedInLatestScan: false })
   })
+
+  it('says how long someone has been open across the scans that saw the frame', () => {
+    const network = networkWith([seen('dee', '2026-09-20', 'OPEN'), seen('dee', '2026-09-22', 'OPEN')])
+    expect(listOpenToWorkPeople(indexNetwork(network))[0]).toMatchObject({ openSince: '2026-09-20', daysOpen: 3, scansSeenOpen: 2 })
+  })
 })

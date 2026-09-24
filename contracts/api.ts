@@ -93,7 +93,11 @@ export const hiringPersonSchema = z.object({
   firstSeenHiring: z.string(),
   lastSeenHiring: z.string(),
   lastSeen: z.string(),
-  daysObservedHiring: z.number(),
+  /** Start of the latest unbroken run of scans showing #HIRING (the current one, unless the frame was removed). */
+  hiringSince: z.string(),
+  /** Calendar days from hiringSince to the last scan in that run that showed the frame, both included. */
+  daysHiring: z.number(),
+  scansSeenHiring: z.number(),
   isCurrentlyHiring: z.boolean(),
   wasObservedInLatestScan: z.boolean(),
 })
@@ -280,6 +284,11 @@ export const openToWorkPersonSchema = z.object({
   companyName: z.string().nullable(),
   firstSeenOpen: z.string(),
   lastSeenOpen: z.string(),
+  /** Start of the current unbroken run of scans showing #OPENTOWORK; only a clear reading without the frame breaks it. */
+  openSince: z.string(),
+  /** Calendar days from openSince to the last scan that showed the frame, both included. */
+  daysOpen: z.number(),
+  scansSeenOpen: z.number(),
   wasObservedInLatestScan: z.boolean(),
 })
 export type OpenToWorkPerson = z.infer<typeof openToWorkPersonSchema>

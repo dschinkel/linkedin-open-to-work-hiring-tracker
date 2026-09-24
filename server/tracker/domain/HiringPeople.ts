@@ -2,7 +2,9 @@ import type { CompanyHiring, HiringPeopleQuery, HiringPerson, HiringSort } from 
 import { isReliableCompany, normalizeCompanyName } from '../../shared/domain/Company.ts'
 import type { NetworkIndex } from './NetworkIndex.ts'
 import { hiringSignal, type Person, type SignalStatus } from '../../shared/domain/Observation.ts'
-import { daysBetween } from '../../shared/domain/ScanDate.ts'
+import { type FrameStreak, frameStreaksByPerson } from './FrameStreaks.ts'
+
+type HiringStreakDetails = Pick<HiringPerson, 'hiringSince' | 'daysHiring' | 'scansSeenHiring'>
 
 interface HiringHistory {
   firstSeenHiring: string | null
@@ -11,12 +13,16 @@ interface HiringHistory {
   latestClassifiedStatus: SignalStatus
 }
 
-/** Everyone ever observed with the #HIRING frame, with how recently it was actually seen. */
+/** Everyone ever observed with the #HIRING frame, with how recently it was actually seen and how long their latest run lasted. */
 export function listHiringPeople(index: NetworkIndex): HiringPerson[] {
   const latestScanDate = index.scansInOrder.at(-1)?.scanDate
+  const streaks = frameStreaksByPerson(index, hiringSignal)
   return [...hiringHistories(index).entries()]
     .filter(([, history]) => history.firstSeenHiring !== null)
-    .map(([personId, history]) => toHiringPerson(index.personOf(personId), history, latestScanDate))
+    .map(([personId, history]) => ({
+      ...toHiringPerson(index.personOf(personId), history, latestScanDate),
+      ...streakDetails(streaks.get(personId) as FrameStreak),
+    }))
 }
 
 function hiringHistories(index: NetworkIndex): Map<string, HiringHistory> {
@@ -44,8 +50,7 @@ function recordSighting(history: HiringHistory, scanDate: string, status: Signal
   }
 }
 
-function toHiringPerson(person: Person, history: HiringHistory, latestScanDate: string | undefined): HiringPerson {
-  const firstSeenHiring = history.firstSeenHiring as string
+function toHiringPerson(person: Person, history: HiringHistory, latestScanDate: string | undefined): Omit<HiringPerson, keyof HiringStreakDetails> {
   const lastSeenHiring = history.lastSeenHiring as string
   return {
     personId: person.id,
@@ -53,13 +58,16 @@ function toHiringPerson(person: Person, history: HiringHistory, latestScanDate: 
     headline: person.headline,
     companyName: person.companyName,
     companyNeedsReview: person.companyName !== null && !isReliableCompany(person),
-    firstSeenHiring,
+    firstSeenHiring: history.firstSeenHiring as string,
     lastSeenHiring,
     lastSeen: history.lastSeen,
-    daysObservedHiring: daysBetween(firstSeenHiring, lastSeenHiring) + 1,
     isCurrentlyHiring: history.latestClassifiedStatus === 'POSITIVE',
     wasObservedInLatestScan: lastSeenHiring === latestScanDate,
   }
+}
+
+function streakDetails(streak: FrameStreak): HiringStreakDetails {
+  return { hiringSince: streak.since, daysHiring: streak.days, scansSeenHiring: streak.scansSeen }
 }
 
 export function filterHiringPeople(people: HiringPerson[], query: HiringPeopleQuery): HiringPerson[] {
@@ -90,8 +98,8 @@ function includesText(value: string | null, search: string): boolean {
 
 const comparators: Record<HiringSort, (a: HiringPerson, b: HiringPerson) => number> = {
   lastSeen: (a, b) => b.lastSeenHiring.localeCompare(a.lastSeenHiring) || a.displayName.localeCompare(b.displayName),
-  firstSeen: (a, b) => b.firstSeenHiring.localeCompare(a.firstSeenHiring) || a.displayName.localeCompare(b.displayName),
-  duration: (a, b) => b.daysObservedHiring - a.daysObservedHiring || a.displayName.localeCompare(b.displayName),
+  firstSeen: (a, b) => b.hiringSince.localeCompare(a.hiringSince) || a.displayName.localeCompare(b.displayName),
+  duration: (a, b) => b.daysHiring - a.daysHiring || a.displayName.localeCompare(b.displayName),
   name: (a, b) => a.displayName.localeCompare(b.displayName),
 }
 

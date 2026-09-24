@@ -66,6 +66,11 @@ describe('dashboard at a glance', () => {
     expect(view.whoIsHiringPeople.map((person) => person.name)).toEqual(['Mike Brown'])
   })
 
+  it('previews how long each person has been hiring', async () => {
+    const view = await readyDashboard(repositoryReturning(dashboard()))
+    expect(view.whoIsHiringPeople[0].timeHiring).toBe('22 days · 4 scans')
+  })
+
   it('says nobody is hiring when no one wears the frame', async () => {
     const view = await readyDashboard(repositoryReturning(dashboard({ whoIsHiring: { peopleCount: 0, companyCount: 0, preview: [] } })))
 

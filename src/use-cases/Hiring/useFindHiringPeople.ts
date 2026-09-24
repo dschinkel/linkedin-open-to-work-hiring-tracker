@@ -44,9 +44,9 @@ const columns: DataColumn[] = [
   { key: 'name', label: 'Person' },
   { key: 'headline', label: 'Title / headline' },
   { key: 'company', label: 'Company' },
-  { key: 'firstSeen', label: 'First seen hiring' },
+  { key: 'since', label: 'Hiring since' },
+  { key: 'days', label: 'Time hiring' },
   { key: 'lastSeen', label: 'Last seen hiring' },
-  { key: 'days', label: 'Days observed', isNumeric: true },
   { key: 'recency', label: 'Recency' },
 ]
 
@@ -91,9 +91,9 @@ function toTableRow(person: HiringPerson): DataRow {
       name: { text: row.name },
       headline: { text: row.headline },
       company: { text: row.company, note: row.companyNeedsReview ? 'review' : undefined },
-      firstSeen: { text: row.firstSeenHiring, sortValue: person.firstSeenHiring },
+      since: { text: row.hiringSince, sortValue: person.hiringSince },
+      days: { text: row.timeHiring, sortValue: person.daysHiring },
       lastSeen: { text: row.lastSeenHiring, sortValue: person.lastSeenHiring },
-      days: { text: row.daysObservedHiring, sortValue: person.daysObservedHiring },
       recency: { text: row.recency },
     },
   }

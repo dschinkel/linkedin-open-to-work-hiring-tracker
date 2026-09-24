@@ -27,6 +27,7 @@ export function WhoIsHiringPreview({ people, showNoHiringPeople, hiringHref }: W
             <div className="min-w-0 flex-1">
               <div className="truncate text-sm text-primary">{person.name}</div>
               {person.headline && <div className="truncate text-xs text-muted-foreground">{person.headline}</div>}
+              <div className="truncate text-xs text-muted-foreground">Hiring {person.timeHiring}</div>
             </div>
             <span className={cn('flex shrink-0 items-center gap-2 text-right text-sm', person.isCompanyVisible ? 'font-bold text-primary' : 'text-muted-foreground italic')}>
               {person.company}

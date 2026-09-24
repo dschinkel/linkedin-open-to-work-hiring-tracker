@@ -6,7 +6,7 @@ import type { HiringRepository } from './HiringRepository'
 import { useFindHiringPeople } from './useFindHiringPeople'
 
 const mikeBrown = hiringPerson()
-const priyaNair = hiringPerson({ personId: 'person-priya-nair', displayName: 'Priya Nair', lastSeenHiring: '2026-09-10', daysObservedHiring: 3, companyName: 'Fabrikam', companyNeedsReview: true, wasObservedInLatestScan: false })
+const priyaNair = hiringPerson({ personId: 'person-priya-nair', displayName: 'Priya Nair', lastSeenHiring: '2026-09-10', hiringSince: '2026-09-08', daysHiring: 3, scansSeenHiring: 2, companyName: 'Fabrikam', companyNeedsReview: true, wasObservedInLatestScan: false })
 
 const companiesHiring: CompanyHiring = {
   companies: [
@@ -114,7 +114,7 @@ describe("who's hiring", () => {
   it('lists each person with their company', async () => {
     const { result } = await readyHiringSearch([mikeBrown])
 
-    expect(result.current.rows[0].cells).toMatchObject({ name: { text: 'Mike Brown' }, company: { text: 'Northwind' }, days: { text: '21' } })
+    expect(result.current.rows[0].cells).toMatchObject({ name: { text: 'Mike Brown' }, company: { text: 'Northwind' }, since: { text: 'Sep 1' }, days: { text: '22 days · 4 scans' } })
   })
 
   it('flags a company that needs review', async () => {

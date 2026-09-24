@@ -3,7 +3,7 @@ import { useState } from 'react'
 import type { OpenToWorkPerson } from '@contracts/api'
 import type { LoadStatus } from '@/components/AsyncContent'
 import type { DataColumn, DataRow } from '@/components/DataTable'
-import { formatPeople, formatShortDate } from '@/shared-formatting/formatMetric'
+import { formatPeople, formatShortDate, formatTimeShowingFrame } from '@/shared-formatting/formatMetric'
 import { useTrackerEnvironment } from '@/shared-repositories/trackerEnvironment'
 import { loadStatusOf } from '@/shared-state/loadStatus'
 import { type SortedRows, useSortedRows } from '@/shared-state/useSortedRows'
@@ -23,7 +23,8 @@ const columns: DataColumn[] = [
   { key: 'name', label: 'Person' },
   { key: 'headline', label: 'Title / headline' },
   { key: 'company', label: 'Company' },
-  { key: 'firstSeen', label: 'First seen open' },
+  { key: 'openSince', label: 'Open since' },
+  { key: 'timeOpen', label: 'Time open' },
   { key: 'lastSeen', label: 'Last seen open' },
 ]
 
@@ -60,7 +61,8 @@ function toRow(person: OpenToWorkPerson): DataRow {
       name: { text: person.displayName },
       headline: { text: person.headline ?? '' },
       company: { text: person.companyName ?? 'Company not visible' },
-      firstSeen: { text: formatShortDate(person.firstSeenOpen), sortValue: person.firstSeenOpen },
+      openSince: { text: formatShortDate(person.openSince), sortValue: person.openSince },
+      timeOpen: { text: formatTimeShowingFrame(person.daysOpen, person.scansSeenOpen), sortValue: person.daysOpen },
       lastSeen: { text: formatShortDate(person.lastSeenOpen), sortValue: person.lastSeenOpen },
     },
   }

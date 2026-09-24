@@ -13,13 +13,16 @@ function openPerson(overrides: Partial<OpenToWorkPerson> = {}): OpenToWorkPerson
     companyName: null,
     firstSeenOpen: '2026-09-01',
     lastSeenOpen: '2026-09-22',
+    openSince: '2026-09-01',
+    daysOpen: 22,
+    scansSeenOpen: 4,
     wasObservedInLatestScan: true,
     ...overrides,
   }
 }
 
 const danaLee = openPerson()
-const samOrtiz = openPerson({ personId: 'person-sam-ortiz', displayName: 'Sam Ortiz', headline: 'Product Designer', companyName: 'Contoso', firstSeenOpen: '2026-09-15', lastSeenOpen: '2026-09-18', wasObservedInLatestScan: false })
+const samOrtiz = openPerson({ personId: 'person-sam-ortiz', displayName: 'Sam Ortiz', headline: 'Product Designer', companyName: 'Contoso', firstSeenOpen: '2026-09-15', lastSeenOpen: '2026-09-18', openSince: '2026-09-15', daysOpen: 4, scansSeenOpen: 1, wasObservedInLatestScan: false })
 
 async function readyOpenList(people: OpenToWorkPerson[]) {
   const repository: OpenToWorkRepository = { people: async () => people }
@@ -65,12 +68,21 @@ describe('people open to work', () => {
     expect(result.current.rows[0].isMuted).toBe(true)
   })
 
-  it('sorts by first seen date, not by the shown text, when that column is clicked', async () => {
+  it('sorts by the date the current run began, not by the shown text, when that column is clicked', async () => {
     const { result } = await readyOpenList([samOrtiz, danaLee])
-
-    act(() => result.current.sortBy('firstSeen'))
-
+    act(() => result.current.sortBy('openSince'))
     expect(names(result.current.rows)).toEqual(['Dana Lee', 'Sam Ortiz'])
+  })
+
+  it('shows since when and for how long each person has been open', async () => {
+    const { result } = await readyOpenList([danaLee])
+    expect(result.current.rows[0].cells).toMatchObject({ openSince: { text: 'Sep 1' }, timeOpen: { text: '22 days · 4 scans' } })
+  })
+
+  it('sorts by how many days people have been open when that column is clicked', async () => {
+    const { result } = await readyOpenList([danaLee, samOrtiz])
+    act(() => result.current.sortBy('timeOpen'))
+    expect(names(result.current.rows)).toEqual(['Sam Ortiz', 'Dana Lee'])
   })
 
   it('makes every column sortable', async () => {

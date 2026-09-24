@@ -51,3 +51,12 @@ export function daysSince(isoDate: string, today: Date = new Date()): number {
 export function formatPeople(count: number): string {
   return count === 1 ? '1 person' : `${formatCount(count)} people`
 }
+
+/** How long a frame has been showing: "3 days · 2 scans", "1 day · 1 scan". Days count both ends, so a frame seen on one day is 1 day. */
+export function formatTimeShowingFrame(days: number, scansSeen: number): string {
+  return `${plural(days, 'day')} · ${plural(scansSeen, 'scan')}`
+}
+
+function plural(count: number, unit: string): string {
+  return `${formatCount(count)} ${unit}${count === 1 ? '' : 's'}`
+}

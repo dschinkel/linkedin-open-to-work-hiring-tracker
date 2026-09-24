@@ -1,6 +1,6 @@
 import type { HiringPerson, HiringSummary } from '@contracts/api'
 import type { StatTileView } from '@/components/StatTile'
-import { daysSince, formatCount, formatPercent, formatShortDate, formatSignedCount } from '@/shared-formatting/formatMetric'
+import { daysSince, formatCount, formatPercent, formatShortDate, formatSignedCount, formatTimeShowingFrame } from '@/shared-formatting/formatMetric'
 
 const noPriorHint = 'Scan again another day'
 const recentDays = 14
@@ -27,9 +27,10 @@ export interface HiringPersonRow {
   company: string
   isCompanyVisible: boolean
   companyNeedsReview: boolean
-  firstSeenHiring: string
+  hiringSince: string
   lastSeenHiring: string
-  daysObservedHiring: string
+  /** Length of the latest unbroken run of scans showing #HIRING, e.g. "3 days · 2 scans". */
+  timeHiring: string
   recency: string
   isStale: boolean
 }
@@ -44,9 +45,9 @@ export function describeHiringPerson(person: HiringPerson, today: Date = new Dat
     company: person.companyName ?? 'Company not visible',
     isCompanyVisible: person.companyName !== null,
     companyNeedsReview: person.companyNeedsReview,
-    firstSeenHiring: formatShortDate(person.firstSeenHiring),
+    hiringSince: formatShortDate(person.hiringSince),
     lastSeenHiring: formatShortDate(person.lastSeenHiring),
-    daysObservedHiring: String(person.daysObservedHiring),
+    timeHiring: formatTimeShowingFrame(person.daysHiring, person.scansSeenHiring),
     recency: describeRecency(person, today),
     isStale: !person.wasObservedInLatestScan,
   }
