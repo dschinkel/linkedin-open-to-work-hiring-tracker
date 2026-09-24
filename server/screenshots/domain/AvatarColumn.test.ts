@@ -50,6 +50,18 @@ describe('telling a whole row from one cut by the top of the image', () => {
     expect(hasLostItsName({ centreX: 100, centreY: 19, radius: 20 })).toBe(false)
   })
 
+  it('keeps the name read beside a photo cut by more than a sliver, when the name starts level with the photo and below the cut', () => {
+    const nameUnderTheCut = { displayName: 'Chase Doyle', headline: 'Client Engagement Manager', top: 2, bottom: 30 }
+
+    expect(hasLostItsName({ centreX: 100, centreY: 15, radius: 20 }, nameUnderTheCut)).toBe(false)
+  })
+
+  it('has lost its name when the text read beside its cut photo starts well down it, as a title does', () => {
+    const titleLeftOver = { displayName: 'Client Engagement Manager', headline: null, top: 2, bottom: 20 }
+
+    expect(hasLostItsName({ centreX: 100, centreY: 5, radius: 20 }, titleLeftOver)).toBe(true)
+  })
+
   it('keeps its name when the whole photo shows', () => {
     expect(hasLostItsName({ centreX: 100, centreY: 25, radius: 20 })).toBe(false)
   })

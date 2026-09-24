@@ -1,4 +1,5 @@
 import type { AvatarCircle, Pixels } from './FrameDetection.ts'
+import { type NameBlock, startsLevelWithTheTopOf } from './ScreenLayout.ts'
 
 interface Blob {
   left: number
@@ -37,22 +38,26 @@ function photoCutByTheTop(shapes: Component[], column: Blob[]): Blob | null {
 
 /**
  * A photo taken against a white wall or sky blends into the page where the background shows, so it is no longer a
- * filled circle. It still spans a whole photo from top to bottom, starts at the column's left edge, and sits where no
- * other photo is: such a shape in the column is a photo too.
+ * filled circle. What is left (the person, down to their shoulders at the foot of the circle) still reaches the foot
+ * of a photo, is nearly a photo tall and more than half a photo wide, lies in the column, and sits where no other
+ * photo is: such a shape is a photo too.
  */
 function photosBlendingIntoThePage(shapes: Component[], column: Blob[], imageHeight: number): Blob[] {
   const size = medianSize(column)
   const left = medianLeft(column)
   const isFree = (top: number) => column.every((blob) => Math.abs(blob.top - top) >= size)
+  const width = (shape: Component) => shape.maxX - shape.minX + 1
+  const height = (shape: Component) => shape.maxY - shape.minY + 1
   return shapes
-    .filter((shape) => shape.minY > 0 && shape.maxY < imageHeight - 1)
-    .filter((shape) => Math.abs(shape.maxY - shape.minY + 1 - size) <= size * 0.1 && shape.maxX - shape.minX + 1 <= size * 1.1 && shape.maxX - shape.minX + 1 >= size * 0.75)
-    .filter((shape) => Math.abs(shape.minX - left) <= size * 0.3 && shape.area / (size * size) >= blendedPhotoFill && isFree(shape.minY))
-    .map((shape) => ({ left, top: shape.minY, size }))
+    .filter((shape) => shape.minY > 0 && shape.maxY < imageHeight - 1 && shape.minX >= left - size * 0.3 && shape.maxX <= left + size * 1.3)
+    .filter((shape) => height(shape) >= size * 0.85 && height(shape) <= size * 1.05 && width(shape) >= size * 0.6 && width(shape) <= size * 1.05)
+    .filter((shape) => shape.area / (size * size) >= blendedPhotoFill)
+    .map((shape) => ({ left, top: shape.maxY + 1 - size, size }))
+    .filter((blob) => isFree(blob.top))
 }
 
 /** Even a photo mostly against a white background has a person in it: this much of its square at least. */
-const blendedPhotoFill = 0.4
+const blendedPhotoFill = 0.3
 
 function medianLeft(column: Blob[]): number {
   const lefts = column.map((blob) => blob.left).sort((a, b) => a - b)
@@ -71,11 +76,15 @@ export function rowSpacing(photos: AvatarCircle[]): number {
 
 /**
  * Whether a row was cut by the top of the image: its photo, or the spot where its photo should be, reaches well
- * past the top edge. A name starts level with the top of its photo, so such a row has lost its name and what is
- * left beside it is only a title. A row cut by the bottom edge keeps its name.
+ * past the top edge. A name starts level with the top of its photo, so such a row has usually lost its name and what
+ * is left beside it is only a title. On some lists (Connections) a name starts a little below the top of its photo, and
+ * a cut just above it leaves it whole: text read beside the cut photo that still starts level with its top is that
+ * name. A row cut by the bottom edge keeps its name.
  */
-export function hasLostItsName({ centreY, radius }: AvatarCircle): boolean {
-  return centreY - radius < -radius * cutSliver
+export function hasLostItsName(photo: AvatarCircle, textBeside?: NameBlock): boolean {
+  const { centreY, radius } = photo
+  if (centreY - radius >= -radius * cutSliver) return false
+  return !textBeside || !startsLevelWithTheTopOf(textBeside, photo)
 }
 
 /** A photo (and the name level with it) cut by no more than this share of its radius still reads. */

@@ -70,7 +70,7 @@ export const screenshotCardReader = (cacheFolder = path.resolve('data/ocr')): Ca
     const names = await readWholeNames(await ocr(), { pixels, photos, paper })
     return names
       .map((name) => ({ name, photo: photoFor(name, photos) }))
-      .filter(({ photo }) => !hasLostItsName(photo))
+      .filter(({ name, photo }) => !hasLostItsName(photo, name))
       .filter(({ photo }) => photos.includes(photo) || sitsOnThePage(pixels, photo))
       .map(({ name, photo }) => toCard(name, { photo, wasFound: photos.includes(photo) }, pixels, fileName))
   }

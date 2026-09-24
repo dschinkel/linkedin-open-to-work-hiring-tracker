@@ -35,6 +35,36 @@ The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avata
 
 ---
 
+## Running it
+
+**Needs:** Node.js 26.10+ (`nvm install && nvm use` reads `.nvmrc`) and pnpm 12+.
+
+```bash
+pnpm install
+pnpm dev
+```
+
+Open <http://localhost:5173>.
+
+### Demo
+
+<https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers> (or **Demo** in the app header). It runs in your browser with fictional data: 800 followers and 500 connections over 180 days. Every chart zooms like a stock chart: drag the handles under it.
+
+For sample data in your local dashboards (kept in memory; your database isn't touched): `TRACKER_SAMPLE=full pnpm dev`.
+
+### Scripts
+
+| Command | What it does |
+|---|---|
+| `pnpm dev` | App, API, database, and inbox watchers, with live reload |
+| `pnpm server` | Just the API on port 3001 (headless, for scripts) |
+| `pnpm test` | All tests: React hooks and views, analytics, the screenshot reader, SQLite, and headless HTTP tests of the Koa server |
+| `pnpm typecheck` | TypeScript check |
+| `pnpm lint` | oxlint |
+| `pnpm build` | Production build |
+
+---
+
 ## Taking screenshots (required)
 
 The app never logs into LinkedIn, crawls profiles, or automates your browser. **You** take screenshots, and the app does the rest.
@@ -127,36 +157,6 @@ Everything is in **`data/linkedin.sqlite`**, one file on your computer, created 
 | `settings` | Your Settings choices |
 
 Followers and Connections share the file but never mix. It survives restarts and updates, but **git doesn't back it up**: copy `data/linkedin.sqlite` somewhere safe now and then (or let Time Machine do it). Open it with any SQLite tool, e.g. `sqlite3 data/linkedin.sqlite`.
-
----
-
-## Running it
-
-**Needs:** Node.js 26.10+ (`nvm install && nvm use` reads `.nvmrc`) and pnpm 12+.
-
-```bash
-pnpm install
-pnpm dev
-```
-
-Open <http://localhost:5173>.
-
-### Demo
-
-<https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers> (or **Demo** in the app header). It runs in your browser with fictional data: 800 followers and 500 connections over 180 days. Every chart zooms like a stock chart: drag the handles under it.
-
-For sample data in your local dashboards (kept in memory; your database isn't touched): `TRACKER_SAMPLE=full pnpm dev`.
-
-### Scripts
-
-| Command | What it does |
-|---|---|
-| `pnpm dev` | App, API, database, and inbox watchers, with live reload |
-| `pnpm server` | Just the API on port 3001 (headless, for scripts) |
-| `pnpm test` | All tests: React hooks and views, analytics, the screenshot reader, SQLite, and headless HTTP tests of the Koa server |
-| `pnpm typecheck` | TypeScript check |
-| `pnpm lint` | oxlint |
-| `pnpm build` | Production build |
 
 ---
 
