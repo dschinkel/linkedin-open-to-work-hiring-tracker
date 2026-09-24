@@ -42,7 +42,7 @@ export function Tracker({ mode, audience }: { mode: TrackerMode; audience: Audie
             </>
           }
         >
-          <Routes>
+          <Routes key={audience}>
             <Route index element={<ViewDashboard />} />
             <Route path="trends" element={<ViewTrends />} />
             <Route path="open-to-work" element={<FindOpenToWorkPeople />} />

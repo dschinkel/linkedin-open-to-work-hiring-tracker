@@ -1,5 +1,5 @@
 import { QueryClient, useQueries } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { type Audience, audiences, type NetworkSize, networkSizeSchema } from '@contracts/api'
 import type { NavItem } from '@/components/AppShell'
@@ -45,9 +45,9 @@ const subtitle = 'Your followers and connections open to work or hiring, tracked
 
 export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
   const location = useLocation()
-  const [queryClient] = useState(() => trackerClientFor(mode, audience))
   const [transport] = useState<Transport>(() => (mode === 'demo' ? demoTransport : httpTransport))
-  const [environment] = useState(() => trackerEnvironmentFor(mode, audience, transport))
+  const queryClient = useMemo(() => trackerClientFor(mode, audience), [mode, audience])
+  const environment = useMemo(() => trackerEnvironmentFor(mode, audience, transport), [mode, audience, transport])
   const [apisByAudience] = useState(() => apisFor(mode, transport))
   const sizes = useQueries(
     { queries: audiences.map((each) => ({ queryKey: ['network-size', mode, each], queryFn: () => apisByAudience[each].getJson('/network-size', networkSizeSchema) })) },

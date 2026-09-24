@@ -53,3 +53,11 @@
 :is([data-slot='input'], [data-slot='select-trigger']) {
   @apply h-10 rounded-none border-input bg-background px-3 dark:bg-background dark:hover:bg-background;
 }
+
+[data-slot='table-container'] {
+  @apply overflow-visible;
+}
+
+[data-slot='table-header'] [data-slot='table-head'] {
+  @apply sticky top-0 z-10 bg-card shadow-[inset_0_-1px_0_var(--border)];
+}

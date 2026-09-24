@@ -7,5 +7,5 @@ export function TrackerRoute({ mode }: { mode: TrackerMode }) {
   const route = useTrackerRoute(mode)
 
   if (route.redirectTo !== null) return <Navigate to={route.redirectTo} replace />
-  return <Tracker key={`${mode}-${route.audience}`} mode={mode} audience={route.audience} />
+  return <Tracker key={mode} mode={mode} audience={route.audience} />
 }
