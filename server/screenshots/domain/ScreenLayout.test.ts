@@ -60,6 +60,19 @@ describe('reading names beside the photo column', () => {
     expect(readNameStrip([word('@Kaia', 100, 60, 38), word('B.', 160, 60), word('Mentor', 100, 82)], pitch).map((person) => person.displayName)).toEqual(['Kaia B.'])
   })
 
+  it('keeps a hyphenated name OCR was unsure of when the rest of its line reads clearly', () => {
+    const hyphenated = [word('Ilkka-Cristian', 100, 360, 56), word('Niemi', 230, 360), word('Founder', 100, 382)]
+
+    expect(readNameStrip([...nameStrip, ...hyphenated], pitch).map((person) => person.displayName)).toContain('Ilkka-Cristian Niemi')
+  })
+
+  it('keeps a name moved right by an emoji as wide as a couple of its letters are tall', () => {
+    const wideEmoji = { text: 'Corey', x0: 132, y0: 360, x1: 180, y1: 390, confidence: 96 }
+    const rest = [{ text: 'Haines', x0: 190, y0: 360, x1: 250, y1: 390, confidence: 96 }, word('Developer', 100, 395)]
+
+    expect(readNameStrip([...nameStrip, wideEmoji, ...rest], pitch).map((person) => person.displayName)).toContain('Corey Haines')
+  })
+
   it('keeps initials in names', () => {
     expect(readNameStrip([word('Azad', 100, 60), word('A.', 145, 60)], pitch).map((person) => person.displayName)).toEqual(['Azad A.'])
   })

@@ -164,9 +164,9 @@ function hasNameAbove(title: TextLine, aligned: TextLine[], rowPitch: number): b
   return aligned.some((line) => title.y0 >= line.y1 && title.y0 - line.y1 <= rowPitch * 0.2 && isNudgedRightOf(title, line, rowPitch))
 }
 
-/** An emoji before a name or title moves it a little right of the line next to it. */
+/** An emoji before a name or title moves it right of the line next to it, by about as much as a couple of its letters are tall. */
 function isNudgedRightOf(line: TextLine, neighbour: TextLine, rowPitch: number): boolean {
-  return line.x0 > neighbour.x0 && line.x0 - neighbour.x0 <= rowPitch * 0.3
+  return line.x0 > neighbour.x0 && line.x0 - neighbour.x0 <= Math.max(rowPitch * 0.3, line.height * 2.5)
 }
 
 function isReadableLine(line: TextLine): boolean {
@@ -210,7 +210,7 @@ function withoutSlivers(words: TextBox[]): TextBox[] {
  */
 function couldBeAWord(word: TextBox): boolean {
   const trusted = word.confidence >= trustworthyConfidence && (/[A-Za-z]{2}/.test(word.text) || /^[A-Z]\.$/.test(word.text))
-  return trusted || /^[@©®“”"'‘’]?\p{L}{2,}$/u.test(word.text)
+  return trusted || /^[@©®“”"'‘’]?\p{L}{2,}([-'’]\p{L}+)*$/u.test(word.text)
 }
 
 /** Words that sit on the same baseline and close together become one line of text. */

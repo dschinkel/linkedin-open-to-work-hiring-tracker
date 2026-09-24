@@ -39,7 +39,7 @@ function photoCutByTheTop(shapes: Component[], column: Blob[]): Blob | null {
 /**
  * A photo taken against a white wall or sky blends into the page where the background shows, so it is no longer a
  * filled circle. What is left (the person, down to their shoulders at the foot of the circle) still reaches the foot
- * of a photo, is nearly a photo tall and more than half a photo wide, lies in the column, and sits where no other
+ * of a photo, is most of a photo tall and more than half a photo wide, lies in the column, and sits where no other
  * photo is: such a shape is a photo too.
  */
 function photosBlendingIntoThePage(shapes: Component[], column: Blob[], imageHeight: number): Blob[] {
@@ -50,7 +50,7 @@ function photosBlendingIntoThePage(shapes: Component[], column: Blob[], imageHei
   const height = (shape: Component) => shape.maxY - shape.minY + 1
   return shapes
     .filter((shape) => shape.minY > 0 && shape.maxY < imageHeight - 1 && shape.minX >= left - size * 0.3 && shape.maxX <= left + size * 1.3)
-    .filter((shape) => height(shape) >= size * 0.85 && height(shape) <= size * 1.05 && width(shape) >= size * 0.6 && width(shape) <= size * 1.05)
+    .filter((shape) => height(shape) >= size * 0.75 && height(shape) <= size * 1.05 && width(shape) >= size * 0.6 && width(shape) <= size * 1.05)
     .filter((shape) => shape.area / (size * size) >= blendedPhotoFill)
     .map((shape) => ({ left, top: shape.maxY + 1 - size, size }))
     .filter((blob) => isFree(blob.top))
