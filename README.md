@@ -109,7 +109,7 @@ You can also drop a PDF whose pages are screenshots (for example, several screen
 
 ### Screenshot rules
 
-1. Drop screenshots on the Dashboard, or copy them into that dashboard's inbox folder. They're read straight away; there's no button.
+1. Drop screenshots on the Dashboard.
 2. Screenshots from the same date make one scan, even across several uploads.
 3. Overlap is fine: each person is counted once, matched by name, headline, and company (never by face).
 4. Keep avatars, names, and headlines visible.
