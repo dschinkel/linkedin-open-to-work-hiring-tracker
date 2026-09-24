@@ -9,7 +9,13 @@ const isoDateInFileName = /(\d{4}-\d{2}-\d{2})/
 export function parseScanDate(fileName: string, fileTimestamp: Date): string {
   const match = isoDateInFileName.exec(fileName)
   if (match) return match[1]
-  return toIsoDate(fileTimestamp)
+  return localIsoDate(fileTimestamp)
+}
+
+/** The calendar day where the user is, so a late-evening capture isn't filed under tomorrow's UTC date. */
+function localIsoDate(date: Date): string {
+  const twoDigits = (value: number) => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`
 }
 
 export function toIsoDate(date: Date): string {
