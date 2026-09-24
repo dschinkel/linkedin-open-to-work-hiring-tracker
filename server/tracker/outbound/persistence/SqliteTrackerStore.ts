@@ -231,7 +231,7 @@ function listSnapshots(database: DatabaseSync, audience: Audience, kind: Snapsho
 }
 
 function readSnapshot(database: DatabaseSync, audience: Audience, snapshotId: string): Snapshot | null {
-  const row = database.prepare('SELECT * FROM snapshots WHERE audience = ? AND id = ?').get(audience, snapshotId) as SnapshotRow | undefined
+  const row = database.prepare('SELECT * FROM snapshots WHERE audience = ? AND id = ?').get(audience, snapshotId) as unknown as SnapshotRow | undefined
   if (!row) return null
   return snapshotSchema.parse({
     id: row.id,
