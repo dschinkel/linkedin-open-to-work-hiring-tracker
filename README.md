@@ -82,6 +82,8 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 
 GoFullPage file names include the date (for example `screencapture-linkedin-com-mynetwork-2026-09-22-09_01_12.png`), and the app uses that date for the scan.
 
+**A PDF is the easiest source.** In GoFullPage's result tab, choose **Download PDF** instead of the image, then drop that PDF on the drop box. One file holds your whole list, and each page is read like its own screenshot (see [A PDF of screenshots](#a-pdf-of-screenshots)).
+
 > **Heads-up: GoFullPage carries some risk.** It captures the page by scrolling it automatically, and LinkedIn may treat automated scrolling or capturing as scraping by an application. That could get your account flagged or restricted. If you want to be sure you won't get dinged, scroll and take the screenshots yourself (see below).
 
 ### <img src="https://img.shields.io/badge/Safest-2ea043?style=flat-square" alt="Safest" align="absmiddle"> Scroll and take screenshots yourself
