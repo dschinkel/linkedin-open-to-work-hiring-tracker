@@ -119,7 +119,7 @@ You can also drop a PDF whose pages are screenshots (for example, several screen
 
 Each screenshot is read the moment it arrives: people, headlines, and both frames are saved to your local database, and **the screenshot is then deleted**. One that can't be read (blurry, not a LinkedIn list) is left in the inbox so you can see what went wrong. To keep an archived copy of each one instead, choose *Keep an archived copy* in Settings.
 
-Screenshots and the database are **git-ignored**, so they're never committed or pushed. **Recommendation: never push your screenshots**, not even to a private fork; they show other people's names and photos, and the database already holds what you need. (To keep them in a private fork anyway, remove `LinkedinScreenShots/*`, `!LinkedinScreenShots/.gitkeep`, and `data/` from `.gitignore`.)
+Screenshots and the database are **git-ignored**, so they're never committed or pushed. **Recommendation: never push your screenshots**, not even to a private fork; they show other people's names and photos, and the database already holds what you need.
 
 ### Where your data lives
 
