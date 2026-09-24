@@ -33,7 +33,7 @@ Next, grab a [screenshot](#taking-screenshots-required) of your followers or con
 |---|---|
 | <code>pnpm&nbsp;dev</code> | App, API, database, and inbox watchers, with live reload |
 | <code>pnpm&nbsp;server</code> | Just the API on port 3001 (headless, for scripts) |
-| <code>pnpm&nbsp;test</code> | All tests: React hooks and views, analytics, the screenshot reader, SQLite, and headless HTTP tests of the Koa server |
+| <code>pnpm&nbsp;test</code> | All tests: React hooks, analytics, the screenshot reader, SQLite, and headless HTTP tests of the Koa server |
 | <code>pnpm&nbsp;typecheck</code> | TypeScript check |
 | <code>pnpm&nbsp;lint</code> | oxlint |
 | <code>pnpm&nbsp;build</code> | Production build |
