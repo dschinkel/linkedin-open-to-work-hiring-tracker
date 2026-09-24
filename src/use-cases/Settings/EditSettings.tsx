@@ -34,8 +34,8 @@ export function EditSettings() {
               <LabeledInput id="archive" label="Archive folder" value={form.settings.archiveDirectory} onChange={form.changeArchiveDirectory} />
               <SwitchField
                 id="automatic-processing"
-                label="Watch inbox folders"
-                description="Also import files copied into them."
+                label="Auto-import from the inbox folder"
+                description="When on, screenshots you save straight into the inbox folder above are picked up and read automatically. Dragging files onto the page works either way."
                 checked={form.settings.automaticProcessing}
                 onChange={form.changeAutomaticProcessing}
               />
@@ -43,7 +43,7 @@ export function EditSettings() {
               <ChoiceSelect id="retention" label="Keep archive for" value={form.settings.retention} options={form.retentionOptions} onChange={form.changeRetention} />
             </div>
           </SectionCard>
-          <SectionCard title="Frame detection" description="Confidence needed to count. Anything in between is Uncertain.">
+          <SectionCard title="Frame detection" description="How sure the app must be, from 0 to 1, that a photo does or doesn’t show the #OPENTOWORK or #HIRING frame. Photos scoring between the two numbers are marked unclear and left out of the percentages.">
             <div className="grid gap-x-4 gap-y-6 sm:grid-cols-2">
                 <LabeledInput id="open-threshold" label="Open to Work: yes above" type="number" step="0.01" value={form.thresholds.open} onChange={form.changeThreshold('open')} />
                 <LabeledInput id="not-open-threshold" label="Open to Work: no below" type="number" step="0.01" value={form.thresholds.notOpen} onChange={form.changeThreshold('notOpen')} />
