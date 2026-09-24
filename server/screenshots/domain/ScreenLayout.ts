@@ -205,11 +205,12 @@ function withoutSlivers(words: TextBox[]): TextBox[] {
 
 /**
  * A trustworthy word, an initial like the "A." in "Azad A.", or letters OCR was unsure of (accents such as the
- * "ü" in "Jürgen" lower its confidence). Unsure words only count on a line that also has a trustworthy word.
+ * "ü" in "Jürgen" lower its confidence, and so does an emoji it ran into the name as "@" or a quote mark). Unsure
+ * words only count on a line that also has a trustworthy word.
  */
 function couldBeAWord(word: TextBox): boolean {
   const trusted = word.confidence >= trustworthyConfidence && (/[A-Za-z]{2}/.test(word.text) || /^[A-Z]\.$/.test(word.text))
-  return trusted || /^\p{L}{2,}$/u.test(word.text)
+  return trusted || /^[@©®“”"'‘’]?\p{L}{2,}$/u.test(word.text)
 }
 
 /** Words that sit on the same baseline and close together become one line of text. */
@@ -244,12 +245,12 @@ function joinWord(line: TextLine, word: TextBox): TextLine {
 }
 
 /**
- * Drops LinkedIn's connection-degree and pronoun suffixes ("Jane Smith · 2nd", "Jane Smith (She/Her)") and quote
- * marks OCR sees in an emoji before a name, so one person reads the same in every screenshot.
+ * Drops LinkedIn's connection-degree and pronoun suffixes ("Jane Smith · 2nd", "Jane Smith (She/Her)") and the quote
+ * marks and at signs OCR sees in an emoji before a name, so one person reads the same in every screenshot.
  */
 export function cleanName(text: string): string {
   return text
-    .replace(/^[“”"'‘’«»]+\s*/, '')
+    .replace(/^[“”"'‘’«»@©®]+\s*/, '')
     .replace(/\s*[•·]\s*(1st|2nd|3rd\+?)\s*$/i, '')
     .replace(/\s*\((he|she|they)\/\w+\)\s*$/i, '')
     .trim()

@@ -56,6 +56,10 @@ describe('reading names beside the photo column', () => {
     expect(readNameStrip([...nameStrip, ...accentedName], pitch).map((person) => [person.displayName, person.headline])).toContainEqual(['Jurgen De Smet', 'Coach'])
   })
 
+  it('keeps a name OCR ran into the emoji before it, though unsure of that word', () => {
+    expect(readNameStrip([word('@Kaia', 100, 60, 38), word('B.', 160, 60), word('Mentor', 100, 82)], pitch).map((person) => person.displayName)).toEqual(['Kaia B.'])
+  })
+
   it('keeps initials in names', () => {
     expect(readNameStrip([word('Azad', 100, 60), word('A.', 145, 60)], pitch).map((person) => person.displayName)).toEqual(['Azad A.'])
   })
@@ -118,6 +122,10 @@ describe('cleaning names', () => {
 
   it('drops a quote mark OCR saw in an emoji before the name', () => {
     expect(cleanName('“Ezequiel Birman')).toBe('Ezequiel Birman')
+  })
+
+  it('drops an at sign OCR saw in an emoji before the name', () => {
+    expect(cleanName('@Karim B.')).toBe('Karim B.')
   })
 })
 
