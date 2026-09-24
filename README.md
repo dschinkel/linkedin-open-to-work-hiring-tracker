@@ -11,8 +11,6 @@ This app is semi-vibe-coded, meaning it's using some of my XP rules but not all.
 
 <p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
-> **To use it:** fork this repo, clone your fork, and run `pnpm install && pnpm dev`. Your data never leaves your machine.
-
 The goal is a clearer picture of how your close network of connections is doing, not a single snapshot.
 ---
 
