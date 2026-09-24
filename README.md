@@ -88,7 +88,7 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 4. Click the GoFullPage icon (or press `Alt+Shift+P`). It captures the whole scrolled page as a single image
 5. Download the screenshot as a PNG or better, just one PDF, and drag onto the **drop box** on that dashboard
 
-**A PDF is the easiest source.** In GoFullPage's result tab, choose **Download PDF** instead of the image, then drop that PDF on the drop box. One file holds your whole list, and each page is read like its own screenshot (see [A PDF of screenshots](#a-pdf-of-screenshots)).
+**A PDF is the easiest source.** In GoFullPage's result tab, choose **Download PDF** instead of the image.
 
 
 ### <img src="https://img.shields.io/badge/Safest-2ea043?style=flat-square" alt="Safest" align="absmiddle"> Scroll and take screenshots yourself
