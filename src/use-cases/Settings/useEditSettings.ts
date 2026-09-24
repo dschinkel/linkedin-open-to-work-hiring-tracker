@@ -28,6 +28,8 @@ export interface SettingsView {
   isSaving: boolean
   isSaveDisabled: boolean
   saveMessage: string
+  /** Whether the form holds edits that aren't saved yet, said plainly next to the Save button. */
+  saveStatus: string
 }
 
 const frequencyOptions: PickerOption<Settings['scanFrequency']>[] = [
@@ -110,6 +112,7 @@ export function useEditSettings(injectedRepository?: SettingsRepository): Settin
     isSaving: saving.isPending,
     isSaveDisabled: draft === null || saving.isPending,
     saveMessage: validationMessage || saveOutcome(saving.isSuccess, saving.error),
+    saveStatus: draft === null ? 'No unsaved changes' : 'You have unsaved changes',
   }
 }
 

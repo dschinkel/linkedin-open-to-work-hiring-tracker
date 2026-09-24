@@ -19,10 +19,10 @@ export function EditSettings() {
           <p className="mt-1 text-label text-muted-foreground">Stored locally in data/linkedin.sqlite.</p>
         </div>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-muted-foreground">{form.saveMessage}</span>
+          <span className="text-xs text-muted-foreground">{form.saveMessage || form.saveStatus}</span>
           <Button onClick={form.save} disabled={form.isSaveDisabled}>
             <Save />
-            Save
+            Save changes
           </Button>
         </div>
       </div>
