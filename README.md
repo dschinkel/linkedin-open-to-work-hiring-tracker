@@ -6,12 +6,14 @@
 
 <p align="center"><em>Who in your network is looking for work, how many, and who's hiring, tracked over time.</em></p>
 
+The goal is a clearer picture of how your close network of connections is doing, not a single snapshot.
+
+
 ### Disclaimer (ok?)
 This app is semi-vibe-coded, meaning it's using some of my XP rules but not all.  I did not run it through my vflow orchestrator.  So kinda half baked. It is what it is, some good, some bad; don't expect super clean or superb test coverage 😆.  It's just to find out some quick stats.
 
 <p align="center"><a href="https://dschinkel.github.io/linkedin-open-to-work-hiring-tracker/demo/followers"><strong>▶ Try the live demo</strong></a> (sample data, nothing from LinkedIn)</p>
 
-The goal is a clearer picture of how your close network of connections is doing, not a single snapshot.
 ---
 
 ## Running it
