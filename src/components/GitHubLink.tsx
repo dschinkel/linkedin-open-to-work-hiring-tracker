@@ -1,20 +1,44 @@
+import { Check, Copy } from 'lucide-react'
 import { buttonVariants } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
+import { useCopyText } from '@/shared-state/useCopyText'
 
 export const repositoryUrl = 'https://github.com/dschinkel/linkedin-open-to-work-hiring-tracker'
 
 export function GitHubLink() {
+  const clipboard = useCopyText(repositoryUrl)
+
   return (
-    <a
-      href={repositoryUrl}
-      target="_blank"
-      rel="noreferrer"
-      aria-label="Source code on GitHub"
-      title={repositoryUrl}
-      className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-11 border-0 hover:bg-transparent aria-expanded:bg-transparent')}
-    >
-      <GitHubMark />
-    </a>
+    <Tooltip>
+      <TooltipTrigger
+        render={
+          <a
+            href={repositoryUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Source code on GitHub"
+            className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'size-11 border-0 hover:bg-transparent aria-expanded:bg-transparent')}
+          />
+        }
+      >
+        <GitHubMark />
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="max-w-none">
+        <span className="flex items-center gap-2 whitespace-nowrap">
+          <span className="text-sm">{repositoryUrl}</span>
+          <button
+            type="button"
+            onClick={clipboard.copy}
+            aria-label={clipboard.wasCopied ? 'Copied' : 'Copy link'}
+            title={clipboard.wasCopied ? 'Copied' : 'Copy link'}
+            className="grid size-7 cursor-pointer place-items-center border border-current/30 hover:bg-background/15"
+          >
+            {clipboard.wasCopied ? <Check className="size-4" /> : <Copy className="size-4" />}
+          </button>
+        </span>
+      </TooltipContent>
+    </Tooltip>
   )
 }
 
