@@ -24,3 +24,11 @@ describe('tracker API contract', () => {
     expect((await answerRequest(routes, { method: 'GET', path: '/api/nope', query: {}, body: null })).status).toBe(404)
   })
 })
+
+describe('clearing sample data', () => {
+  it("says the sample has nothing of the user's to clear for one audience", async () => {
+    const response = await answerRequest(routes, { method: 'DELETE', path: '/api/data', query: {}, body: null })
+
+    expect([response.status, (response.body as { message: string }).message]).toEqual([200, expect.stringContaining('sample data')])
+  })
+})

@@ -121,11 +121,32 @@ export const sqliteTrackerStore = (database: DatabaseSync, audience: Audience, d
     listSnapshots: (kind) => listSnapshots(database, audience, kind),
     readSnapshot: (snapshotId) => readSnapshot(database, audience, snapshotId),
     deleteSnapshot: (snapshotId) => Number(database.prepare('DELETE FROM snapshots WHERE audience = ? AND id = ?').run(audience, snapshotId).changes) > 0,
+    eraseAudience: () => eraseAudience(database, audience),
   }
 }
 
 export function eraseTrackerDatabase(database: DatabaseSync): void {
   database.exec('BEGIN; DELETE FROM observations; DELETE FROM screenshots; DELETE FROM scans; DELETE FROM people; DELETE FROM settings; DELETE FROM snapshots; COMMIT;')
+}
+
+const audienceErasures = [
+  'DELETE FROM observations WHERE scan_id IN (SELECT id FROM scans WHERE audience = :audience) OR person_id IN (SELECT id FROM people WHERE audience = :audience)',
+  'DELETE FROM screenshots WHERE audience = :audience',
+  'DELETE FROM scans WHERE audience = :audience',
+  'DELETE FROM people WHERE audience = :audience',
+  'DELETE FROM settings WHERE audience = :audience',
+  'DELETE FROM snapshots WHERE audience = :audience',
+]
+
+function eraseAudience(database: DatabaseSync, audience: Audience): void {
+  database.exec('BEGIN')
+  try {
+    for (const erasure of audienceErasures) database.prepare(erasure).run({ audience })
+    database.exec('COMMIT')
+  } catch (error) {
+    database.exec('ROLLBACK')
+    throw error
+  }
 }
 
 function readDay(database: DatabaseSync, audience: Audience, scanDate: string): AnalyzedDay | null {

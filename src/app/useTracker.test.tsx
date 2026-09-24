@@ -4,7 +4,8 @@ import type { ReactNode } from 'react'
 import { MemoryRouter } from 'react-router-dom'
 import type { Audience, NetworkSize } from '@contracts/api'
 import type { TrackerMode } from '@/shared-repositories/trackerEnvironment'
-import { forgetCachedTrackers, useTracker } from './useTracker'
+import { forgetCachedTrackers } from '@/shared-repositories/trackerQueryClients'
+import { useTracker } from './useTracker'
 
 function atAddress(path: string) {
   return function Browser({ children }: { children: ReactNode }) {

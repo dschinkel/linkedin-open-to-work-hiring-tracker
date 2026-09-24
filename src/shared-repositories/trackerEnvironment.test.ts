@@ -43,4 +43,12 @@ describe('tracker environment', () => {
 
     expect(requests[0].path).toBe('/api/contacts/network-size')
   })
+
+  it("reaches another audience's data when asked for it by name", async () => {
+    const { transport, requests } = recordingTransport()
+
+    await trackerEnvironmentFor('live', 'followers', transport).apiFor('contacts').getJson('/network-size', networkSizeSchema)
+
+    expect(requests[0].path).toBe('/api/contacts/network-size')
+  })
 })

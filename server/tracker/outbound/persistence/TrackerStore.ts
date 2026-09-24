@@ -29,4 +29,5 @@ export interface TrackerStore {
   listSnapshots: (kind: SnapshotKind) => SnapshotSummary[]
   readSnapshot: (snapshotId: string) => Snapshot | null
   deleteSnapshot: (snapshotId: string) => boolean
+  eraseAudience: () => void
 }

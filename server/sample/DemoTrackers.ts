@@ -25,9 +25,14 @@ export const sampleTrackerRoutes = (audience: Audience, network: Network) =>
       addScreenshots: async (request) => nothingSaved(request),
       reprocessScan: async () => ({ message: 'Sample data has no screenshots to re-read.' }),
     },
-    clearAllData: async () => ({ message: 'This is sample data, so there is nothing of yours to clear.' }),
+    clearAllData: nothingToClear,
+    clearAudienceData: nothingToClear,
     today: () => network.scans.map((scan) => scan.scanDate).sort().at(-1) ?? demoLatestScanDate,
   })
+
+async function nothingToClear() {
+  return { message: 'This is sample data, so there is nothing of yours to clear.' }
+}
 
 function nothingSaved(request: AddScreenshotsRequest): AddScreenshotsResult {
   return {

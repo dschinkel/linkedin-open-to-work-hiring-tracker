@@ -2,6 +2,7 @@ import { existsSync } from 'node:fs'
 import path from 'node:path'
 import type { Audience, ProcessingResult } from '../../contracts/api.ts'
 import { clearAllData } from '../tracker/use-cases/ClearAllData.ts'
+import { clearAudienceData } from '../tracker/use-cases/ClearAudienceData.ts'
 import { watchInbox } from '../screenshots/jobs/InboxWatcher.ts'
 import { type InboxFolder, inboxFolder as inboxFolderAt } from '../screenshots/outbound/filesystem/InboxFolder.ts'
 import type { CardReader } from '../screenshots/outbound/vision/CardReader.ts'
@@ -61,6 +62,7 @@ function liveAudience(audience: Audience, trackerStore: TrackerStore, projectRoo
       ...reprocessScan({ audience, trackerStore, inboxFolder, cardReader }),
     },
     clearAllData: clearEverything,
+    ...clearAudienceData({ audience, trackerStore, emptyInbox: inboxFolder.emptyInbox }),
   })
   const watch = (log: (message: string) => void) =>
     watchInbox({

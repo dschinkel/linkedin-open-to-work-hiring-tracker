@@ -208,3 +208,82 @@ describe('saved snapshots in SQLite', () => {
     expect(followersStore(database).listSnapshots('open-to-work')).toEqual([])
   })
 })
+
+describe("erasing one audience's data in SQLite", () => {
+  const contactsScan: Scan = { ...scan, id: 'contacts-2026-09-22', screenshots: [{ ...scan.screenshots[0], fileName: 'contact-shot.png' }] }
+  const contactJane: Person = { ...jane, id: 'contact-jane' }
+  const contactsDay = { scan: contactsScan, people: [contactJane], observations: [{ ...janeIsOpen, scanId: contactsScan.id, personId: contactJane.id }] }
+
+  function bothAudiencesFilledIn() {
+    const database = openTrackerDatabase(freshDatabaseFile())
+    const followers = followersStore(database)
+    const contacts = sqliteTrackerStore(database, 'contacts', defaultSettingsFor('contacts'))
+    followers.saveAnalyzedDay(janesDay)
+    contacts.saveAnalyzedDay(contactsDay)
+    followers.recordWaitingScreenshot('waiting.png')
+    contacts.recordWaitingScreenshot('waiting.png')
+    followers.saveSettings({ ...defaultSettingsFor('followers'), scanFrequency: 'weekly' })
+    contacts.saveSettings({ ...defaultSettingsFor('contacts'), scanFrequency: 'monthly' })
+    followers.saveSnapshot(janeOpenSnapshot)
+    contacts.saveSnapshot({ ...janeOpenSnapshot, id: 'contacts-snapshot' })
+    return { followers, contacts }
+  }
+
+  function everythingIn(store: ReturnType<typeof followersStore>) {
+    return {
+      network: store.readNetwork(),
+      waiting: store.waitingScreenshots().map((waiting) => waiting.fileName),
+      knowsWaiting: store.knowsScreenshot('waiting.png'),
+      scanFrequency: store.readSettings().scanFrequency,
+      snapshots: store.listSnapshots('open-to-work').map((snapshot) => snapshot.id),
+    }
+  }
+
+  it("empties every table of followers' rows and puts their settings back to defaults", () => {
+    const { followers } = bothAudiencesFilledIn()
+
+    followers.eraseAudience()
+
+    expect(everythingIn(followers)).toEqual({
+      network: { people: [], scans: [], observations: [] },
+      waiting: [],
+      knowsWaiting: false,
+      scanFrequency: defaultSettingsFor('followers').scanFrequency,
+      snapshots: [],
+    })
+  })
+
+  it("leaves every one of the connections' rows alone when followers are erased", () => {
+    const { followers, contacts } = bothAudiencesFilledIn()
+
+    followers.eraseAudience()
+
+    expect(everythingIn(contacts)).toEqual({
+      network: { people: [contactJane], scans: [contactsScan], observations: contactsDay.observations },
+      waiting: ['waiting.png'],
+      knowsWaiting: true,
+      scanFrequency: 'monthly',
+      snapshots: ['contacts-snapshot'],
+    })
+  })
+
+  it("leaves every one of the followers' rows alone when connections are erased", () => {
+    const { followers, contacts } = bothAudiencesFilledIn()
+
+    contacts.eraseAudience()
+
+    expect([everythingIn(followers), everythingIn(contacts).network]).toEqual([
+      { network: { people: [jane], scans: [scan], observations: [janeIsOpen] }, waiting: ['waiting.png'], knowsWaiting: true, scanFrequency: 'weekly', snapshots: ['snapshot-1'] },
+      { people: [], scans: [], observations: [] },
+    ])
+  })
+
+  it('imports the same day again after an audience is erased', () => {
+    const { followers } = bothAudiencesFilledIn()
+    followers.eraseAudience()
+
+    followers.saveAnalyzedDay(janesDay)
+
+    expect(followers.readNetwork()).toEqual({ people: [jane], scans: [scan], observations: [janeIsOpen] })
+  })
+})

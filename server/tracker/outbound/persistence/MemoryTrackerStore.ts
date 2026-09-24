@@ -63,5 +63,13 @@ export const memoryTrackerStore = (initialNetwork: Network, initialSettings: Set
         .map(summaryOf),
     readSnapshot: (snapshotId) => snapshots.get(snapshotId) ?? null,
     deleteSnapshot: (snapshotId) => snapshots.delete(snapshotId),
+    eraseAudience: () => {
+      network = { people: [], scans: [], observations: [] }
+      settings = initialSettings
+      waiting.clear()
+      seen.clear()
+      snapshots.clear()
+      version += 1
+    },
   }
 }

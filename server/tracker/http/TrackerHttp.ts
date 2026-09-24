@@ -18,6 +18,7 @@ export interface TrackerUseCases {
   viewSettings: () => Settings
   saveSettings: (settings: Settings) => Settings
   clearAllData: () => Promise<ProcessingResult>
+  clearAudienceData: () => Promise<ProcessingResult>
   listSnapshots: (kind: SnapshotKind) => SnapshotList
   saveSnapshot: (kind: SnapshotKind, request: SaveSnapshotRequest) => SnapshotSummary
   viewSnapshot: (snapshotId: string) => Snapshot | null
@@ -42,6 +43,7 @@ export const trackerHttp = (useCases: TrackerUseCases) => ({
   settings: (): ApiResponse => ok(useCases.viewSettings()),
   saveSettings: (request: ApiRequest): ApiResponse => ok(useCases.saveSettings(settingsSchema.parse(request.body))),
   clearAllData: async (): Promise<ApiResponse> => ok(await useCases.clearAllData()),
+  clearAudienceData: async (): Promise<ApiResponse> => ok(await useCases.clearAudienceData()),
   snapshots: (request: ApiRequest): ApiResponse => ok(useCases.listSnapshots(kindQuery.parse(request.query).kind)),
   saveSnapshot: (request: ApiRequest): ApiResponse => ok(useCases.saveSnapshot(kindQuery.parse(request.query).kind, saveSnapshotRequestSchema.parse(request.body ?? {}))),
   snapshot: (_request: ApiRequest, [snapshotId]: string[]): ApiResponse => orNotFound(useCases.viewSnapshot(snapshotId)),

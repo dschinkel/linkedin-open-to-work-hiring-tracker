@@ -1,4 +1,4 @@
-import { QueryClient, useQueries } from '@tanstack/react-query'
+import { type QueryClient, useQueries } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import { type Audience, audiences, type NetworkSize, networkSizeSchema } from '@contracts/api'
@@ -11,6 +11,7 @@ import { demoTransport } from '@/demo/demoTransport'
 import { type ApiClient, httpTransport, type Transport } from '@/shared-repositories/apiClient'
 import { formatCount } from '@/shared-formatting/formatMetric'
 import { type TrackerEnvironment, type TrackerMode, trackerEnvironmentFor } from '@/shared-repositories/trackerEnvironment'
+import { sizeClientFor, trackerClientFor } from '@/shared-repositories/trackerQueryClients'
 
 export interface TrackerView {
   queryClient: QueryClient
@@ -69,33 +70,6 @@ export function useTracker(mode: TrackerMode, audience: Audience): TrackerView {
     demoHref: `/demo/${audience}`,
     exitDemoHref: `/${audience}`,
   }
-}
-
-const liveRefreshMilliseconds = 5_000
-
-const sizeClients = new Map<TrackerMode, QueryClient>()
-
-function sizeClientFor(mode: TrackerMode): QueryClient {
-  if (!sizeClients.has(mode)) sizeClients.set(mode, queryClientFor(mode))
-  return sizeClients.get(mode)!
-}
-
-export function forgetCachedTrackers(): void {
-  sizeClients.clear()
-  trackerClients.clear()
-}
-
-const trackerClients = new Map<string, QueryClient>()
-
-function trackerClientFor(mode: TrackerMode, audience: Audience): QueryClient {
-  const key = `${mode}-${audience}`
-  if (!trackerClients.has(key)) trackerClients.set(key, queryClientFor(mode))
-  return trackerClients.get(key)!
-}
-
-function queryClientFor(mode: TrackerMode): QueryClient {
-  const refetchInterval = mode === 'live' ? liveRefreshMilliseconds : false
-  return new QueryClient({ defaultOptions: { queries: { staleTime: 0, refetchInterval, refetchOnWindowFocus: mode === 'live' } } })
 }
 
 function apisFor(mode: TrackerMode, transport: Transport): Record<Audience, ApiClient> {

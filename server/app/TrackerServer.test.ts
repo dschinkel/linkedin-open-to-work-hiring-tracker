@@ -182,3 +182,46 @@ describe('clearing all data', () => {
     expect((await http.get('/api/followers/dashboard')).body.scanCount).toBe(1)
   }, 60_000)
 })
+
+describe("clearing one audience's data", () => {
+  function dropIntoInbox(project: string, audience: string) {
+    mkdirSync(path.join(project, 'LinkedinScreenShots', audience), { recursive: true })
+    copyFileSync(path.join(fixtures, secondShot), path.join(project, 'LinkedinScreenShots', audience, secondShot))
+  }
+
+  it("empties the followers' dashboard and inbox but keeps the connections' settings and inbox", async () => {
+    const project = freshProject()
+    const { http } = serverIn(project)
+    await upload(http, 'followers', firstShot)
+    const contactsSettings = (await http.get('/api/contacts/settings')).body
+    await http.put('/api/contacts/settings').send({ ...contactsSettings, scanFrequency: 'monthly' })
+    dropIntoInbox(project, 'followers')
+    dropIntoInbox(project, 'contacts')
+
+    await http.delete('/api/followers/data')
+
+    expect([
+      (await http.get('/api/followers/dashboard')).body.scanCount,
+      readdirSync(path.join(project, 'LinkedinScreenShots/followers')),
+      (await http.get('/api/contacts/settings')).body.scanFrequency,
+      readdirSync(path.join(project, 'LinkedinScreenShots/contacts')),
+    ]).toEqual([0, [], 'monthly', [secondShot]])
+  }, 60_000)
+
+  it("keeps the followers' scans and inbox when connections are cleared", async () => {
+    const project = freshProject()
+    const { http } = serverIn(project)
+    await upload(http, 'followers', firstShot)
+    dropIntoInbox(project, 'followers')
+    dropIntoInbox(project, 'contacts')
+
+    const { body } = await http.delete('/api/contacts/data')
+
+    expect([
+      body.message,
+      (await http.get('/api/followers/dashboard')).body.scanCount,
+      readdirSync(path.join(project, 'LinkedinScreenShots/followers')),
+      readdirSync(path.join(project, 'LinkedinScreenShots/contacts')),
+    ]).toEqual([expect.stringContaining('Connections data was deleted'), 1, [secondShot], []])
+  }, 60_000)
+})

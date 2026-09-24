@@ -7,8 +7,8 @@ interface ClearAllDataPorts {
 
 export const clearAllData = ({ eraseDatabase, emptyInboxes }: ClearAllDataPorts) => ({
   clearAllData: async (): Promise<ProcessingResult> => {
-    eraseDatabase()
     await emptyInboxes()
+    eraseDatabase()
     return { message: 'All data was deleted. Followers and Connections are empty.' }
   },
 })

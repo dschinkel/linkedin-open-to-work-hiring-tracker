@@ -41,6 +41,7 @@ function trackerWithClock() {
     trackerStore,
     screenshots: { addScreenshots: async () => Promise.reject(new Error('unused')), reprocessScan: async () => ({ message: '' }) },
     clearAllData: async () => ({ message: '' }),
+    clearAudienceData: async () => ({ message: '' }),
     today: () => '2026-09-22',
     now: () => new Date(2026, 8, 23, 10, minute++),
   })

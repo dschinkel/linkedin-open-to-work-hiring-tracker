@@ -25,11 +25,12 @@ export interface AudienceTrackerParts {
   trackerStore: TrackerStore
   screenshots: ScreenshotUseCases
   clearAllData: () => Promise<ProcessingResult>
+  clearAudienceData: () => Promise<ProcessingResult>
   today?: () => string
   now?: () => Date
 }
 
-export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData, today = localToday, now = () => new Date() }: AudienceTrackerParts): Route[] => {
+export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData, clearAudienceData, today = localToday, now = () => new Date() }: AudienceTrackerParts): Route[] => {
   const ports = { analytics: trackerAnalytics(trackerStore), trackerStore, today }
   const useCases: TrackerUseCases = {
     ...viewDashboard(ports),
@@ -45,6 +46,7 @@ export const audienceTrackerRoutes = ({ trackerStore, screenshots, clearAllData,
     ...measureNetworkSize(ports),
     ...editSettings(ports),
     clearAllData,
+    clearAudienceData,
     ...keepSnapshots({ ...ports, now, newSnapshotId: () => crypto.randomUUID() }),
   }
   return [...trackerRoutes(trackerHttp(useCases)), ...screenshotRoutes(screenshotsHttp(screenshots))]

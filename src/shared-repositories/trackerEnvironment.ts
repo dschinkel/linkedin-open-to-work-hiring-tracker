@@ -6,6 +6,7 @@ export type TrackerMode = 'live' | 'demo'
 
 export interface TrackerEnvironment {
   api: ApiClient
+  apiFor: (audience: Audience) => ApiClient
   routeBase: string
   isDemo: boolean
   audience: Audience
@@ -15,6 +16,7 @@ export function trackerEnvironmentFor(mode: TrackerMode, audience: Audience, tra
   const modeBase = mode === 'demo' ? '/demo' : ''
   return {
     api: createApiClient(transport, `/api/${audience}`),
+    apiFor: (other) => createApiClient(transport, `/api/${other}`),
     routeBase: `${modeBase}/${audience}`,
     isDemo: mode === 'demo',
     audience,

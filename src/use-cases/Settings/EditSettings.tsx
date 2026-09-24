@@ -3,7 +3,7 @@ import { ChoiceSelect } from '@/components/ChoiceSelect'
 import { LabeledInput } from '@/components/LabeledInput'
 import { SectionCard } from '@/components/SectionCard'
 import { SwitchField } from '@/components/SwitchField'
-import { ClearAllData } from './ClearAllData'
+import { DangerZone } from './DangerZone'
 import { useEditSettings } from './useEditSettings'
 
 export function EditSettings() {
@@ -41,7 +41,7 @@ export function EditSettings() {
             <ChoiceSelect id="frequency" label="Remind me" value={form.settings.scanFrequency} options={form.frequencyOptions} onChange={form.changeScanFrequency} />
           </SectionCard>
         </div>
-        <ClearAllData />
+        <DangerZone />
       </AsyncContent>
     </>
   )
