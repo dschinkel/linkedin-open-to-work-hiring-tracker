@@ -145,7 +145,7 @@
   --animate-invite-pulse: invite-pulse 1.8s ease-out 0.4s 5;
   --animate-upload-progress: upload-progress 2.4s ease-in-out infinite;
   --animate-rainbow-flow: rainbow-flow 2.5s linear infinite;
-  --animate-snake-trace: snake-trace 3.2s linear infinite;
+  --animate-snake-trace: snake-trace 7s linear infinite;
   --animate-holo-shimmer: holo-shimmer 5.3s ease-in-out infinite;
   --animate-rainbow-slide: rainbow-slide 4s linear infinite;
 
