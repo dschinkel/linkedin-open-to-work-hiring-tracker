@@ -102,11 +102,13 @@ function hasText({ data, width }: Pixels, row: number, left: number, right: numb
 }
 
 /**
- * A name starting less than a line of text above the bottom of the image was cut through by it, and OCR only
- * guesses at half-letters. The person shows whole in the next screenshot.
+ * A name starting less than a line of text above the bottom of the image, with its letters running off the bottom
+ * edge, was cut through by it, and OCR only guesses at half-letters. The person shows whole in the next screenshot.
+ * A name the edge passes just under (a PDF page break between a name and its title) is whole, and on the next page
+ * only the title is left.
  */
-export function isCutByTheBottom(name: NameBlock, imageHeight: number, lineHeight: number): boolean {
-  return name.top + lineHeight > imageHeight
+export function isCutByTheBottom(pixels: Pixels, { left, right }: { left: number; right: number }, name: NameBlock, lineHeight: number): boolean {
+  return name.top + lineHeight > pixels.height && hasText(pixels, pixels.height - 1, left, right)
 }
 
 /** A title touching the bottom of the image was cut through by it; OCR's guess at its half-letters is left out. */

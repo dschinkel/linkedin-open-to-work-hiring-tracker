@@ -119,12 +119,18 @@ describe('telling a name from a title left without its name', () => {
 })
 
 describe('telling a whole name from one cut by the bottom of the image', () => {
-  it('takes a name starting less than a line above the bottom of the image for a cut one', () => {
-    expect(isCutByTheBottom({ displayName: 'Tamein Ellarv', headline: null, top: 485, bottom: 500 }, 500, 24)).toBe(true)
+  const alanTuring = { displayName: 'Alan Turing', headline: null, top: 110, bottom: 130 }
+
+  it('takes a name running off the bottom of the image, less than a line above it, for a cut one', () => {
+    expect(isCutByTheBottom(cropToHeight(twoPeopleOfText(), 120), { left: 0, right: 200 }, alanTuring, 24)).toBe(true)
   })
 
   it('keeps a name with room for the whole line, even when the text under it runs off the bottom', () => {
-    expect(isCutByTheBottom({ displayName: 'Nicolas Bottarini', headline: null, top: 460, bottom: 500 }, 500, 24)).toBe(false)
+    expect(isCutByTheBottom(cropToHeight(twoPeopleOfText(), 158), { left: 0, right: 200 }, alanTuring, 24)).toBe(false)
+  })
+
+  it('keeps a whole name the bottom of the image passes just under, as a page break between a name and its title does', () => {
+    expect(isCutByTheBottom(cropToHeight(twoPeopleOfText(), 133), { left: 0, right: 200 }, alanTuring, 24)).toBe(false)
   })
 })
 
@@ -182,6 +188,10 @@ describe('telling a title left over from a name cut by the top of the image', ()
     expect(isCutByTheTop(cropFromTheTop(twoPeopleOfText(), 20), { left: 0, right: 200 }, { ...secondPerson, top: 90, bottom: 140 }, 100)).toBe(false)
   })
 })
+
+function cropToHeight(pixels: { data: Uint8Array; width: number; height: number }, height: number) {
+  return { data: pixels.data.slice(0, height * pixels.width * 4), width: pixels.width, height }
+}
 
 function cropFromTheTop(pixels: { data: Uint8Array; width: number; height: number }, rows: number) {
   return { data: pixels.data.slice(rows * pixels.width * 4), width: pixels.width, height: pixels.height - rows }
