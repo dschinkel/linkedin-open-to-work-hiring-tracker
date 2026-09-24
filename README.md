@@ -13,26 +13,7 @@ This app is semi-vibe-coded, meaning it's using some of my XP rules but not all.
 
 > **To use it:** fork this repo, clone your fork, and run `pnpm install && pnpm dev`. Your data never leaves your machine.
 
-Track, over time, **who in your network is looking for work**, **what percentage of your network that is**, and **who is hiring**.
-
 The goal is a clearer picture of how your close network of connections is doing, not a single snapshot.
-
-The app reads the green **#OPEN_TO_WORK** and purple **#HIRING** frames on avatars in LinkedIn screenshots that you take. It then shows:
-
-**Open to Work:** how many people show the frame, the rate and its direction, who added or removed it, and how long people stay open.
-
-**Hiring:** who shows the #HIRING frame, their title and company, and which companies are hiring.
-
-**Who left:** who **unfollowed you** or who you **lost as connections**, and whether they were Open to Work or Hiring when last seen.
-
-**Open to Work by job title:** which kinds of roles (engineers, recruiters, product, and so on) are Open to Work, and how that's changing. It only covers people whose title could be read, and says how many that is.
-
-**Followers and connections count:** shown in the header, counting each person once across your recent screenshots.
-
-**Trust signals:** matched-cohort rates, scan quality, and classifier confidence, so you can tell a real change from a different set of screenshots.
-
-> This measures a **visible public signal** in a **non-random sample** (your screenshots). It is not an unemployment rate. Removing the frame does not mean someone found a job. People who share Open to Work only with recruiters cannot be detected.
-
 ---
 
 ## Running it

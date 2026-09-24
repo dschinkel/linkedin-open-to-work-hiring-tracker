@@ -1,5 +1,5 @@
 import type { AvatarCircle, Pixels } from './FrameDetection.ts'
-import { type NameBlock, startsLevelWithTheTopOf } from './ScreenLayout.ts'
+import type { NameBlock } from './ScreenLayout.ts'
 
 interface Blob {
   left: number
@@ -77,14 +77,16 @@ export function rowSpacing(photos: AvatarCircle[]): number {
 /**
  * Whether a row was cut by the top of the image: its photo, or the spot where its photo should be, reaches well
  * past the top edge. A name starts level with the top of its photo, so such a row has usually lost its name and what
- * is left beside it is only a title. On some lists (Connections) a name starts a little below the top of its photo, and
- * a cut just above it leaves it whole: text read beside the cut photo that still starts level with its top is that
- * name. A row cut by the bottom edge keeps its name.
+ * is left beside it is only a title. On some lists (Connections) names start a little below the top of their photos,
+ * and a cut just above a name leaves it whole: text beside the cut photo starting just where this list's names start
+ * (the given drop below the photo's top) is that name. A row cut by the bottom edge keeps its name.
  */
-export function hasLostItsName(photo: AvatarCircle, textBeside?: NameBlock): boolean {
+export function hasLostItsName(photo: AvatarCircle, whereNamesStart?: { textBeside: NameBlock; nameDrop: number }): boolean {
   const { centreY, radius } = photo
   if (centreY - radius >= -radius * cutSliver) return false
-  return !textBeside || !startsLevelWithTheTopOf(textBeside, photo)
+  if (!whereNamesStart) return true
+  const { textBeside, nameDrop } = whereNamesStart
+  return Math.abs(textBeside.top - (centreY - radius + nameDrop)) > radius * 0.15
 }
 
 /** A photo (and the name level with it) cut by no more than this share of its radius still reads. */

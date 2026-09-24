@@ -68,9 +68,10 @@ export const screenshotCardReader = (cacheFolder = path.resolve('data/ocr')): Ca
     const photos = findAvatarColumn(pixels)
     if (photos.length === 0) return []
     const names = await readWholeNames(await ocr(), { pixels, photos, paper })
-    return names
-      .map((name) => ({ name, photo: photoFor(name, photos) }))
-      .filter(({ name, photo }) => !hasLostItsName(photo, name))
+    const rows = names.map((name) => ({ name, photo: photoFor(name, photos) }))
+    const drop = nameDrop(rows.filter(({ photo }) => photos.includes(photo)))
+    return rows
+      .filter(({ name, photo }) => !hasLostItsName(photo, { textBeside: name, nameDrop: drop }))
       .filter(({ photo }) => photos.includes(photo) || sitsOnThePage(pixels, photo))
       .map(({ name, photo }) => toCard(name, { photo, wasFound: photos.includes(photo) }, pixels, fileName))
   }
@@ -213,6 +214,12 @@ function onThePrintedPage({ top, height, paper }: NameStrip): { top: number; hei
 function isAName(name: NameBlock, photos: AvatarCircle[]): boolean {
   const photo = photos.find((candidate) => sitsBeside(name, candidate))
   return !photo || startsLevelWithTheTopOf(name, photo)
+}
+
+/** How far below the top of their photo names start on this list: the rows of one list are laid out alike. */
+function nameDrop(rows: { name: NameBlock; photo: AvatarCircle }[]): number {
+  const drops = rows.map(({ name, photo }) => name.top - (photo.centreY - photo.radius)).sort((a, b) => a - b)
+  return drops[Math.floor(drops.length / 2)] ?? 0
 }
 
 /** The photo on this person's row; for an empty photo that wasn't found, the spot where it sits. */
