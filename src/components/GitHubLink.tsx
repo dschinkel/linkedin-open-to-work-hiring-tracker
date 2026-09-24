@@ -52,7 +52,7 @@ function GitHubMark() {
     <span aria-hidden className="relative size-10">
       <span className="rainbow-fill absolute inset-0" style={{ maskImage: octocat, WebkitMaskImage: octocat, maskSize: 'contain', WebkitMaskSize: 'contain' }} />
       <svg viewBox="0 0 16 16" className="absolute inset-0 size-full overflow-visible">
-        <path d={catOutline} pathLength={100} className="snake-trace" />
+        <path d={catOutline} className="cat-outline" />
       </svg>
     </span>
   )

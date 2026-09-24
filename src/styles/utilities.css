@@ -22,14 +22,12 @@
   background-size: 300% 300%, 200% 200%;
 }
 
-@utility snake-trace {
-  @apply animate-snake-trace motion-reduce:animate-none;
+@utility cat-outline {
   fill: none;
   stroke: var(--foreground);
   stroke-width: 0.55;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-dasharray: 93 7;
   filter: drop-shadow(0 0 0.6px var(--prompt));
 }
 
