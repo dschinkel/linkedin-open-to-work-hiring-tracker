@@ -72,7 +72,7 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 >
 > Any number of screenshots can be dropped at once; they're read one by one. Let each screenshot overlap the previous by a row or two so nobody is skipped; duplicates are filtered out.
 
-### Easiest: GoFullPage (Chrome or Brave) <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle">
+### <img src="https://img.shields.io/badge/use_at_your_own_risk-d73a49?style=flat-square" alt="use at your own risk" align="absmiddle"> Easiest: GoFullPage (Chrome or Brave)
 
 Scanning too often is risky: LinkedIn may take frequent automated captures for a bot scraping the site and flag your account. Scan sparingly; the choice and the risk are yours.
 
