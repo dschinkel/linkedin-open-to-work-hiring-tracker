@@ -90,7 +90,7 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 
 ### <img src="https://img.shields.io/badge/Safest-2ea043?style=flat-square" alt="Safest" align="absmiddle"> Scroll and take screenshots yourself
 
-This is the safest option because nothing is automated: you scroll LinkedIn like any normal visitor and use your operating system's own screenshot tool. No browser extension or app touches the LinkedIn page, so there is nothing for LinkedIn to flag as scraping.
+No browser extension or app touches the LinkedIn page, so there is nothing for LinkedIn to flag as scraping.
 
 Scroll manually and take screenshots as you go. On macOS:
 
