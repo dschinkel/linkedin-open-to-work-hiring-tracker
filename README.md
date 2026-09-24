@@ -105,7 +105,7 @@ Overlapping screenshots are fine, because people are de-duplicated.
 
 ### A PDF of screenshots
 
-You can also drop a PDF whose pages are screenshots (for example, several screenshots exported as one PDF). Each page is drawn as its own screenshot, named `<pdf name> - page N.png`, at twice the page size or the resolution of the picture on the page, whichever is sharper. Put the date in the PDF's name (for example `followers 2026-09-22.pdf`) to date the scan; otherwise it's dated the day you drop it. PDFs are only read when dropped in the app: a PDF copied straight into an inbox folder is skipped, and the server log says so.
+You can also drop a PDF whose pages are screenshots (for example, several screenshots exported as one PDF).
 
 ### Screenshot rules
 
