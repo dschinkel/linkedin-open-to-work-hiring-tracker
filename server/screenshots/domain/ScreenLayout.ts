@@ -151,16 +151,22 @@ function linesOfTheList(lines: TextLine[], rowPitch: number): TextLine[] {
   const edge = lines.map((line) => line.x0).sort((a, b) => startsNear(b).length - startsNear(a).length || a - b)[0]
   if (edge === undefined) return []
   const aligned = startsNear(edge)
-  const nudged = lines.filter((line) => line.x0 - edge > tolerance && line.x0 - edge <= rowPitch * 0.3 && (hasTitleUnder(line, aligned, rowPitch) || hasNameAbove(line, aligned, rowPitch)))
+  const nudged = lines.filter((line) => line.x0 - edge > tolerance && (hasTitleUnder(line, aligned, rowPitch) || hasNameAbove(line, aligned, rowPitch)))
   return [...aligned, ...nudged]
 }
 
+/** Measured against the lines of its own row, which a stitching seam may have moved a little off the list's edge. */
 function hasTitleUnder(name: TextLine, aligned: TextLine[], rowPitch: number): boolean {
-  return aligned.some((line) => line.y0 >= name.y1 && line.y0 - name.y1 <= rowPitch * 0.2)
+  return aligned.some((line) => line.y0 >= name.y1 && line.y0 - name.y1 <= rowPitch * 0.2 && isNudgedRightOf(name, line, rowPitch))
 }
 
 function hasNameAbove(title: TextLine, aligned: TextLine[], rowPitch: number): boolean {
-  return aligned.some((line) => title.y0 >= line.y1 && title.y0 - line.y1 <= rowPitch * 0.2)
+  return aligned.some((line) => title.y0 >= line.y1 && title.y0 - line.y1 <= rowPitch * 0.2 && isNudgedRightOf(title, line, rowPitch))
+}
+
+/** An emoji before a name or title moves it a little right of the line next to it. */
+function isNudgedRightOf(line: TextLine, neighbour: TextLine, rowPitch: number): boolean {
+  return line.x0 > neighbour.x0 && line.x0 - neighbour.x0 <= rowPitch * 0.3
 }
 
 function isReadableLine(line: TextLine): boolean {

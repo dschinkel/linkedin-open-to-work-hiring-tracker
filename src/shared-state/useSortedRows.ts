@@ -9,7 +9,7 @@ export interface SortedRows {
   sortBy: (key: string) => void
 }
 
-interface Sort {
+export interface Sort {
   key: string
   direction: SortDirection
 }
@@ -31,7 +31,8 @@ export function useSortedRows(columns: DataColumn[], rows: DataRow[], initialSor
   }
 }
 
-function sortRows(rows: DataRow[], sort: Sort): DataRow[] {
+/** Rows in the given column order, as a table sorted that way would show them. */
+export function sortRows(rows: DataRow[], sort: Sort): DataRow[] {
   const ascending = [...rows].sort((a, b) => compareCells(a.cells[sort.key], b.cells[sort.key]))
   return sort.direction === 'asc' ? ascending : ascending.reverse()
 }

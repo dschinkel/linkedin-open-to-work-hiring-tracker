@@ -78,7 +78,7 @@ It's up to you whether you gauge your **followers** or your **connections**, or 
 2. Open the list you track (connections or followers, see the table above).
 3. Scroll down until everyone you want to track has loaded.
 4. Click the GoFullPage icon (or press `Alt+Shift+P`). It captures the whole scrolled page as a single image.
-5. Download the PNG and drag it onto the **drop box** on that dashboard (or its Scans page), or copy it into its inbox folder yourself.
+5. Download the screenshot as a PNG or better, just one PDF, and drag onto the **drop box** on that dashboard.
 
 GoFullPage file names include the date (for example `screencapture-linkedin-com-mynetwork-2026-09-22-09_01_12.png`), and the app uses that date for the scan.
 
